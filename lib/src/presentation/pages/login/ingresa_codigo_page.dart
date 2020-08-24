@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pidos/src/presentation/widgets/login/verification_input.dart';
 import 'package:pidos/src/utils/colors.dart';
+import 'package:pidos/src/utils/screen_aware_size.dart';
 
 
 class IngresaCodigoPage extends StatefulWidget {
@@ -10,6 +11,9 @@ class IngresaCodigoPage extends StatefulWidget {
 }
 
 class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
+
+  double screenSizeHeight;
+  double screenSizeWidth;
 
   /// controller
   TextEditingController _primerDigitoController;
@@ -70,11 +74,11 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 60.0),  //height: 60.0
+            SizedBox(height: screenSizeHeight * 0.1013),  //height: 60.0
             Image(
               image: AssetImage('assets/img/acerca_de_icon.png'),
               fit: BoxFit.cover,
-              width: 80.0,
+              width: screenSizeWidth * 0.222, //width: 80.0
             )
           ],
         ),
@@ -122,7 +126,7 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 25.0),
+          padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.042),  //vertical: 25.0
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -180,6 +184,8 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
 ///
   @override
   Widget build(BuildContext context) {
+    screenSizeHeight = MediaQuery.of(context).size.height;
+    screenSizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(

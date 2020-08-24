@@ -12,6 +12,9 @@ class RegistroPage extends StatefulWidget {
 
 class _RegistroPageState extends State<RegistroPage> {
 
+  double screenSizeHeight;
+  double screenSizeWidth ;
+
   ///
   /// Imagen de fondo
   ///
@@ -37,11 +40,11 @@ class _RegistroPageState extends State<RegistroPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 40.0),
+            SizedBox(height: screenSizeHeight * 0.067),  ///height: 40.0
             Image(
               image: AssetImage('assets/img/logo_blank.png'),
               fit: BoxFit.cover,
-              width: 80.0,
+              width: screenSizeWidth * 0.222, //width: 80.0
             )
           ],
         ),
@@ -70,6 +73,8 @@ class _RegistroPageState extends State<RegistroPage> {
 
   @override
   Widget build(BuildContext context) {
+    screenSizeHeight = MediaQuery.of(context).size.height;
+    screenSizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Stack(
         children: [
@@ -99,6 +104,8 @@ class _RegistroForm extends StatefulWidget {
 
 class __RegistroFormState extends State<_RegistroForm> {
 
+  double screenSizeHeight;
+  double screenSizeWidth;
 
   /// controllers
   TextEditingController nroCelularController;
@@ -126,7 +133,7 @@ class __RegistroFormState extends State<_RegistroForm> {
     return Column(
       children: [
         Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0),
+            padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
             child: Text(
               'Tus nombres',
               style: TextStyle(
@@ -153,7 +160,7 @@ class __RegistroFormState extends State<_RegistroForm> {
     return Column(
       children: [
         Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0),
+            padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
             child: Text(
               'Tu número de celular',
               style: TextStyle(
@@ -186,12 +193,12 @@ class __RegistroFormState extends State<_RegistroForm> {
   ///
   Widget _accederButton(){
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 30.0 ),
+      padding: EdgeInsets.symmetric(vertical: screenSizeHeight  * 0.0506 ), //vertical: 30.0
       child: SizedBox(
         width: double.infinity,
         child: RaisedButton(
           child: Container( 
-            padding: EdgeInsets.symmetric( vertical: 10.0 ),
+            padding: EdgeInsets.symmetric( vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
             child: Text(
               'Siguiente',
               style: TextStyle(
@@ -216,6 +223,8 @@ class __RegistroFormState extends State<_RegistroForm> {
 
   @override
   Widget build(BuildContext context) {
+    screenSizeHeight = MediaQuery.of(context).size.height;
+    screenSizeWidth = MediaQuery.of(context).size.width;
     return Padding(
       padding: EdgeInsets.only(top: 0.0,left: 40.0, right: 40.0),
       child: Column(

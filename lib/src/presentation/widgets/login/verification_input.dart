@@ -16,9 +16,12 @@ class VerificationInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _screenSize = MediaQuery.of(context).size;
+    double screenSizeHeight = _screenSize.height;
+    double screenSizeWidth = _screenSize.width;
     return Container(
-      height: 50.0,
-      width: 42.0,
+      height: screenSizeHeight * 0.084, ///height: 50.0
+      width: screenSizeWidth * 0.116,  ///width: 42.0
       child: Card(
           color: secundaryColor,
           child: Padding(

@@ -20,6 +20,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  double screenSizeHeight;
+  double screenSizeWidth;
+
   final _carruselData = ['Foto 1','Foto 2','Foto 3' ]; 
 
   /// variable para controlar los radio button
@@ -65,7 +68,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 5.0),
+              padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.008445), //vertical: 5.0
               child: Text(
                 '06 de Agosto del 2020',
                 style: TextStyle(
@@ -98,10 +101,10 @@ class _HomePageState extends State<HomePage> {
   ///
   Widget _carruselHorizontal(){
     return Padding(
-      padding: EdgeInsets.only(top: 20.0),
+      padding: EdgeInsets.only(top: screenSizeHeight * 0.0337), //top: 20.0
       child: Container(
         // color: Colors.red,
-        height: 200.0,
+        height: screenSizeHeight * 0.337, //height: 200.0,
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: _carruselData.map((data) => _carruselChild(data)).toList(),
@@ -115,9 +118,9 @@ class _HomePageState extends State<HomePage> {
   ///
   Widget _carruselChild(String title){
     return Padding(
-      padding: EdgeInsets.only(left: 15.0),
+      padding: EdgeInsets.only(left: screenSizeWidth * 0.0416 ), //left: 15.0
       child: Container(
-        width: 300.0,
+        width: screenSizeWidth * 0.833, //width: 300.0,
         height: double.infinity,
         decoration: BoxDecoration(
           color: secundaryColor,
@@ -142,9 +145,9 @@ class _HomePageState extends State<HomePage> {
   Widget _radioButtonSection(){
     
     return Padding(
-      padding: EdgeInsets.only(bottom: 10.0),
+      padding: EdgeInsets.only(bottom: screenSizeHeight * 0.016), // bottom: 10.0
       child: SizedBox(
-        width: 180.0,
+        width: screenSizeWidth * 0.5, //width: 180.0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -201,12 +204,12 @@ class _HomePageState extends State<HomePage> {
   ///
   Widget _transferirButton(){
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 30.0 ),
+      padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.00844, horizontal: screenSizeWidth * 0.0833  ), //vertical: 5.0, horizontal: 30.0
       child: SizedBox(
         width: double.infinity,
         child: RaisedButton(
           child: Container( 
-            padding: EdgeInsets.symmetric( vertical: 15.0 ),
+            padding: EdgeInsets.symmetric( vertical: screenSizeHeight * 0.0253 ), //vertical: 15.0
             child: Text(
               'Transferir',
               style: TextStyle(
@@ -233,7 +236,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final _screenSize = MediaQuery.of(context).size;
+    screenSizeHeight = MediaQuery.of(context).size.height;
+    screenSizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       // key: _scaffoldKey,
       extendBodyBehindAppBar: true, 
@@ -270,7 +274,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             color: primaryColor,
             width: double.infinity,
-            height: _screenSize.height * 0.6,
+            height: (screenSizeHeight>600) ? screenSizeHeight * 0.5 : screenSizeHeight * 0.6,
           ),
           SingleChildScrollView(child: _bodySection())
         ],

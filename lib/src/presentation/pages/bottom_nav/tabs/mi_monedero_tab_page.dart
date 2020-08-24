@@ -19,6 +19,9 @@ class MiMonederoTabPage extends StatefulWidget {
 
 class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
 
+  double screenSizeHeight;
+  double screenSizeWidth;
+
 
   String _username = '';
   String _pidNumber = '';
@@ -63,7 +66,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5.0),
+                  padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.00844), //vertical: 5.0
                   child: Text(
                     '06 de Agosto del 2020',
                     style: TextStyle(
@@ -84,7 +87,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
               ],
             ),
             Padding(
-              padding: EdgeInsets.only(bottom: 20.0),
+              padding: EdgeInsets.only(bottom: screenSizeHeight * 0.0337), //bottom: 20.0
               child: _transferirButton(),
             )
           ],
@@ -99,11 +102,11 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
   ///
   Widget _cardPidsDisponibles(){
     return Padding(
-      padding: EdgeInsets.only(top: 20.0, right: 40.0, left: 40.0),
+      padding: EdgeInsets.only(top: screenSizeHeight * 0.0337, right:screenSizeWidth * 0.111, left: screenSizeWidth * 0.111), //top: 20.0, right: 40.0, left: 40.0
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 35.0),
+        padding: EdgeInsets.symmetric(horizontal: screenSizeWidth * 0.097), //horizontal: 35.0
         width: double.infinity,
-        height: 200.0,
+        height: screenSizeHeight * 0.337, //height: 200.0,
         decoration: BoxDecoration(
           color: electricVioletColor,
           borderRadius: BorderRadius.circular(30.0),
@@ -125,20 +128,20 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 CircleWidget(
-                  width: 40.0, 
-                  height: 40.0, 
+                  width: screenSizeWidth * 0.111, //width: 40.0,
+                  height: screenSizeHeight * 0.067, //height: 40.0
                   color: Colors.transparent,
                   borderColor: Colors.white,
                   borderWidth: 2.5,
                   widget: Center(
                     child: CircleWidget(
-                      width: 15.0, 
-                      height: 15.0,  
+                      width: screenSizeWidth * 0.0416, //width: 15.0, 
+                      height: screenSizeHeight * 0.0253,  //height: 15.0,  
                       color: Colors.white
                     ),
                   ),
                 ),
-                SizedBox(width: 8.0),
+                SizedBox(width: screenSizeWidth * 0.022), //width: 8.0
                 Text('1.000.000', style: TextStyle( fontSize: 35.0, fontWeight: FontWeight.w700,color: Colors.white )),
               ],
             ),
@@ -155,12 +158,12 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
   ///
   Widget _transferirButton(){
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 30.0 ),
+      padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.00844, horizontal: screenSizeWidth * 0.0833  ), //vertical: 5.0, horizontal: 30.0
       child: SizedBox(
         width: double.infinity,
         child: RaisedButton(
           child: Container( 
-            padding: EdgeInsets.symmetric( vertical: 15.0 ),
+            padding: EdgeInsets.symmetric( vertical: screenSizeHeight * 0.0253 ), //vertical: 15.0
             child: Text(
               'Transferir',
               style: TextStyle(
@@ -191,7 +194,8 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
 
   @override
   Widget build(BuildContext context) {
-    final _screenSize = MediaQuery.of(context).size;
+    screenSizeHeight = MediaQuery.of(context).size.height;
+    screenSizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
@@ -222,7 +226,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
           Container(
             color: primaryColor,
             width: double.infinity,
-            height: _screenSize.height * 0.58,
+            height: (screenSizeHeight>600) ? screenSizeHeight * 0.48 : screenSizeHeight * 0.58,
           ),
           _bodySection(),
         ],

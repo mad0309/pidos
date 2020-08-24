@@ -13,6 +13,8 @@ class AcercaDePage extends StatelessWidget {
   /// metodo build
   @override
   Widget build(BuildContext context) {
+    final screenSizeHeight = MediaQuery.of(context).size.height;
+    final screenSizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -44,18 +46,18 @@ class AcercaDePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 40.0, bottom: 25.0),
+                padding: EdgeInsets.only(top: screenSizeHeight * 0.067, bottom: screenSizeHeight * 0.042), //top: 40.0, bottom: 25.0
                 child: Text('Acerca de', style: TextStyle(color: primaryColor, fontSize: 30.0,fontWeight: FontWeight.w700)),
               ),
               Container(
-                width: 110.0,
+                width: screenSizeWidth  * 0.305, //width: 110.0,
                 child: Image(
                   image: AssetImage('assets/img/acerca_de_icon.png'),
                   fit: BoxFit.cover,
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 20.0),
+                padding: EdgeInsets.only(top: screenSizeHeight * 0.0337), //top: 20.0
                 child: Text('Pidos App Versión', style: TextStyle(color: Color(0xFF666666), fontSize: 18.0)),
               ),
               Text('1.0.0', style: TextStyle(color: Color(0xFF666666), fontSize: 18.0)),
