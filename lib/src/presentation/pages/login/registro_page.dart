@@ -22,10 +22,7 @@ class _RegistroPageState extends State<RegistroPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      child: Image(
-        image: AssetImage('assets/img/fondo.jpg'),
-        fit: BoxFit.cover,
-      ),
+      color: Colors.white,
     ); 
   }
 
@@ -42,7 +39,7 @@ class _RegistroPageState extends State<RegistroPage> {
           children: [
             SizedBox(height: screenSizeHeight * 0.067),  ///height: 40.0
             Image(
-              image: AssetImage('assets/img/logo_blank.png'),
+              image: AssetImage('assets/img/acerca_de_icon.png'),
               fit: BoxFit.cover,
               width: screenSizeWidth * 0.222, //width: 80.0
             )
@@ -61,7 +58,9 @@ class _RegistroPageState extends State<RegistroPage> {
       child: Text(
         'Crea tu cuenta', 
         style: TextStyle(
-          color: Colors.white,
+          fontFamily: 'Raleway',
+          // color: Colors.white,
+          color: primaryColor,
           fontSize: 30.0,
           fontWeight: FontWeight.w700
         ),
@@ -111,11 +110,17 @@ class __RegistroFormState extends State<_RegistroForm> {
   TextEditingController nroCelularController;
   TextEditingController nombreController;
 
+  //focusNode
+  FocusNode nroCelularFocus;
+  FocusNode nombreFocus;
+
   /// Metodo de ciclo de vida
   @override
   void initState() { 
     nroCelularController = TextEditingController(text: '');
     nombreController = TextEditingController(text: '');
+    nroCelularFocus = FocusNode();
+    nombreFocus = FocusNode();
     super.initState();
   }
   /// Metodo de ciclo de vida
@@ -124,6 +129,11 @@ class __RegistroFormState extends State<_RegistroForm> {
     nroCelularController?.dispose();
     nombreController?.dispose();
     super.dispose();
+  }
+
+  void _unfocus(){
+    nroCelularFocus.unfocus();
+    nombreFocus.unfocus();
   }
 
   ///
@@ -138,12 +148,13 @@ class __RegistroFormState extends State<_RegistroForm> {
               'Tus nombres',
               style: TextStyle(
                 fontSize: 18.0,
-                color: Colors.white,
-                fontWeight: FontWeight.w600
+                color: primaryColor,
+                fontWeight: FontWeight.w700
               )),
           ),
           // SizedBox(height: 10.0),
           InputLoginWidget(
+            focusNode: nombreFocus,
             textEditingController: nombreController,
             inputType: TextInputType.text,
             obscureText: false,
@@ -165,11 +176,12 @@ class __RegistroFormState extends State<_RegistroForm> {
               'Tu número de celular',
               style: TextStyle(
                 fontSize: 18.0,
-                color: Colors.white,
-                fontWeight: FontWeight.w600
+                color: primaryColor,
+                fontWeight: FontWeight.w700
               )),
           ),
           InputLoginWidget(
+            focusNode: nroCelularFocus,
             textEditingController: nroCelularController,
             inputType: TextInputType.number,
             obscureText: false, 

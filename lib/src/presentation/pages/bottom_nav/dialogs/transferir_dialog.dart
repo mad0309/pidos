@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
-import 'package:pidos/src/presentation/widgets/muy_pronto_dialog.dart';
+import 'package:pidos/src/presentation/blocs/provider/servicios_bloc.dart';
+import 'package:pidos/src/presentation/widgets/circle_color.dart';
 import 'package:pidos/src/utils/colors.dart';
 
 
@@ -48,6 +50,9 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
   String _buttonLabel;
   String _perfil;
 
+  bool pidCash = true;
+  bool puntosPids = false;
+
   @override
   void initState() { 
     final _sharedPrefs = PreferenciasUsuario();
@@ -55,7 +60,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     if( _perfil == 'CLIENTE' ){
       _buttonLabel = 'Transferir';
     }else{
-      _buttonLabel = 'Redimir';
+      _buttonLabel = 'Transferir';
     }
     super.initState();
   }
@@ -114,7 +119,67 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
           color: electricVioletColor,
           elevation: 0.0,
           textColor: cyanColor,
-          onPressed:() => muyProntoDialog(context: context)
+          // onPressed:() => muyProntoDialog(context: context)
+          onPressed:() => Navigator.of(context).popAndPushNamed('/transferencia', arguments: false),
+        ),
+      ),
+    );
+  }
+  Widget _titulo(){
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10.0),
+      child: Text('Transferir', style: TextStyle(fontFamily: 'Raleway', fontSize: 30.0, color: primaryColor, fontWeight: FontWeight.w600)),
+    );
+  }
+
+  Widget _radioButtonRow(){
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _radioButtonWithLabel('Pid Cash', pidCash),
+          SizedBox(width: 15.0),
+          _radioButtonWithLabel('Puntos Pidos', puntosPids),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _radioButtonWithLabel(String title, bool value){
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if(!value){
+            pidCash = !pidCash;
+            puntosPids = !puntosPids;
+          }
+        });
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _radioButton(value),
+          SizedBox(width: 5.0),
+          Text(title, style: TextStyle(fontSize: 18.0, color: Colors.black, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+
+  Widget _radioButton(bool active){
+    return CircleWidget(
+      width: 20.0, //width: 40.0,
+      height: 20.0, //height: 40.0
+      color: Colors.transparent,
+      borderColor: primaryColor,
+      borderWidth: 2.5,
+      widget: Center(
+        child: CircleWidget(
+          width: 10.0, //width: 15.0, 
+          height: 10.0,  //height: 15.0,  
+          color: (active) ?  primaryColor : Colors.transparent
         ),
       ),
     );
@@ -137,6 +202,19 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
+            _titulo(),
+            StreamBuilder<bool>(
+              stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
+              initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+              builder: (context, snapshot) {
+                final isActive = snapshot.data ?? false;
+                if(isActive){
+                  return _radioButtonRow(); 
+                }else{
+                  return Container();
+                }
+              }
+            ),
             _titlelWithInput('Cantidad en PIDS:', '300 pids'),
             _titlelWithInput('Cantidad en Pesos:', '\$100.0 pids'),
             _titlelWithInput('Pidos ID:', 'PID-123456789 - Ricardo Castro'),

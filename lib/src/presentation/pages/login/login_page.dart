@@ -22,10 +22,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      child: Image(
-        image: AssetImage('assets/img/fondo.jpg'),
-        fit: BoxFit.cover,
-      ),
+      color: Colors.white
     ); 
   }
 
@@ -43,13 +40,21 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             SizedBox(height: _screenSizeHeight * 0.084), /// height: 50.0
             Image(
-              image: AssetImage('assets/img/logo_blank.png'),
+              image: AssetImage('assets/img/acerca_de_icon.png'),
               fit: BoxFit.cover,
-              width: _screenSizeWidth * 0.33, //width: 120.0
+              // width: _screenSizeWidth * 0.33, //width: 120.0
+              width: _screenSizeWidth * 0.22 , //width: 80.0
             )
           ],
         ),
       ),
+    );
+  }
+
+  Widget _title(){
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: _screenSizeHeight * 0.0337), //vertical: 20.0
+      child: Text('Acceder', style: TextStyle(fontFamily: 'Raleway',color: primaryColor, fontSize: 30.0,fontWeight: FontWeight.w700)),
     );
   }
 
@@ -64,14 +69,14 @@ class _LoginPageState extends State<LoginPage> {
           text: TextSpan(
             style: TextStyle(
               fontSize: 16.0,
-              color: Colors.white,
+              color: Colors.black,
               fontWeight: FontWeight.w300
             ),
             children: <TextSpan>[
               TextSpan(text: '¿No tienes cuenta? Crea una '),
               TextSpan(
                 text: 'aquí', 
-                style: new TextStyle(fontWeight: FontWeight.bold),
+                style: new TextStyle(fontWeight: FontWeight.bold,color: electricVioletColor),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () => Navigator.of(context).pushNamed('/registro') 
               ),
@@ -83,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
           '¿Olvidaste tu contraseña?',
           style: TextStyle(
             fontSize: 16.0,
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.w300,
             decoration: TextDecoration.underline,
           ),
@@ -113,6 +118,7 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _logoImage(),
+                _title(),
                 _LoginForm(),
                 bottomSection()
               ],
@@ -149,12 +155,17 @@ class __LoginFormState extends State<_LoginForm> {
   /// controllers
   TextEditingController nroCelularController;
   TextEditingController contrasenaController;
+  /// focusNode
+  FocusNode nroCelularFocus;
+  FocusNode contrasenaFocus;
 
   /// Metodo de ciclo de vida
   @override
   void initState() { 
     nroCelularController = TextEditingController(text: '');
     contrasenaController = TextEditingController(text: '');
+    nroCelularFocus =FocusNode();
+    contrasenaFocus =FocusNode();
     super.initState();
   }
   /// Metodo de ciclo de vida
@@ -194,17 +205,18 @@ class __LoginFormState extends State<_LoginForm> {
     return Column(
       children: [
         Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0),
+            padding: EdgeInsets.only(bottom: 10.0),
             child: Text(
               'Tu número celular',
               style: TextStyle(
                 fontSize: 18.0,
-                color: Colors.white,
-                fontWeight: FontWeight.w600
+                color: primaryColor,
+                fontWeight: FontWeight.w700
               )),
           ),
           // SizedBox(height: 10.0),
           InputLoginWidget(
+            focusNode: nroCelularFocus,
             textEditingController: nroCelularController,
             inputType: TextInputType.number,
             obscureText: false, 
@@ -235,11 +247,12 @@ class __LoginFormState extends State<_LoginForm> {
               'Tu Contraseña',
               style: TextStyle(
                 fontSize: 18.0, //fontSize: 18.0, 
-                color: Colors.white,
-                fontWeight: FontWeight.w600
+                color: primaryColor,
+                fontWeight: FontWeight.w700
               )),
           ),
           InputLoginWidget(
+            focusNode: contrasenaFocus,
             textEditingController: contrasenaController,
             inputType: TextInputType.text,
             obscureText: true,

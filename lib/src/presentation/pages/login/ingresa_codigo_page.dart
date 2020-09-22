@@ -95,6 +95,7 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
       child: Text(
         'Crea tu cuenta', 
         style: TextStyle(
+          fontFamily: 'Raleway',
           color: primaryColor,
           fontSize: 30.0,
           fontWeight: FontWeight.w700

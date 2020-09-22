@@ -7,6 +7,7 @@ class StorageKeys {
   static final String perfil ="PERFIL";
   static final String pid ="PID";
   static final String shortName ="SHORTNAME";
+  static final String pidCash ="PIDCASH";
 }
 
 class PreferenciasUsuario {
@@ -30,7 +31,10 @@ class PreferenciasUsuario {
   }
 
   bool getBool(String key){
-    return _prefs.getString(key) ?? false;
+    return _prefs.getBool(key) ?? false;
+  }
+  void setBool(String key, bool value){
+    _prefs.setBool(key, value);
   }
 
   void set(String key, dynamic value){

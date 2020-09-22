@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/app/tab_navigator.dart';
 import 'package:pidos/device/nav/nav_slide_from_right.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/bottom_navigation.dart';
@@ -14,6 +15,8 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  //global singleton
+  GlobalSingleton gb;
   /// tab actual
   TabItem _currentTab = TabItem.home;
 
@@ -120,13 +123,14 @@ class _AppState extends State<App> {
       }
     };
   }
-
+  
 
   ///
   /// metodo Build
   ///
   @override
   Widget build(BuildContext context) {
+    gb ??= GlobalSingleton(contextApp: context,globalScaffoldKey: _globalScaffoldKey);
     return WillPopScope(
       onWillPop: () async {
         final isFirstRouteInCurrentTab =!await _navigatorKey.currentState.maybePop();

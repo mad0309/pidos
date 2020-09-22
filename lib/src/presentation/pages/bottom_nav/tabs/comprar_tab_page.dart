@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/drawer_nav.dart';
@@ -26,6 +27,8 @@ class _ComprarTabPageState extends State<ComprarTabPage> {
 
   String shortName;
 
+  bool compraSucess = false;
+
   @override
   void initState() {
     final _sharedPrefs = PreferenciasUsuario();
@@ -42,7 +45,7 @@ class _ComprarTabPageState extends State<ComprarTabPage> {
         // color:Colors.red,
         child: Padding(
           padding: EdgeInsets.only(bottom: screenSizeHeight * 0.138, top: screenSizeHeight * 0.0337), //bottom: 80.0, top: 20.0
-          child: Text('Comprar', style: TextStyle(fontSize: 30.0, color: Colors.white, fontWeight: FontWeight.w600)),
+          child: Text('Comprar', style: TextStyle(fontFamily: 'Raleway',fontSize: 30.0, color: Colors.white, fontWeight: FontWeight.w600)),
         ),
       ),
     );
@@ -149,7 +152,12 @@ class _ComprarTabPageState extends State<ComprarTabPage> {
           color: primaryColor,
           elevation: 0.0,
           textColor: cyanColor,
-          onPressed:()  => muyProntoDialog(context: context)
+          // onPressed:()  => muyProntoDialog(context: context)
+          onPressed:()  {
+            final contextApp = GlobalSingleton().contextApp;
+            Navigator.of(contextApp).pushNamed('/compra_detalle', arguments: !compraSucess);
+            compraSucess = !compraSucess;
+          }
         ),
       ),
     );

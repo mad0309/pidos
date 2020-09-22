@@ -10,8 +10,10 @@ class InputLoginWidget extends StatefulWidget {
   final String placeholderText;
   final Widget prefixIcon;
   final TextEditingController textEditingController;
+  final FocusNode focusNode;
 
   InputLoginWidget({
+    @required this.focusNode,
     @required this.inputType, 
     @required this.obscureText, 
     @required this.placeholderText,
@@ -35,6 +37,7 @@ class _InputLoginWidgetState extends State<InputLoginWidget> {
       controller: widget.textEditingController,
       obscureText: widget.obscureText,
       keyboardType: widget.inputType,
+      focusNode: widget.focusNode,
       textAlign: TextAlign.center, 
       style: TextStyle(
         fontWeight: FontWeight.w300,
@@ -51,7 +54,7 @@ class _InputLoginWidgetState extends State<InputLoginWidget> {
         
         hintStyle: TextStyle(color: Color(0xFF666666)),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: secundaryColor,
         contentPadding: EdgeInsets.symmetric(vertical: _screenSizeHeight * 0.017,horizontal: _screenSizeWidth * 0.027 ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),

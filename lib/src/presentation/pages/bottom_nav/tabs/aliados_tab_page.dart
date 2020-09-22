@@ -69,46 +69,72 @@ class _AliadosTabPageState extends State<AliadosTabPage> {
           SafeArea(
             child: SizedBox(
               width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text("Aliados", style: TextStyle(color:Colors.white, fontSize: 35.0, fontWeight: FontWeight.w500 ) ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 45.0, vertical: 5.0),
-                    child: SearchWidget(),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
-                    child: _filterButton(),
-                  ),
-                  SizedBox(height: 10.0),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(top:40.0, left: 20.0, right: 20.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(20.0),
-                          topRight: const Radius.circular(20.0),
+              child: LayoutBuilder(
+                builder: (context, constrains) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: constrains.maxHeight),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("Aliados", style: TextStyle(fontFamily: 'Raleway', color:Colors.white, fontSize: 35.0, fontWeight: FontWeight.w600 ) ),
+                            SizedBox(height: 20.0),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 45.0),
+                              // child: AliadosInput(),
+                              child: _filterInpustWidgets(),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 45.0),
+                              child: _buscarButton(),
+                            ),
+                            SizedBox(height: 10.0),
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.only(top:40.0, left: 20.0, right: 20.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: const Radius.circular(20.0),
+                                    topRight: const Radius.circular(20.0),
+                                  ),
+                                  color:Colors.white
+                                ),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text('Muy Pronto', style: TextStyle( color: primaryColor, fontSize: 35.0, fontWeight: FontWeight.w700 )),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                                        child: Text('encontrarás nuestros aliados aqui',textAlign: TextAlign.center, style: TextStyle( color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.w600 ), ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // child: GridView.builder(
+                                //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                //     mainAxisSpacing: 5.0,
+                                //     crossAxisSpacing: 5.0, //space horizontal
+                                //     crossAxisCount: 2,
+                                //     childAspectRatio: 1.0
+                                //   ),
+                                //   itemCount: 9,
+                                //   itemBuilder: (BuildContext context, int index) {
+                                //     return AliadosWidget(
+                                //       title: 'Aliado ${index + 1}',
+                                //     );
+                                //   }
+                                // ),
+                              )
+                            )
+                          ],
                         ),
-                        color:Colors.white
                       ),
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          mainAxisSpacing: 5.0,
-                          crossAxisSpacing: 5.0, //space horizontal
-                          crossAxisCount: 2,
-                          childAspectRatio: 1.0
-                        ),
-                        itemCount: 9,
-                        itemBuilder: (BuildContext context, int index) {
-                          return AliadosWidget(
-                            title: 'Aliado ${index + 1}',
-                          );
-                        }
-                      ),
-                    )
-                  )
-                ],
+                    ),
+                  );
+                }
               ),
             )
           )
@@ -117,21 +143,50 @@ class _AliadosTabPageState extends State<AliadosTabPage> {
     );
   }
 
-  /// boton de filtro
-  Widget _filterButton(){
-    return Container(
-      decoration: BoxDecoration(
-        color: secundaryColor,
-        borderRadius: BorderRadius.circular(20.0)
-      ),
-      padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
-      width: 120.0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Icon(Icons.filter_list, size: 15.0, color: Colors.grey ),
-          Text('Filtros', style: TextStyle(color: Colors.grey, fontSize: 15.0 ))
-        ],
+  Widget _filterInpustWidgets(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.0),
+          child: AliadosInput(hintTitle: 'Elige un servicio')
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.0),
+          child: Row(
+            children: [
+              Flexible(
+                flex: 2,
+                fit: FlexFit.tight,
+                child: AliadosInput(hintTitle: 'Categoría'),
+              ),
+              SizedBox(width: 15.0),
+              Flexible(
+                flex: 2,
+                fit: FlexFit.tight,
+                child: AliadosInput(hintTitle: 'Ciudad'),
+              ),
+            ]
+          ),
+        )
+      ],
+    );
+  }
+
+  /// boton de buscar
+  Widget _buscarButton(){
+    return InkWell(
+      onTap: (){},
+      child: Container(
+        decoration: BoxDecoration(
+          color: secundaryColor,
+          borderRadius: BorderRadius.circular(20.0)
+        ),
+        padding: EdgeInsets.symmetric(vertical: 10.0),
+        width: double.infinity,
+        child: Center(
+          child: Text('Buscar', style: TextStyle(color: primaryColor ,fontSize: 18.0, fontWeight: FontWeight.w700))
+        ),
       ),
     );
   }

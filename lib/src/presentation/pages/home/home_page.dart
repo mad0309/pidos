@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src//utils/colors.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
@@ -224,7 +225,12 @@ class _HomePageState extends State<HomePage> {
           color: primaryColor,
           elevation: 0.0,
           textColor: Colors.white,
-          onPressed:() => muyProntoDialog(context: context)
+          // onPressed:() => muyProntoDialog(context: context)
+          onPressed:() {
+            final contextApp = GlobalSingleton().contextApp;
+            Navigator.of(contextApp).pushNamed('/transferencia',arguments: true);
+
+          } 
         ),
       ),
     );
@@ -252,9 +258,7 @@ class _HomePageState extends State<HomePage> {
           onPressed:() {},
         ),
         actions: [
-          (_perfil == 'CLIENTE')
-            ? Container()
-            : InkResponse(
+          InkResponse(
                 onTap: () => widget.globalScaffoldKey.currentState.openEndDrawer(),
                 child: Padding(
                   padding: EdgeInsets.only(right: 20.0),

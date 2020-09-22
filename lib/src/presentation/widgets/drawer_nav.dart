@@ -45,21 +45,42 @@ class DrawerNav extends StatelessWidget {
                 onTap: () => Navigator.popAndPushNamed(context, '/mi_cuenta'),
                 child: Padding(
                   padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
-                  child: Text('Mi cuenta',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.w600)),
+                  child: Text('Mi cuenta',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
+                ),
+              ),
+              InkWell(
+                onTap: () => Navigator.popAndPushNamed(context, '/servicios'),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
+                  child: Text('Servicios',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
                 ),
               ),
               InkWell(
                 onTap: () => Navigator.popAndPushNamed(context, '/ayuda'),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.0),
-                  child: Text('Ayuda',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.w600)),
+                  child: Text('Ayuda',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
                 ),
               ),
               InkWell(
                 onTap: () => Navigator.popAndPushNamed(context, '/acerca_de'),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.0),
-                  child: Text('Acerca de',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.w600)),
+                  child: Text('Acerca de',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
+                ),
+              ),
+              InkWell(
+                onTap: () => Navigator.popAndPushNamed(context, '/trabaja_con_nosotros'),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text('Trabaja con nosotros',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
+                ),
+              ),
+              InkWell(
+                onTap: () => Navigator.pushReplacementNamed(context, '/login'),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text('Cerrar sesión',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],

@@ -2,26 +2,17 @@ import 'package:flutter/material.dart';
 
 
 
-class SearchWidget extends StatefulWidget {
+class AliadosInput extends StatefulWidget {
+  final String hintTitle;
+
+  const AliadosInput({Key key, this.hintTitle}) : super(key: key);
 
   @override
-  _SearchWidgetState createState() => _SearchWidgetState();
+  _AliadosInputState createState() => _AliadosInputState();
 }
 
-class _SearchWidgetState extends State<SearchWidget> {
+class _AliadosInputState extends State<AliadosInput> {
 
-  
-
-  Widget suffixIcon(){
-    return Padding(
-      padding: const EdgeInsets.only(right: 10.0),
-      child: Icon(Icons.search, color: Colors.white, size: 25.0),
-    );
-    // return IconButton(
-    //   icon: Icon(Icons.search, color: Colors.white), 
-    //   onPressed: () {}
-    // );
-  }
 
 
   @override
@@ -38,13 +29,13 @@ class _SearchWidgetState extends State<SearchWidget> {
       cursorColor: Colors.white,
       decoration: InputDecoration(
         isDense: true,
-        hintText: 'Tu búsqueda...',
-        suffixIcon: suffixIcon(),
-        suffixIconConstraints: BoxConstraints(
-              minHeight: 0,
-              minWidth: 0,
-        ),
-        hintStyle: TextStyle(color: Colors.white24),
+        hintText: widget.hintTitle,
+        // suffixIcon: suffixIcon(),
+        // suffixIconConstraints: BoxConstraints(
+        //       minHeight: 0,
+        //       minWidth: 0,
+        // ),
+        hintStyle: TextStyle(color: Colors.white54),
         filled: true,
         fillColor: Colors.transparent,
         focusColor: Colors.white,

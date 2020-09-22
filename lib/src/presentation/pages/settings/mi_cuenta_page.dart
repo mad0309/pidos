@@ -255,7 +255,7 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
             children: [
               Padding(
                 padding: EdgeInsets.only(top: 40.0, bottom: 20.0),
-                child: Text('Mi cuenta', style: TextStyle(color: primaryColor, fontSize: 30.0,fontWeight: FontWeight.w700)),
+                child: Text('Mi cuenta', style: TextStyle(fontFamily: 'Raleway',color: primaryColor, fontSize: 30.0,fontWeight: FontWeight.w700)),
               ),
               ( _perfil == 'CLIENTE' )
                 ? _formPerfilCliente()

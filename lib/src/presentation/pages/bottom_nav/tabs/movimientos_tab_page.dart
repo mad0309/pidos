@@ -80,7 +80,7 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                   Flexible(
                     flex: 1,
                     child:
-                        Text("Tus movimientos", textAlign: TextAlign.center),
+                        Text("Tus movimientos", textAlign: TextAlign.center,style: TextStyle(fontFamily: 'Raleway',fontWeight: FontWeight.w600),),
                   ),
                   Flexible(
                     flex: 1,
