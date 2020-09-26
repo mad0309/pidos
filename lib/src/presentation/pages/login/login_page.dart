@@ -220,7 +220,7 @@ class __LoginFormState extends State<_LoginForm> {
             textEditingController: nroCelularController,
             inputType: TextInputType.number,
             obscureText: false, 
-            placeholderText: 'Ingeresa tu numero',
+            placeholderText: 'Ingresa tu numero',
             prefixIcon: Container(
               child: Padding(
                 padding: EdgeInsets.only(top: 0.0,left: 10.0),
@@ -256,7 +256,7 @@ class __LoginFormState extends State<_LoginForm> {
             textEditingController: contrasenaController,
             inputType: TextInputType.text,
             obscureText: true,
-            placeholderText: 'Ingeresa tu contraseña',
+            placeholderText: 'Ingresa tu contraseña',
           )
       ],
     );

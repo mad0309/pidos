@@ -79,16 +79,30 @@ class _CompraDetallePageState extends State<CompraDetallePage> {
         children: [
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20.0), 
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
               children: [
-                Text('PID-1456237',style: TextStyle(color: Colors.black, fontSize: 15.0)),
-                Container(
-                  width: 1,
-                  height: 30.0,
-                  color: Color(0xFF0CE7FD),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 13.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('ID Origen',style: TextStyle(color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w700)),
+                      Text('ID Destino',style: TextStyle(color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w700)),
+                    ],
+                  ),
                 ),
-                Text('PID-1456237',style: TextStyle(color: Colors.black, fontSize: 15.0)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('PID-1456237',style: TextStyle(color: Colors.black, fontSize: 15.0)),
+                    Container(
+                      width: 1,
+                      height: 30.0,
+                      color: Color(0xFF0CE7FD),
+                    ),
+                    Text('PID-1456237',style: TextStyle(color: Colors.black, fontSize: 15.0)),
+                  ],
+                ),
               ],
             ),
           ),

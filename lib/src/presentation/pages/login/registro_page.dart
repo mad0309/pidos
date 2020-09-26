@@ -158,7 +158,7 @@ class __RegistroFormState extends State<_RegistroForm> {
             textEditingController: nombreController,
             inputType: TextInputType.text,
             obscureText: false,
-            placeholderText: 'Ingeresa su nombre',
+            placeholderText: 'Ingresa su nombre',
           )
       ],
     );
@@ -185,7 +185,7 @@ class __RegistroFormState extends State<_RegistroForm> {
             textEditingController: nroCelularController,
             inputType: TextInputType.number,
             obscureText: false, 
-            placeholderText: 'Ingeresa tu numero',
+            placeholderText: 'Ingresa tu numero',
             prefixIcon: Container(
               child: Padding(
                 padding: EdgeInsets.only(top: 0.0,left: 10.0),
