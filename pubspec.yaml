@@ -37,10 +37,20 @@ dependencies:
   flutter_provider: ^1.1.1
   flutter_bloc_pattern: ^1.2.0
   rxdart: ^0.24.0
+  distinct_value_connectable_stream: ^1.1.1
+  dio: ^3.0.9
+  built_value: ^7.1.0
+  built_collection: ^4.3.2
+  flutter_spinkit: ^4.1.2+1
+  freezed: ^0.12.1
+  flutter_webview_plugin: ^0.3.11
+  intl: ^0.16.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner:
+  built_value_generator: ^7.1.0
   flutter_launcher_icons: ^0.7.5
 
 flutter_icons:

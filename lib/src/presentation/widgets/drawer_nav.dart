@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:pidos/src//utils/colors.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/presentation/blocs/login/login_bloc.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 
 
@@ -14,8 +16,9 @@ class DrawerNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final _screenSize = MediaQuery.of(context).size;
     final _sharedPrefs = PreferenciasUsuario();
-    final _shortName = _sharedPrefs.get(StorageKeys.shortName);
-    final _username = _sharedPrefs.get(StorageKeys.usuario);
+    final usuario = _sharedPrefs.getUsuario();
+    final _shortName = usuario.shortName;
+    final _username = usuario.name;
     return SizedBox(
       width: _screenSize.width * 0.6,
       child: Drawer(
@@ -77,7 +80,10 @@ class DrawerNav extends StatelessWidget {
                 ),
               ),
               InkWell(
-                onTap: () => Navigator.pushReplacementNamed(context, '/login'),
+                onTap: () {
+                  BlocProvider.of<LoginBloc>(context).logout();
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.0),
                   child: Text('Cerrar sesión',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),

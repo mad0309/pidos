@@ -32,7 +32,8 @@ class _ComprarTabPageState extends State<ComprarTabPage> {
   @override
   void initState() {
     final _sharedPrefs = PreferenciasUsuario();
-    shortName = _sharedPrefs.get(StorageKeys.shortName);
+    final usuario = _sharedPrefs.getUsuario();
+    shortName = usuario.shortName;
     super.initState();
   }
 

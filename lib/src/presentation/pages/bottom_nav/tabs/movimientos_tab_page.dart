@@ -19,10 +19,12 @@ class MovimientosTabPage extends StatefulWidget {
 class _MovimientosTabPageState extends State<MovimientosTabPage> {
 
   String _shortName;
+  int movimientosLenght = 0;
 
   @override
   void initState() {
-    _shortName = PreferenciasUsuario().get(StorageKeys.shortName);
+    final usuario = PreferenciasUsuario().getUsuario();
+    _shortName = usuario.shortName;
     super.initState();
   }
   
@@ -114,17 +116,37 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate((context, index) {
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-                child: MovimientosWidget(
-                  fechaMovimiento: '10/Enero/20',
-                  pids: '350',
-                  pidId: 'A900697856',
-                  comerciante: 'Pollos Frisby',
-                  comercianteId: '0012345679',
-                ),
-              );
-            }, childCount: 10)
+              if(movimientosLenght == 0){
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 80.0),
+                      Image(
+                        color: Colors.black.withOpacity(0.6),
+                        image: AssetImage('assets/img/movimientos_icon_tab.png'),
+                        fit: BoxFit.cover,
+                        width: 50.0,
+                      ),
+                      SizedBox(height: 20.0),
+                      Text('Aun no cuenta con movimientos', style: TextStyle(fontFamily: 'Raleway', fontWeight: FontWeight.w700, color: Colors.black.withOpacity(0.6)))
+                    ],
+                  ),
+                );
+              }else{
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                  child: MovimientosWidget(
+                    fechaMovimiento: '10/Enero/20',
+                    pids: '350',
+                    pidId: 'A900697856',
+                    comerciante: 'Pollos Frisby',
+                    comercianteId: '0012345679',
+                  ),
+                );
+              }
+            }, childCount: 1)
           )
         ],
       ),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src//utils/colors.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/icons_widgets/bell_icon.dart';
-import 'package:pidos/src/presentation/widgets/muy_pronto_dialog.dart';
+import 'package:pidos/src/utils/extensions.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -24,12 +26,14 @@ class _HomePageState extends State<HomePage> {
   double screenSizeHeight;
   double screenSizeWidth;
 
-  final _carruselData = ['Foto 1','Foto 2','Foto 3' ]; 
+  final _carruselData = ['slide-app-1.jpg','slide-app-2.jpg']; 
+  
 
   /// variable para controlar los radio button
   /// incializa como 1 para marcar el primer radio button
   int idRadioButton = 1;
 
+  Usuario usuario;
   String _username = '';
   String _pidNumber = '';
   String _perfil = '';
@@ -40,10 +44,13 @@ class _HomePageState extends State<HomePage> {
   void initState() { 
     /// ======= get data from local storage ===== ///
     final _sharedPrefs = PreferenciasUsuario();
-    _username = _sharedPrefs.get(StorageKeys.usuario);
-    _pidNumber = _sharedPrefs.get(StorageKeys.pid);
-    _perfil = _sharedPrefs.get(StorageKeys.perfil);
-    _shortName = _sharedPrefs.get(StorageKeys.shortName);
+    usuario = _sharedPrefs.getUsuario();
+    _username = usuario.firstName;
+    _pidNumber = usuario.document.toString();
+    _perfil = usuario.role;
+    _shortName = usuario.shortName;
+    // _perfil = _sharedPrefs.get(StorageKeys.perfil);
+    // _shortName = _sharedPrefs.get(StorageKeys.shortName);
     /// ======= =========================== ===== ///
     super.initState();
   }
@@ -53,6 +60,10 @@ class _HomePageState extends State<HomePage> {
   /// Main Seccion
   ///
   Widget _bodySection() {
+    final dia = DateFormat('dd', 'es').format(DateTime.now());
+    final mes = DateFormat('MMMM', 'es').format(DateTime.now());
+    final ano = DateFormat('y', 'es').format(DateTime.now());
+    final fechaActual = '$dia de ${mes.capitalize()} del $ano';
     return SafeArea(
       child: SizedBox(
         width: double.infinity,
@@ -71,7 +82,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.008445), //vertical: 5.0
               child: Text(
-                '06 de Agosto del 2020',
+                fechaActual,
                 style: TextStyle(
                   fontSize: 16.0,
                   color: Colors.white,
@@ -79,7 +90,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Text(
-              (_perfil == "CLIENTE") ? 'PID - $_pidNumber' : 'Pidos ID: PID - $_pidNumber',
+              (_perfil != roleUsuarioName[RoleUsuario.cliente]) ? 'PID - $_pidNumber' : 'Pidos ID: PID - $_pidNumber',
               style: TextStyle(
                 fontSize: 16.0,
                 color: Colors.white,
@@ -87,7 +98,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             _carruselHorizontal(),
-            ( _perfil == 'CLIENTE' )
+            ( _perfil != roleUsuarioName[RoleUsuario.cliente] )
               ? _radioButtonSection()
               : Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
             _transferirButton()
@@ -108,11 +119,21 @@ class _HomePageState extends State<HomePage> {
         height: screenSizeHeight * 0.337, //height: 200.0,
         child: ListView(
           scrollDirection: Axis.horizontal,
-          children: _carruselData.map((data) => _carruselChild(data)).toList(),
+          children: _carruselData.map((data) {
+            final index = _carruselData.indexOf(data);
+            if( index==_carruselData.length-1 ){//ultimo valor
+              return Padding(
+                padding: EdgeInsets.only(right: screenSizeWidth * 0.0416 ),
+                child: _carruselChild(data),
+              );
+            }else{
+              return _carruselChild(data);
+            }
+          }).toList()
         ),
       ),
     );
-  }
+  }   
 
   ///
   /// Card
@@ -127,13 +148,11 @@ class _HomePageState extends State<HomePage> {
           color: secundaryColor,
           borderRadius: BorderRadius.circular(30.0)
         ),
-        child: Center(
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 40.0,
-              fontWeight: FontWeight.w700
-            )
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30.0),
+          child: Image(
+            image: AssetImage('assets/img/$title'),
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -226,10 +245,16 @@ class _HomePageState extends State<HomePage> {
           elevation: 0.0,
           textColor: Colors.white,
           // onPressed:() => muyProntoDialog(context: context)
+          // onPressed:() {
+          //   final contextApp = GlobalSingleton().contextApp;
+          //   Navigator.of(contextApp).pushNamed('/transferencia',arguments: true);
+          // } 
           onPressed:() {
             final contextApp = GlobalSingleton().contextApp;
-            Navigator.of(contextApp).pushNamed('/transferencia',arguments: true);
-
+            Navigator.of(contextApp).pushNamed(
+              '/action_not_avaible', 
+              arguments: 'En este momento no cuentas con Pidos disponibles para realizar esta acción'
+            );
           } 
         ),
       ),

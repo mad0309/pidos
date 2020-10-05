@@ -11,6 +11,7 @@ class InputLoginWidget extends StatefulWidget {
   final Widget prefixIcon;
   final TextEditingController textEditingController;
   final FocusNode focusNode;
+  final Function onChange;
 
   InputLoginWidget({
     @required this.focusNode,
@@ -19,6 +20,7 @@ class InputLoginWidget extends StatefulWidget {
     @required this.placeholderText,
     @required this.textEditingController,
     this.prefixIcon,
+    this.onChange
   });
 
 
@@ -65,6 +67,7 @@ class _InputLoginWidgetState extends State<InputLoginWidget> {
           borderSide: BorderSide(color: Colors.transparent, width: 2),
         ),
       ),
+      onChanged: widget.onChange ?? (value){},
     );
   }
 }

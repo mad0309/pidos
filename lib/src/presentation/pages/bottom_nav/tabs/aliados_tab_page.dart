@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
-import 'package:pidos/src/presentation/widgets/bottom_nav_widgets/aliados_widget.dart';
 import 'package:pidos/src/presentation/widgets/bottom_nav_widgets/search_widget.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/utils/colors.dart';
@@ -23,7 +22,8 @@ class _AliadosTabPageState extends State<AliadosTabPage> {
   String _shortName;
   @override
   void initState() { 
-    _shortName = PreferenciasUsuario().get(StorageKeys.shortName);
+    final usuario = PreferenciasUsuario().getUsuario();
+    _shortName = usuario.shortName;
     super.initState();
   }
   

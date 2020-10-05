@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
-import 'package:pidos/src/presentation/blocs/provider/servicios_bloc.dart';
+import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/drawer_nav.dart';
 import 'package:pidos/src/utils/colors.dart';

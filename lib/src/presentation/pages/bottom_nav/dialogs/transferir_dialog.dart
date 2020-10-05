@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
-import 'package:pidos/src/presentation/blocs/provider/servicios_bloc.dart';
+import 'package:pidos/src/domain/models/usuario.dart';
+import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/widgets/circle_color.dart';
+import 'package:pidos/src/presentation/widgets/inputs_widgets/input_form_dialog.dart';
 import 'package:pidos/src/utils/colors.dart';
 
 
@@ -46,6 +48,13 @@ class _TransferenciaDialog extends StatefulWidget {
 
 class __TransferenciaDialogState extends State<_TransferenciaDialog> {
 
+
+  TextEditingController cantidadPidsController;
+  TextEditingController pidosIdController;
+  FocusNode cantidadPidsFocus;
+  FocusNode pidosIdFocus;
+
+
   //label del boton
   String _buttonLabel;
   String _perfil;
@@ -56,17 +65,28 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
   @override
   void initState() { 
     final _sharedPrefs = PreferenciasUsuario();
-    _perfil = _sharedPrefs.get(StorageKeys.perfil);
-    if( _perfil == 'CLIENTE' ){
+    final usuario = _sharedPrefs.getUsuario();
+    _perfil = usuario.role;
+    if( _perfil != roleUsuarioName[RoleUsuario.cliente] ){
       _buttonLabel = 'Transferir';
     }else{
       _buttonLabel = 'Transferir';
     }
+
+    cantidadPidsController = TextEditingController(text: '');
+    pidosIdController = TextEditingController(text: '');
+    cantidadPidsFocus = FocusNode();
+    pidosIdFocus = FocusNode();
     super.initState();
   }
 
-  /// construye el titulo con el input text
-  Widget _titlelWithInput(String title, String content){
+  _unfocus(){
+    cantidadPidsFocus.unfocus();
+    pidosIdFocus.unfocus();
+  }
+
+  /// construye el titulo con el input text disabled
+  Widget _titlelWithInputDisabled(String title, String content){
     return Column(
       children: [
         Padding(
@@ -80,8 +100,37 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
       ],
     );
   }
+  /// construye el titulo con el input text field
+  Widget _titlelWithInputTextField(String title,{
+    TextEditingController textEditingController,
+    FocusNode focusNode,
+    String hintText = '',
+    TextInputType textInputType,
+    String sufix,
+    String prefix,
+  }){
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: Text(title, style: TextStyle(fontSize: 15.0, color: Color(0xFF666666))),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: InputFormDialog(
+            textEditingController: textEditingController,
+            focusNode: focusNode,
+            placeholderText: hintText,
+            inputType: textInputType,
+            sufix: sufix,
+            prefix: prefix,
+          )
+        ),
+      ],
+    );
+  }
 
-  /// input text
+  /// input text disabled
   Widget _textDisabledContainer(String content){
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -93,6 +142,21 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
       child: Text(content, textAlign: TextAlign.center,style: TextStyle(fontSize: 15.0, color: Color(0xFF666666))),
     );
   }
+
+  //input Textfield
+  // Widget _textInput({
+    
+  // }){
+  //   return Padding(
+  //     padding:  EdgeInsets.symmetric(vertical: 10.0),
+  //     child: InputFormDialog(
+  //       textEditingController: textEditingController,
+  //       focusNode: focusNode,
+  //       placeholderText: hintText,
+  //     ),
+  //   );
+  // }
+
 
   /// 
   /// boton de transferir
@@ -120,7 +184,15 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
           elevation: 0.0,
           textColor: cyanColor,
           // onPressed:() => muyProntoDialog(context: context)
-          onPressed:() => Navigator.of(context).popAndPushNamed('/transferencia', arguments: false),
+          // onPressed:() => Navigator.of(context).popAndPushNamed('/transferencia', arguments: false),
+          onPressed:() {
+            _unfocus();
+            Navigator.of(context).popAndPushNamed(
+              '/action_not_avaible', 
+              arguments: 'En este momento no cuentas con Pidos disponibles para realizar esta acción'
+            );
+
+          } 
         ),
       ),
     );
@@ -192,34 +264,53 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      // contentPadding: EdgeInsets.all(0.0),
+      // scrollable: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
       insetPadding: EdgeInsets.all(15.0),
-      child: Container(
-        padding: EdgeInsets.all(30.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _titulo(),
-            StreamBuilder<bool>(
-              stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
-              initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
-              builder: (context, snapshot) {
-                final isActive = snapshot.data ?? false;
-                if(isActive){
-                  return _radioButtonRow(); 
-                }else{
-                  return Container();
-                }
-              }
+      child: GestureDetector(
+        onTap: _unfocus,
+        child: Container(
+          padding: EdgeInsets.all(30.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _titulo(),
+                StreamBuilder<bool>(
+                  stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
+                  initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+                  builder: (context, snapshot) {
+                    final isActive = snapshot.data ?? false;
+                    if(isActive){
+                      return _radioButtonRow(); 
+                    }else{
+                      return Container();
+                    }
+                  }
+                ),
+                // _titlelWithInputDisabled('Cantidad en PIDS:', '300 pids'),
+                _titlelWithInputTextField('Cantidad en PIDS:',
+                  textEditingController: cantidadPidsController,
+                  focusNode: cantidadPidsFocus,
+                  hintText: 'Ingrese la cantidad',
+                  textInputType: TextInputType.number,
+                  sufix: '  pids' ),
+                _titlelWithInputDisabled('Cantidad en Pesos:', '\$100.0 pids'),
+                // _titlelWithInputDisabled('Pidos ID:', 'PID-123456789 - Ricardo Castro'),
+                _titlelWithInputTextField('Pidos ID:', 
+                  textEditingController: pidosIdController,
+                  focusNode: pidosIdFocus,
+                  hintText: 'Ingrese ID',
+                  textInputType: TextInputType.number,
+                  prefix: 'PID - '),
+                _transferirButton()
+              ],
             ),
-            _titlelWithInput('Cantidad en PIDS:', '300 pids'),
-            _titlelWithInput('Cantidad en Pesos:', '\$100.0 pids'),
-            _titlelWithInput('Pidos ID:', 'PID-123456789 - Ricardo Castro'),
-            _transferirButton()
-          ],
+          ),
         ),
       )
     );

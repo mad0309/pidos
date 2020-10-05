@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/tabs/aliados_tab_page.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/tabs/comprar_tab_page.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/tabs/mi_monedero_tab_page.dart';
@@ -32,12 +33,14 @@ class _MainTabsPageState extends State<MainTabsPage> {
   @override
   void initState() {
     final _sharedPrefs = PreferenciasUsuario();
-    _perfil = _sharedPrefs.get(StorageKeys.perfil);
+    final usuario = _sharedPrefs.getUsuario();
+    // _perfil = _sharedPrefs.get(StorageKeys.perfil);
+    _perfil = usuario.role;
 
     _screens = [
       MiMonederoTabPage(globalScaffoldKey: widget.globalScaffoldKey),
       MovimientosTabPage(globalScaffoldKey: widget.globalScaffoldKey),
-      ( _perfil=="CLIENTE" )
+      ( _perfil!=roleUsuarioName[RoleUsuario.cliente] )
         ? ComprarTabPage(globalScaffoldKey: widget.globalScaffoldKey)
         : AliadosTabPage(globalScaffoldKey:widget.globalScaffoldKey)
   ];

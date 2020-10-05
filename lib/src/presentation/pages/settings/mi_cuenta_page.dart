@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/presentation/widgets/button_submit.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/drawer_nav.dart';
@@ -25,8 +26,9 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
   void initState() { 
     /// ======== get localtion storage ======= ///
     final _sharedPrefs = PreferenciasUsuario();
-    _perfil = _sharedPrefs.get(StorageKeys.perfil);
-    _shortName = _sharedPrefs.get(StorageKeys.shortName);
+    final usuario = _sharedPrefs.getUsuario();
+    _perfil = usuario.role;
+    _shortName = usuario.shortName;
     /// ======== get localtion storage ======= ///
     _scaffoldKey = new GlobalKey();
     super.initState();
@@ -111,7 +113,7 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
   ///
   /// construye el formulario para el perfil [Cliente]
   /// 
-  Widget _formPerfilCliente(){
+  Widget _formPerfilComerciante(){
     return Column(
       children: [
         _titleWithInputForm(
@@ -157,7 +159,7 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
   ///
   /// construye el formulario para el perfil [Comerciante]
   /// 
-  Widget _formPerfilComerciante(){
+  Widget _formPerfilCliente(){
     return Column(
       children: [
         _titleWithInputForm(
@@ -257,9 +259,9 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
                 padding: EdgeInsets.only(top: 40.0, bottom: 20.0),
                 child: Text('Mi cuenta', style: TextStyle(fontFamily: 'Raleway',color: primaryColor, fontSize: 30.0,fontWeight: FontWeight.w700)),
               ),
-              ( _perfil == 'CLIENTE' )
-                ? _formPerfilCliente()
-                : _formPerfilComerciante(),
+              ( _perfil != roleUsuarioName[RoleUsuario.cliente] )
+                ? _formPerfilComerciante()
+                : _formPerfilCliente(),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 50.0),
                 child: ButtonSubmit(

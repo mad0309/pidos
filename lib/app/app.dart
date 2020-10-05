@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/app/tab_navigator.dart';
 import 'package:pidos/device/nav/nav_slide_from_right.dart';
+import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/presentation/blocs/mi_monedero/mi_monedero_bloc.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/bottom_navigation.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/main_tabs_page.dart';
 import 'package:pidos/src/presentation/pages/home/home_page.dart';
@@ -116,9 +119,17 @@ class _AppState extends State<App> {
     return {
       TabNavigatorRoutes.home: (context) => HomePage(globalScaffoldKey: _globalScaffoldKey),
       TabNavigatorRoutes.mainTabs: (context) {
-        return MainTabsPage(
-          pageController: _pageController,
-          globalScaffoldKey: _globalScaffoldKey
+        final _prefs = PreferenciasUsuario();
+        final usuario  = _prefs.getUsuario();
+        return BlocProvider(
+          initBloc: () => MiMonederoBloc(
+            pidosDisponiblesInit: usuario.pid ?? 0.0,
+            pidoscashDisponiblesInit: usuario.pidcash ?? 0.0
+          ),
+          child: MainTabsPage(
+            pageController: _pageController,
+            globalScaffoldKey: _globalScaffoldKey
+          ),
         );
       }
     };

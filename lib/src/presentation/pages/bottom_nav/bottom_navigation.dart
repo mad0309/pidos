@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/domain/models/usuario.dart';
 
 // importante el orden
 enum TabItem { 
@@ -43,7 +44,8 @@ class BottomNavigation extends StatelessWidget {
   ///
   @override
   Widget build(BuildContext context) {
-    final _perfil = PreferenciasUsuario().get(StorageKeys.perfil);
+    final usuario = PreferenciasUsuario().getUsuario();
+    final _perfil = usuario.role;
     return BottomAppBar(
       child: Container(
           height: 60.0,
@@ -55,9 +57,9 @@ class BottomNavigation extends StatelessWidget {
             _buildSeparator(),
             _buildMiddleIcon(tabItem: TabItem.movimientos),
             _buildSeparator(),
-            ( _perfil=="CLIENTE" )
-              ? _buildRightIconCliente(tabItem: TabItem.comprar)
-              : _buildRightIconComerciante(tabItem: TabItem.aliados)
+            ( _perfil!=roleUsuarioName[RoleUsuario.cliente] ) //correct
+              ? _buildRightIconComerciante(tabItem: TabItem.comprar)
+              : _buildRightIconCliente(tabItem: TabItem.aliados)
           ]
         ),
         )
@@ -134,9 +136,9 @@ class BottomNavigation extends StatelessWidget {
 
   ///
   /// TAB DERECHO
-  /// perfil: cliente
+  /// perfil: Comerciante
   ///
-  _buildRightIconCliente({TabItem tabItem}){
+  _buildRightIconComerciante({TabItem tabItem}){
     return FlatButton(
       padding: EdgeInsets.fromLTRB(10.0, 10.0, 25.0,10.0),
       onPressed: () {
@@ -165,9 +167,9 @@ class BottomNavigation extends StatelessWidget {
   
   ///
   /// TAB DERECHO
-  /// perfil: comerciante
+  /// perfil: cliente
   ///
-  _buildRightIconComerciante({TabItem tabItem}){
+  _buildRightIconCliente({TabItem tabItem}){
     return FlatButton(
       padding: EdgeInsets.fromLTRB(10.0, 10.0, 25.0,10.0),
       onPressed: () => onPushTab(TabItem.aliados),

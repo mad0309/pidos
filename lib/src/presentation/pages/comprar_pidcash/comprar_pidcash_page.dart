@@ -30,7 +30,8 @@ class _ComprarPidCashPageState extends State<ComprarPidCashPage> {
   void initState() {
     scaffoldKey = GlobalKey<ScaffoldState>();
     final _sharedPrefs = PreferenciasUsuario();
-    shortName = _sharedPrefs.get(StorageKeys.shortName);
+    final usuario = _sharedPrefs.getUsuario();
+    shortName = usuario.shortName;
     super.initState();
   }
 
@@ -155,10 +156,14 @@ class _ComprarPidCashPageState extends State<ComprarPidCashPage> {
           elevation: 0.0,
           textColor: cyanColor,
           // onPressed:()  => muyProntoDialog(context: context)
-          onPressed:()  {
-            Navigator.of(context).pushNamed('/compra_detalle', arguments: !compraSucess);
-            compraSucess = !compraSucess;
-          }
+          // onPressed:()  {
+          //   Navigator.of(context).pushNamed('/compra_detalle', arguments: !compraSucess);
+          //   compraSucess = !compraSucess;
+          // }
+          onPressed:()  => Navigator.of(context).pushNamed(
+            '/action_not_avaible', 
+            arguments: 'En este momento no es posible realizar esta acción intenta más tarde'
+          )
         ),
       ),
     );

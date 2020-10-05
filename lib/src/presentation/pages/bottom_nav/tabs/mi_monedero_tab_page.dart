@@ -1,13 +1,17 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
+import 'package:intl/intl.dart';
 import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
-import 'package:pidos/src/presentation/blocs/provider/servicios_bloc.dart';
+import 'package:pidos/src/domain/models/usuario.dart';
+import 'package:pidos/src/presentation/blocs/mi_monedero/mi_monedero_bloc.dart';
+import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/dialogs/transferir_dialog.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/circle_color.dart';
 import 'package:pidos/src/utils/colors.dart';
+import 'package:pidos/src/utils/extensions.dart';
 
 class MiMonederoTabPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> globalScaffoldKey;
@@ -26,7 +30,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
   String _pidNumber = '';
   String _perfil = '';
   String _shortName = '';
-  bool _pidsActive = false;
+  // bool _pidsActive = false;
 
   PageController _pageController = PageController(initialPage: 0);
   double _currentIndexPage;
@@ -42,11 +46,12 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
 
     /// ======= get data from local storage ===== ///
     final _sharedPrefs = PreferenciasUsuario();
-    _username = _sharedPrefs.get(StorageKeys.usuario);
-    _pidNumber = _sharedPrefs.get(StorageKeys.pid);
-    _perfil = _sharedPrefs.get(StorageKeys.perfil);
-    _shortName = _sharedPrefs.get(StorageKeys.shortName);
-    _pidsActive = _sharedPrefs.getBool(StorageKeys.pidCash);
+    final usuario = _sharedPrefs.getUsuario();
+    _username = usuario.firstName;
+    _pidNumber = usuario.document.toString();
+    _perfil = usuario.role;
+    _shortName = usuario.shortName;
+    // _pidsActive = _sharedPrefs.getBool(StorageKeys.pidCash);
 
     /// ======= =========================== ===== ///
     super.initState();
@@ -62,6 +67,10 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
   /// Seccion principal
   ///
   Widget _bodySection() {
+    final dia = DateFormat('dd', 'es').format(DateTime.now());
+    final mes = DateFormat('MMMM', 'es').format(DateTime.now());
+    final ano = DateFormat('y', 'es').format(DateTime.now());
+    final fechaActual = '$dia de ${mes.capitalize()} del $ano';
     return SafeArea(
       child: SizedBox(
         width: double.infinity,
@@ -87,7 +96,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                     padding: EdgeInsets.symmetric(
                         vertical: screenSizeHeight * 0.00844), //vertical: 5.0
                     child: Text(
-                      '06 de Agosto del 2020',
+                      fechaActual,
                       style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.white,
@@ -95,7 +104,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                     ),
                   ),
                   Text(
-                    (_perfil == "CLIENTE")
+                    (_perfil != roleUsuarioName[RoleUsuario.cliente])
                         ? 'PID - $_pidNumber'
                         : 'Pidos ID: PID - $_pidNumber',
                     style: TextStyle(
@@ -104,7 +113,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  (_perfil == "CLIENTE")
+                  (_perfil != roleUsuarioName[RoleUsuario.cliente])
                       ? _cardPidsDisponibles()
                       : StreamBuilder<bool>(
                           stream: BlocProvider.of<ServiciosBloc>(context)
@@ -123,49 +132,76 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                               return _cardPidsDisponibles();
                             }
                           })
-                  // _cardPidsDisponibles(),
                 ],
               ),
-              // Padding(
-              //   padding: EdgeInsets.only(bottom: 5.0, top: 50.0), //bottom: 20.0
-              //   child: _transferirButton(),
-              // ),
-              (_perfil == "CLIENTE")
-                  ? Padding(
-                      padding: EdgeInsets.only(
-                          bottom: 5.0,
-                          top: 0.08 *
-                              screenSizeHeight), //bottom: 20.0, top: 50.0
-                      child: _transferirButton(),
-                    )
-                  : StreamBuilder<bool>(
-                      stream: BlocProvider.of<ServiciosBloc>(context)
-                          .isPidChasActive$,
-                      initialData: BlocProvider.of<ServiciosBloc>(context)
-                          .isPidChasActive$
-                          .value,
-                      builder: (context, snapshot) {
-                        final isActive = snapshot.data ?? false;
-                        if (isActive) {
-                          return Column(
-                            children: [
-                              _transferirButton(),
-                              _comprarButton(context),
-                            ],
-                          );
-                        } else {
-                          return Padding(
-                            padding: EdgeInsets.only(
-                                bottom: 5.0,
-                                top: 0.08 *
-                                    screenSizeHeight), //bottom: 20.0, top: 50.0
-                            child: _transferirButton(),
-                          );
-                        }
-                      }),
+              (_perfil != roleUsuarioName[RoleUsuario.cliente])
+                ? Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 20.0),
+                      child: _mensajeInfoPuntos(),
+                    ),
+                    Padding(
+                        // padding: EdgeInsets.only(bottom: 5.0, top: 0.08 * screenSizeHeight), //top: 50.0
+                        padding: EdgeInsets.only(bottom: 5.0, top: 0.05 * screenSizeHeight), //top: 50.0
+                        child: _transferirButton(),
+                      ),
+                  ],
+                )
+                : StreamBuilder<bool>(
+                    stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
+                    initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+                    builder: (context, snapshot) {
+                      final isActive = snapshot.data ?? false;
+                      if (isActive) {
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 10.0),
+                              child: _mensajeInfoPuntos(),
+                            ),
+                            _transferirButton(),
+                            _comprarButton(context),
+                          ],
+                        );
+                      } else {
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(top: 20.0),
+                              child: _mensajeInfoPuntos(),
+                            ),
+                            Padding(
+                              // padding: EdgeInsets.only(bottom: 5.0, top: 0.08 * screenSizeHeight), // top: 50.0
+                              padding: EdgeInsets.only(bottom: 5.0, top: 0.05 * screenSizeHeight), // top: 30.0
+                              child: _transferirButton(),
+                            ),
+                          ],
+                        );
+                      }
+                    }
+                  ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _mensajeInfoPuntos(){
+    return Padding(
+      padding: EdgeInsets.only(left: screenSizeWidth * 0.111, right: screenSizeWidth * 0.111),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, size: 30.0, color: Colors.red ),
+          SizedBox(width: 5.0),
+          Expanded(
+            child: Text(
+              'Tus puntos pueden tardar un poco enverse reflejados aquí',
+              style: TextStyle(color: Colors.black, fontSize: 13.0),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -178,7 +214,6 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
         scrollDirection: Axis.horizontal,
         children: [
           _cardPidsDisponibles(),
-          // _cardPidsDisponibles(),
           _cardPidCashDisponibles()
         ],
       ),
@@ -189,6 +224,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
   /// Card de pids disponibles
   ///
   Widget _cardPidsDisponibles() {
+    final _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
     return Padding(
       padding: EdgeInsets.only(
           top: screenSizeHeight * 0.0337,
@@ -216,27 +252,27 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
               Text('Tienes',
                   style: TextStyle(fontSize: 20.0, color: Colors.white)),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                // mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CircleWidget(
-                    width: screenSizeWidth * 0.111, //width: 40.0,
-                    height: screenSizeHeight * 0.067, //height: 40.0
-                    color: Colors.transparent,
-                    borderColor: Colors.white,
-                    borderWidth: 2.5,
-                    widget: Center(
-                      child: CircleWidget(
-                          width: screenSizeWidth * 0.0416, //width: 15.0,
-                          height: screenSizeHeight * 0.0253, //height: 15.0,
-                          color: Colors.white),
-                    ),
-                  ),
+                  _iconPidDisponible(),
                   SizedBox(width: screenSizeWidth * 0.022), //width: 8.0
-                  Text('1.000.000',
-                      style: TextStyle(
-                          fontSize: 35.0,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white)),
+                  StreamBuilder<double>(
+                    stream: _miMonederoBloc.pidosDisponibles$,
+                    initialData: _miMonederoBloc.pidosDisponibles$.value,
+                    builder: (context, snapshot) {
+                      final pid = snapshot.data ?? 0.0;
+                      return Flexible(
+                        child: FittedBox(
+                          child: Text(pid.toStringAsFixed(2),
+                              style: TextStyle(
+                                  fontSize: 35.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white)),
+                        ),
+                      );
+                    }
+                  ),
                 ],
               ),
               Text('Pidos disponibles',
@@ -246,10 +282,27 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
     );
   }
 
+  Widget _iconPidDisponible(){
+    return CircleWidget(
+      width: screenSizeWidth * 0.111, //width: 40.0,
+      height: screenSizeHeight * 0.067, //height: 40.0
+      color: Colors.transparent,
+      borderColor: Colors.white,
+      borderWidth: 2.5,
+      widget: Center(
+        child: CircleWidget(
+            width: screenSizeWidth * 0.0416, //width: 15.0,
+            height: screenSizeHeight * 0.0253, //height: 15.0,
+            color: Colors.white),
+      ),
+    );
+  }
+
   ///
   /// Card de pidsCash disponibles
   ///
   Widget _cardPidCashDisponibles() {
+    final _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
     return Padding(
       padding: EdgeInsets.only(
           top: screenSizeHeight * 0.0337,
@@ -276,22 +329,24 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
             children: [
               Text('Tienes',
                   style: TextStyle(fontSize: 20.0, color: Colors.white)),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Row(
-                  // mainAxisAlignment: MainAxisAlignment.ens
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(Icons.monetization_on,
-                        color: Colors.white, size: 40.0),
-                    // SizedBox(width: screenSizeWidth * 0.022), //width: 8.0
-                    Text('30,00',
-                        style: TextStyle(
-                            fontSize: 35.0,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white)),
-                  ],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(Icons.monetization_on,color: Colors.white, size: 40.0),
+                  SizedBox(width: screenSizeWidth * 0.022), //width: 8.0
+                  StreamBuilder<double>(
+                    stream: _miMonederoBloc.pidoscashDisponibles$,
+                    initialData: _miMonederoBloc.pidoscashDisponibles$.value,
+                    builder: (context, snapshot) {
+                      final pidcash = snapshot.data ?? 0.0;
+                      return Text(pidcash.toStringAsFixed(2),
+                          style: TextStyle(
+                              fontSize: 35.0,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white));
+                    }
+                  ),
+                ],
               ),
               Text('Pid Cash',
                   style: TextStyle(fontSize: 20.0, color: Colors.white)),
