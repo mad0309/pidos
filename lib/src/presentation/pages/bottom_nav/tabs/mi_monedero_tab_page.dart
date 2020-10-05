@@ -250,7 +250,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('Tienes',
-                  style: TextStyle(fontSize: 20.0, color: Colors.white)),
+                  style: TextStyle(fontSize: screenSizeHeight * 0.0337, color: Colors.white)), //fontSize: 20.0
               Row(
                 // mainAxisAlignment: MainAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -266,7 +266,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                         child: FittedBox(
                           child: Text(pid.toStringAsFixed(2),
                               style: TextStyle(
-                                  fontSize: 35.0,
+                                  fontSize: screenSizeHeight * 0.0591, //fontSize: 35.0,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white)),
                         ),
@@ -276,7 +276,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                 ],
               ),
               Text('Pidos disponibles',
-                  style: TextStyle(fontSize: 20.0, color: Colors.white)),
+                  style: TextStyle(fontSize: screenSizeHeight * 0.0337, color: Colors.white)), //fontSize: 20.0
             ],
           )),
     );
@@ -328,7 +328,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('Tienes',
-                  style: TextStyle(fontSize: 20.0, color: Colors.white)),
+                  style: TextStyle(fontSize: screenSizeHeight * 0.0337, color: Colors.white)), //fontSize: 20.0
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -341,7 +341,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                       final pidcash = snapshot.data ?? 0.0;
                       return Text(pidcash.toStringAsFixed(2),
                           style: TextStyle(
-                              fontSize: 35.0,
+                              fontSize: screenSizeHeight * 0.0591, //fontSize: 35.0,,
                               fontWeight: FontWeight.w700,
                               color: Colors.white));
                     }
@@ -349,9 +349,9 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                 ],
               ),
               Text('Pid Cash',
-                  style: TextStyle(fontSize: 20.0, color: Colors.white)),
+                  style: TextStyle(fontSize: screenSizeHeight * 0.0337, color: Colors.white)), //fontSize: 20.0
               Text('disponibles',
-                  style: TextStyle(fontSize: 20.0, color: Colors.white)),
+                  style: TextStyle(fontSize: screenSizeHeight * 0.0337, color: Colors.white)), //fontSize: 20.0
             ],
           )),
     );
