@@ -8,9 +8,7 @@ import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/icons_widgets/bell_icon.dart';
 import 'package:pidos/src/utils/extensions.dart';
 
-
 class HomePage extends StatefulWidget {
-
   /// [globalScaffoldKey]
   /// sirve para poder abrir el drawe nav
   final GlobalKey<ScaffoldState> globalScaffoldKey;
@@ -22,12 +20,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   double screenSizeHeight;
   double screenSizeWidth;
 
-  final _carruselData = ['slide-app-1.jpg','slide-app-2.jpg']; 
-  
+  final _carruselData = ['slide-app-1.jpg', 'slide-app-2.jpg'];
 
   /// variable para controlar los radio button
   /// incializa como 1 para marcar el primer radio button
@@ -39,9 +35,8 @@ class _HomePageState extends State<HomePage> {
   String _perfil = '';
   String _shortName = '';
 
-
   @override
-  void initState() { 
+  void initState() {
     /// ======= get data from local storage ===== ///
     final _sharedPrefs = PreferenciasUsuario();
     usuario = _sharedPrefs.getUsuario();
@@ -54,7 +49,6 @@ class _HomePageState extends State<HomePage> {
     /// ======= =========================== ===== ///
     super.initState();
   }
-
 
   ///
   /// Main Seccion
@@ -80,7 +74,8 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.008445), //vertical: 5.0
+              padding: EdgeInsets.symmetric(
+                  vertical: screenSizeHeight * 0.008445), //vertical: 5.0
               child: Text(
                 fechaActual,
                 style: TextStyle(
@@ -90,7 +85,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Text(
-              (_perfil != roleUsuarioName[RoleUsuario.cliente]) ? 'PID - $_pidNumber' : 'Pidos ID: PID - $_pidNumber',
+              (_perfil != roleUsuarioName[RoleUsuario.cliente])
+                  ? 'PID - $_pidNumber'
+                  : 'Pidos ID: PID - $_pidNumber',
               style: TextStyle(
                 fontSize: 16.0,
                 color: Colors.white,
@@ -98,9 +95,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             _carruselHorizontal(),
-            ( _perfil != roleUsuarioName[RoleUsuario.cliente] )
-              ? _radioButtonSection()
-              : Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
+            (_perfil != roleUsuarioName[RoleUsuario.cliente])
+                ? _radioButtonSection()
+                : Padding(padding: EdgeInsets.symmetric(vertical: 30.0)),
             _transferirButton()
           ],
         ),
@@ -111,48 +108,46 @@ class _HomePageState extends State<HomePage> {
   ///
   /// Carrusel de Silder horizontal Scroll
   ///
-  Widget _carruselHorizontal(){
+  Widget _carruselHorizontal() {
     return Padding(
       padding: EdgeInsets.only(top: screenSizeHeight * 0.0337), //top: 20.0
       child: Container(
         // color: Colors.red,
         height: screenSizeHeight * 0.337, //height: 200.0,
         child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: _carruselData.map((data) {
-            final index = _carruselData.indexOf(data);
-            if( index==_carruselData.length-1 ){//ultimo valor
-              return Padding(
-                padding: EdgeInsets.only(right: screenSizeWidth * 0.0416 ),
-                child: _carruselChild(data),
-              );
-            }else{
-              return _carruselChild(data);
-            }
-          }).toList()
-        ),
+            scrollDirection: Axis.horizontal,
+            children: _carruselData.map((data) {
+              final index = _carruselData.indexOf(data);
+              if (index == _carruselData.length - 1) {
+                //ultimo valor
+                return Padding(
+                  padding: EdgeInsets.only(right: screenSizeWidth * 0.0416),
+                  child: _carruselChild(data),
+                );
+              } else {
+                return _carruselChild(data);
+              }
+            }).toList()),
       ),
     );
-  }   
+  }
 
   ///
   /// Card
   ///
-  Widget _carruselChild(String title){
+  Widget _carruselChild(String title) {
     return Padding(
-      padding: EdgeInsets.only(left: screenSizeWidth * 0.0416 ), //left: 15.0
+      padding: EdgeInsets.only(left: screenSizeWidth * 0.0416), //left: 15.0
       child: Container(
         width: screenSizeWidth * 0.833, //width: 300.0,
         height: double.infinity,
         decoration: BoxDecoration(
-          color: secundaryColor,
-          borderRadius: BorderRadius.circular(30.0)
-        ),
+            color: secundaryColor, borderRadius: BorderRadius.circular(30.0)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(30.0),
           child: Image(
             image: AssetImage('assets/img/$title'),
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
           ),
         ),
       ),
@@ -162,105 +157,100 @@ class _HomePageState extends State<HomePage> {
   ///
   /// Seccion de los radio Buttons
   ///
-  Widget _radioButtonSection(){
-    
+  Widget _radioButtonSection() {
     return Padding(
-      padding: EdgeInsets.only(bottom: screenSizeHeight * 0.016), // bottom: 10.0
-      child: SizedBox(
-        width: screenSizeWidth * 0.5, //width: 180.0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'Enviar PIDS',
-                  style: new TextStyle(fontSize: 15.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: idRadioButton,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  activeColor: primaryColor,
-                  onChanged: (val) {
-                    setState(() {
-                      idRadioButton = 1;
-                    });
-                  },
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'Recibir PIDS',
-                  style: new TextStyle(fontSize: 15.0),
-                ),
-                Radio(
-                  value: 2,
-                  groupValue: idRadioButton,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  activeColor: primaryColor,
-                  focusColor: primaryColor,
-                  onChanged: (val) {
-                    setState(() {
-                      idRadioButton = 2;
-                    });
-                  },
-                ),
-              ],
-            )
-          ],
-        ),
-      )
-    );
+        padding:
+            EdgeInsets.only(bottom: screenSizeHeight * 0.016), // bottom: 10.0
+        child: SizedBox(
+          width: screenSizeWidth * 0.5, //width: 180.0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Enviar PIDS',
+                    style: new TextStyle(fontSize: 15.0),
+                  ),
+                  Radio(
+                    value: 1,
+                    groupValue: idRadioButton,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    activeColor: primaryColor,
+                    onChanged: (val) {
+                      setState(() {
+                        idRadioButton = 1;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Recibir PIDS',
+                    style: new TextStyle(fontSize: 15.0),
+                  ),
+                  Radio(
+                    value: 2,
+                    groupValue: idRadioButton,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    activeColor: primaryColor,
+                    focusColor: primaryColor,
+                    onChanged: (val) {
+                      setState(() {
+                        idRadioButton = 2;
+                      });
+                    },
+                  ),
+                ],
+              )
+            ],
+          ),
+        ));
   }
-
 
   ///
   /// botton de transferir
   ///
-  Widget _transferirButton(){
+  Widget _transferirButton() {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.00844, horizontal: screenSizeWidth * 0.0833  ), //vertical: 5.0, horizontal: 30.0
+      padding: EdgeInsets.symmetric(
+          vertical: screenSizeHeight * 0.00844,
+          horizontal:
+              screenSizeWidth * 0.0833), //vertical: 5.0, horizontal: 30.0
       child: SizedBox(
         width: double.infinity,
         child: RaisedButton(
-          child: Container( 
-            padding: EdgeInsets.symmetric( vertical: screenSizeHeight * 0.0253 ), //vertical: 15.0
-            child: Text(
-              'Transferir',
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 20.0
-              )
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                  vertical: screenSizeHeight * 0.0253), //vertical: 15.0
+              child: Text('Transferir',
+                  style:
+                      TextStyle(fontWeight: FontWeight.w700, fontSize: 20.0)),
             ),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0)
-          ),
-          color: primaryColor,
-          elevation: 0.0,
-          textColor: Colors.white,
-          // onPressed:() => muyProntoDialog(context: context)
-          // onPressed:() {
-          //   final contextApp = GlobalSingleton().contextApp;
-          //   Navigator.of(contextApp).pushNamed('/transferencia',arguments: true);
-          // } 
-          onPressed:() {
-            final contextApp = GlobalSingleton().contextApp;
-            Navigator.of(contextApp).pushNamed(
-              '/action_not_avaible', 
-              arguments: 'En este momento no cuentas con Pidos disponibles para realizar esta acción'
-            );
-          } 
-        ),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0)),
+            color: primaryColor,
+            elevation: 0.0,
+            textColor: Colors.white,
+            // onPressed:() => muyProntoDialog(context: context)
+            // onPressed:() {
+            //   final contextApp = GlobalSingleton().contextApp;
+            //   Navigator.of(contextApp).pushNamed('/transferencia',arguments: true);
+            // }
+            onPressed: () {
+              final contextApp = GlobalSingleton().contextApp;
+              Navigator.of(contextApp).pushNamed('/action_not_avaible',
+                  arguments:
+                      'En este momento no cuentas con Pidos disponibles para realizar esta acción');
+            }),
       ),
     );
   }
-  
+
   ///
   /// metodo build
   ///
@@ -271,30 +261,29 @@ class _HomePageState extends State<HomePage> {
     screenSizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       // key: _scaffoldKey,
-      extendBodyBehindAppBar: true, 
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        elevation: 0.0, 
+        elevation: 0.0,
         leading: IconButton(
           icon: BellIcon(
             imageUrl: 'assets/img/bell_icon.png',
             size: 28.0,
           ),
-          onPressed:() {},
+          onPressed: () {},
         ),
         actions: [
           InkResponse(
-                onTap: () => widget.globalScaffoldKey.currentState.openEndDrawer(),
-                child: Padding(
-                  padding: EdgeInsets.only(right: 20.0),
-                  child: CircleAvatarName(
-                    diameterOutside: 40.0,
-                    diameterInside: 25.0,
-                    shortName: _shortName,
-                    textSize: 10.0,
-                  )
-                ),
-              )
+            onTap: () => widget.globalScaffoldKey.currentState.openEndDrawer(),
+            child: Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: CircleAvatarName(
+                  diameterOutside: 40.0,
+                  diameterInside: 25.0,
+                  shortName: _shortName,
+                  textSize: 10.0,
+                )),
+          )
         ],
       ),
       // endDrawer: (_perfil == 'CLIENTE') ? null : DrawerNav(),
@@ -303,7 +292,9 @@ class _HomePageState extends State<HomePage> {
           Container(
             color: primaryColor,
             width: double.infinity,
-            height: (screenSizeHeight>600) ? screenSizeHeight * 0.5 : screenSizeHeight * 0.6,
+            height: (screenSizeHeight > 600)
+                ? screenSizeHeight * 0.5
+                : screenSizeHeight * 0.6,
           ),
           SingleChildScrollView(child: _bodySection())
         ],
