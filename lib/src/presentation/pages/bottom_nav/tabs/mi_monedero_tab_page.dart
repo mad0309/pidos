@@ -1,13 +1,17 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:pidos/app/global_singleton.dart';
+import 'package:pidos/src/data/exceptions/network_exceptions.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
+import 'package:pidos/src/presentation/blocs/home/home_bloc.dart';
 import 'package:pidos/src/presentation/blocs/mi_monedero/mi_monedero_bloc.dart';
 import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/dialogs/transferir_dialog.dart';
+import 'package:pidos/src/presentation/states/result_state.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/circle_color.dart';
 import 'package:pidos/src/utils/colors.dart';
@@ -228,7 +232,8 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
   /// Card de pids disponibles
   ///
   Widget _cardPidsDisponibles() {
-    final _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
+    // final _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
+    final _homeBloc = BlocProvider.of<HomeBloc>(context);
     return Padding(
       padding: EdgeInsets.only(
           top: screenSizeHeight * 0.0337,
@@ -262,22 +267,38 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                 children: [
                   _iconPidDisponible(),
                   SizedBox(width: screenSizeWidth * 0.022), //width: 8.0
-                  StreamBuilder<double>(
-                      stream: _miMonederoBloc.pidosDisponibles$,
-                      initialData: _miMonederoBloc.pidosDisponibles$.value,
+                  StreamBuilder<ResultState<Usuario>>(
+                      stream: _homeBloc.retornaSaldoState$,
+                      initialData: _homeBloc.retornaSaldoState$.value,
                       builder: (context, snapshot) {
-                        final pid = snapshot.data ?? 0.0;
-                        return Flexible(
-                          child: FittedBox(
-                            child: Text(pid.toStringAsFixed(2),
-                                style: TextStyle(
-                                    fontSize: screenSizeHeight *
-                                        0.0591, //fontSize: 35.0,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white)),
-                          ),
+                        // final pid = snapshot.data ?? 0.0;
+                        final state = snapshot.data;
+                        return state.maybeWhen(
+                          loading: () {
+                            return SpinKitThreeBounce(
+                              color: Colors.white,
+                              size: 20.0,
+                            );
+                          },
+                          error: (NetworkExceptions error){
+                            return Container();
+                          },
+                          data: (Usuario saldo) {
+                            return Flexible(
+                              child: FittedBox(
+                                child: Text(saldo.pid.toStringAsFixed(2),
+                                    style: TextStyle(
+                                        fontSize: screenSizeHeight *
+                                            0.0591, //fontSize: 35.0,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white)),
+                              ),
+                            );
+                          },
+                          orElse: () => Container()
                         );
-                      }),
+                      }
+                  ),
                 ],
               ),
               Text('Pidos disponibles',
@@ -308,7 +329,8 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
   /// Card de pidsCash disponibles
   ///
   Widget _cardPidCashDisponibles() {
-    final _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
+    // final _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
+    final _homeBloc = BlocProvider.of<HomeBloc>(context);
     return Padding(
       padding: EdgeInsets.only(
           top: screenSizeHeight * 0.0337,
@@ -343,17 +365,38 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                       color: Colors.white,
                       size: screenSizeHeight * 0.0675), //size: 40.0
                   SizedBox(width: screenSizeWidth * 0.022), //width: 8.0
-                  StreamBuilder<double>(
-                      stream: _miMonederoBloc.pidoscashDisponibles$,
-                      initialData: _miMonederoBloc.pidoscashDisponibles$.value,
+                  StreamBuilder<ResultState<Usuario>>(
+                      stream: _homeBloc.retornaSaldoState$,
+                      initialData: _homeBloc.retornaSaldoState$.value,
                       builder: (context, snapshot) {
-                        final pidcash = snapshot.data ?? 0.0;
-                        return Text(pidcash.toStringAsFixed(2),
-                            style: TextStyle(
-                                fontSize: screenSizeHeight *
-                                    0.0591, //fontSize: 35.0,,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white));
+                        // final pidcash = snapshot.data ?? 0.0;
+                        final state = snapshot.data;
+                        return state.maybeWhen(
+                          loading: () {
+                            return SpinKitThreeBounce(
+                              color: Colors.white,
+                              size: 20.0,
+                            );
+                          },
+                          error: (NetworkExceptions error){
+                            return Container();
+                          },
+                          data: (Usuario saldo) {
+                            return Flexible(
+                              child: FittedBox(
+                                child: Text(saldo.pidcash.toStringAsFixed(2),
+                                  style: TextStyle(
+                                      fontSize: screenSizeHeight *
+                                          0.0591, //fontSize: 35.0,,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white
+                                  )
+                                ),
+                              ),
+                            );
+                          },
+                          orElse: () => Container()
+                        );
                       }),
                 ],
               ),
@@ -415,7 +458,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
             textColor: Colors.white,
             onPressed: () => transferirDialog(
               context: context,
-              fromPage: '/main_tabs'
+              // fromPage: '/main_tabs'
             )
         ),
       ),

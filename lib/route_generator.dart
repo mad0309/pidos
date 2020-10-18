@@ -6,6 +6,7 @@ import 'package:pidos/main.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/domain/repository/usuario_repository.dart';
+import 'package:pidos/src/presentation/blocs/home/home_bloc.dart';
 import 'package:pidos/src/presentation/blocs/login/enviar_codigo_bloc.dart';
 import 'package:pidos/src/presentation/blocs/login/ingresa_codigo_bloc.dart';
 import 'package:pidos/src/presentation/blocs/login/registro_bloc.dart';
@@ -17,7 +18,6 @@ import 'package:pidos/src/presentation/pages/login/ingresa_codigo_page.dart';
 import 'package:pidos/src/presentation/pages/login/login_page.dart';
 import 'package:pidos/src/presentation/pages/login/registro_form_page.dart';
 import 'package:pidos/src/presentation/pages/login/registro_page.dart';
-import 'package:pidos/src/presentation/pages/login/registro_webview_page.dart';
 import 'package:pidos/src/presentation/pages/no_action_avaible_page.dart';
 import 'package:pidos/src/presentation/pages/settings/acerca_de_page.dart';
 import 'package:pidos/src/presentation/pages/settings/ayuda_page.dart';
@@ -28,7 +28,13 @@ import 'package:pidos/src/presentation/pages/transferir/transferir_page.dart';
 
 final appRoutes = <String, WidgetBuilder>{
   '/init': ( BuildContext context ) => Home(),
-  '/home' :  ( BuildContext context ) => App(),
+  '/home' :  ( BuildContext context ) {
+    final usuarioRepository = Provider.of<UsuarioRepository>(context);
+    return BlocProvider(
+      initBloc: () => HomeBloc(usuarioRepository: usuarioRepository),
+      child: App()
+    );
+  },
   '/login' : ( BuildContext context ) => LoginPage(),
   '/mi_cuenta' : ( BuildContext context ) {
     final _prefs = PreferenciasUsuario();
@@ -92,5 +98,5 @@ final appRoutes = <String, WidgetBuilder>{
     final String message = ModalRoute.of(context).settings.arguments;
     return NoActionAvaiblePage(text: message ?? '');
   },
-  '/registro_webview': ( BuildContext context  ) => RegistroWebviewPage()
+  // '/registro_webview': ( BuildContext context  ) => RegistroWebviewPage()
 };

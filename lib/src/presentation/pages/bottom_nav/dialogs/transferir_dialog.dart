@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:flutter_provider/flutter_provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src/data/constanst.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/domain/repository/transferencia_repository.dart';
+import 'package:pidos/src/presentation/blocs/home/home_bloc.dart';
 import 'package:pidos/src/presentation/blocs/mi_monedero/mi_monedero_bloc.dart';
 import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/blocs/transferir_bloc.dart';
@@ -21,12 +23,12 @@ import 'package:pidos/src/utils/colors.dart';
 
 Future<dynamic> transferirDialog({
   @required BuildContext context,
-  @required String fromPage
+  // @required String fromPage
 }) async {
   MiMonederoBloc _miMonederoBloc;
-  if( fromPage != '/' ){
-    _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
-  }
+  // if( fromPage != '/' ){
+  //   _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
+  // }
   return await showDialog(
     context: context,
     child: BlocProvider(
@@ -35,7 +37,7 @@ Future<dynamic> transferirDialog({
       ),
       child: _SystemPadding(
         child: _TransferenciaDialog(
-          miMonederoBloc: _miMonederoBloc,
+          // miMonederoBloc: _miMonederoBloc,
         ),
       ),
     )
@@ -63,11 +65,11 @@ class _SystemPadding extends StatelessWidget {
 
 
 class _TransferenciaDialog extends StatefulWidget {
-  final MiMonederoBloc miMonederoBloc;
+  // final MiMonederoBloc miMonederoBloc;
 
-  const _TransferenciaDialog({
-    this.miMonederoBloc
-  });
+  // const _TransferenciaDialog({
+  //   this.miMonederoBloc
+  // });
 
   @override
   __TransferenciaDialogState createState() => __TransferenciaDialogState();
@@ -91,6 +93,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
 
   TranferirBloc tranferirBloc;
   StreamSubscription transferenciaMessage$;
+  HomeBloc homeBloc;
 
   @override
   void initState() { 
@@ -102,6 +105,8 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     }else{
       _buttonLabel = 'Transferir';
     }
+    final contextApp = GlobalSingleton().contextApp;
+    homeBloc = BlocProvider.of<HomeBloc>(contextApp);
 
     cantidadPidsController = TextEditingController(text: '');
     pidosIdController = TextEditingController(text: '');
@@ -119,13 +124,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
       final destinationPidId = tranferirBloc.destinationPidId$.value;
       final cantidadPidEnviada = tranferirBloc.cantidadEnPids$.value;
       if( message is TransferenciaSuccessMessage ){
-        if( widget.miMonederoBloc!=null ){
-          if(tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos){
-            widget.miMonederoBloc.pidosDisponiblesSink$.add(usuario.pid);
-          }else{
-            widget.miMonederoBloc.pidosDisponiblesSink$.add(usuario.pidcash);
-          }
-        }
+        homeBloc.retornaSaldo();
         Navigator.of(context).popAndPushNamed('/transferencia', arguments: {
           'status': true,
           'currentPidId': currentPidId,

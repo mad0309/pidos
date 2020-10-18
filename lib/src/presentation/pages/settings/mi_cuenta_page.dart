@@ -329,23 +329,25 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
       key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: primaryColor,
-        leading: IconButton(
+        leading: (isFirstLogin) ? Container() : IconButton(
           icon: Icon(Icons.arrow_back_ios,color: cyanColor),
           onPressed:()  => Navigator.of(context).pop(), 
         ),
         actions: [
-          InkResponse(
-            onTap: () => _scaffoldKey.currentState.openEndDrawer(),
-            child: Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: CircleAvatarName(
-                diameterOutside: 40.0,
-                diameterInside: 25.0,
-                shortName: _shortName,
-                textSize: 10.0,
+          (isFirstLogin)
+          ? Container()
+          : InkResponse(
+              onTap: () => _scaffoldKey.currentState.openEndDrawer(),
+              child: Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: CircleAvatarName(
+                  diameterOutside: 40.0,
+                  diameterInside: 25.0,
+                  shortName: _shortName,
+                  textSize: 10.0,
+                ),
               ),
-            ),
-          )
+            )
         ],
       ),
       endDrawer: DrawerNav(),
