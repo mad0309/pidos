@@ -45,16 +45,23 @@ class DrawerNav extends StatelessWidget {
                 child: Divider(color: Colors.white, thickness: 1.0),
               ),
               InkWell(
-                onTap: () => Navigator.popAndPushNamed(context, '/mi_cuenta'),
+                onTap: () => Navigator.popAndPushNamed(context, '/home'),
                 child: Padding(
                   padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
+                  child: Text('Inicio',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
+                ),
+              ),
+              InkWell(
+                onTap: () => Navigator.popAndPushNamed(context, '/mi_cuenta'),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
                   child: Text('Mi cuenta',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
                 ),
               ),
               InkWell(
                 onTap: () => Navigator.popAndPushNamed(context, '/servicios'),
                 child: Padding(
-                  padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
                   child: Text('Servicios',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
                 ),
               ),

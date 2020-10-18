@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class StorageKeys {
   static final String token = "TOKEN";
   static final String usuario = "USUARIO";
+  static final String newAccountFirstLogin = "FIRSTLOGIN";
   // static final String perfil ="PERFIL";
   // static final String pid ="PID";
   // static final String shortName ="SHORTNAME";
@@ -80,6 +81,19 @@ class PreferenciasUsuario {
   }
   
   Future<void> saveUsuario(UsuarioEntity usuario) async {
+    bool resultU;
+    try {
+      resultU = await  _prefs.setString(StorageKeys.usuario, jsonEncode(usuario.toJson()));
+      print('Saved $usuario');
+    } catch (err) {
+      throw ('Cannot save user => $err');
+    }
+    if (!resultU) {
+      throw ('Cannot save user ');
+    }
+  }
+
+  Future<void> saveUsuarioDomain(Usuario usuario) async {
     bool resultU;
     try {
       resultU = await  _prefs.setString(StorageKeys.usuario, jsonEncode(usuario.toJson()));

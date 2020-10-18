@@ -137,10 +137,10 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
               (_perfil != roleUsuarioName[RoleUsuario.cliente])
                   ? Column(
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 20.0),
-                          child: _mensajeInfoPuntos(),
-                        ),
+                        // Padding(
+                        //   padding: EdgeInsets.only(top: 20.0),
+                        //   child: _mensajeInfoPuntos(),
+                        // ),
                         Padding(
                           // padding: EdgeInsets.only(bottom: 5.0, top: 0.08 * screenSizeHeight), //top: 50.0
                           padding: EdgeInsets.only(
@@ -161,10 +161,10 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                         if (isActive) {
                           return Column(
                             children: [
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 10.0),
-                                child: _mensajeInfoPuntos(),
-                              ),
+                              // Padding(
+                              //   padding: EdgeInsets.only(bottom: 10.0),
+                              //   child: _mensajeInfoPuntos(),
+                              // ),
                               _transferirButton(),
                               _comprarButton(context),
                             ],
@@ -172,10 +172,10 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                         } else {
                           return Column(
                             children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 20.0),
-                                child: _mensajeInfoPuntos(),
-                              ),
+                              // Padding(
+                              //   padding: EdgeInsets.only(top: 20.0),
+                              //   child: _mensajeInfoPuntos(),
+                              // ),
                               Padding(
                                 // padding: EdgeInsets.only(bottom: 5.0, top: 0.08 * screenSizeHeight), // top: 50.0
                                 padding: EdgeInsets.only(
@@ -413,7 +413,11 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
             color: primaryColor,
             elevation: 0.0,
             textColor: Colors.white,
-            onPressed: () => transferirDialog(context: context)),
+            onPressed: () => transferirDialog(
+              context: context,
+              fromPage: '/main_tabs'
+            )
+        ),
       ),
     );
   }
@@ -449,6 +453,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

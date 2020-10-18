@@ -42,8 +42,8 @@ abstract class NetworkExceptions with _$NetworkExceptions {
   const factory NetworkExceptions.unexpectedError() = UnexpectedError;
 
 
-  static NetworkExceptions handleResponse(int statusCode) {
-    switch (statusCode) {
+  static NetworkExceptions handleResponse(Response<dynamic> reponse) {
+    switch (reponse.statusCode) {
       case 400:
       case 401:
       case 403:
@@ -65,7 +65,29 @@ abstract class NetworkExceptions with _$NetworkExceptions {
         return NetworkExceptions.serviceUnavailable();
         break;
       default:
-        var responseCode = statusCode;
+        var responseCode = reponse.statusCode;
+        var data = reponse.data;
+        var messageError = '';
+        if(data['document'] !=null){
+          messageError = data['document'][0];
+          return NetworkExceptions.defaultError(messageError);
+        }else{
+          if(data['email'] !=null){
+            messageError = data['email'][0];
+            return NetworkExceptions.defaultError(messageError);
+          }else{
+            if(data['password'] !=null){
+               messageError = data['password'][0];
+               return NetworkExceptions.defaultError(messageError);
+            }else{
+              if(data['error'] != null){
+              messageError = data['error'];
+              return NetworkExceptions.defaultError(messageError);
+            }
+            }
+            
+          }
+        }
         return NetworkExceptions.defaultError(
           "Received invalid status code: $responseCode",
         );
@@ -93,7 +115,7 @@ abstract class NetworkExceptions with _$NetworkExceptions {
               break;
             case DioErrorType.RESPONSE:
               networkExceptions =
-                  NetworkExceptions.handleResponse(error.response.statusCode);
+                  NetworkExceptions.handleResponse(error.response);
               break;
             case DioErrorType.SEND_TIMEOUT:
               networkExceptions = NetworkExceptions.sendTimeout();

@@ -5,10 +5,10 @@ import 'package:pidos/src/utils/colors.dart';
 
 class TransferirPage extends StatefulWidget {
 
-  final bool success;
+  final Map<String,dynamic> transferencia;
 
   const TransferirPage({
-    this.success = true
+    this.transferencia
   });
 
 
@@ -50,10 +50,10 @@ class _TransferirPageState extends State<TransferirPage> {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: _screenSizeHeight * 0.016), //vertical: 10.0
       child: Text(
-        (widget.success)
+        (widget.transferencia['status'])
           ? '¡Transferencia exitosa!'
           : '¡Transferencia Rechazada!', 
-        style: TextStyle(fontFamily: 'Raleway',color: (widget.success) ? electricVioletColor : Colors.red, fontSize: 25.0,fontWeight: FontWeight.w700)
+        style: TextStyle(fontFamily: 'Raleway',color: (widget.transferencia['status']) ? electricVioletColor : Colors.red, fontSize: 25.0,fontWeight: FontWeight.w700)
       ),
     );
   }
@@ -64,7 +64,7 @@ class _TransferirPageState extends State<TransferirPage> {
       children: [
         Text('Transferencia Nº 3040', style: TextStyle(color: Colors.black, fontSize: 18.0)),
         SizedBox(width: 8.0),
-        (widget.success) 
+        (widget.transferencia['status']) 
           ? Icon(Icons.check_circle_outline, color: Colors.green,size: 22.0)
           : Icon(Icons.error_outline, color: Colors.red,size: 22.0),
       ],
@@ -94,13 +94,13 @@ class _TransferirPageState extends State<TransferirPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('PID-1456237',style: TextStyle(color: Colors.black, fontSize: 15.0)),
+                    Text('PID-${widget.transferencia['currentPidId']}',style: TextStyle(color: Colors.black, fontSize: 15.0)),
                     Container(
                       width: 1,
                       height: 30.0,
                       color: Color(0xFF0CE7FD),
                     ),
-                    Text('PID-1456237',style: TextStyle(color: Colors.black, fontSize: 15.0)),
+                    Text('PID-${widget.transferencia['destinationPidId']}',style: TextStyle(color: Colors.black, fontSize: 15.0)),
                   ],
                 ),
               ],
@@ -112,7 +112,7 @@ class _TransferirPageState extends State<TransferirPage> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0),
-            child: _detailRow('Cantidad:', '10,00 PIDOS'),
+            child: _detailRow('Cantidad:', '${widget.transferencia['cantidadPidEnviada']} PIDOS'),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0),

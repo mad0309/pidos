@@ -7,12 +7,16 @@ class InputFormPrefixIcon extends StatefulWidget {
   final String placeholderText;
   final String postalCode;
   final Function(String) onChange;
+  final TextEditingController textEditingController;
+  final FocusNode focusNode;
 
   InputFormPrefixIcon({
     this.inputType,
     this.placeholderText,
     this.postalCode,
-    this.onChange
+    this.onChange,
+    this.textEditingController,
+    this.focusNode,
   });
 
   @override
@@ -38,6 +42,8 @@ class _InputFormPrefixIconState extends State<InputFormPrefixIcon> {
   Widget build(BuildContext context) {
     return TextField(
       // keyboardType: widget.inputType,
+      controller: widget.textEditingController,
+      focusNode: widget.focusNode,
       keyboardType: widget.inputType,
       textAlign: TextAlign.center, 
       style: TextStyle(

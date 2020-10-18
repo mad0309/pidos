@@ -42,6 +42,18 @@ class _$UsuarioSerializer implements StructuredSerializer<Usuario> {
         ..add(serializers.serialize(object.name,
             specifiedType: const FullType(String)));
     }
+    if (object.lastName != null) {
+      result
+        ..add('lastName')
+        ..add(serializers.serialize(object.lastName,
+            specifiedType: const FullType(String)));
+    }
+    if (object.email != null) {
+      result
+        ..add('email')
+        ..add(serializers.serialize(object.email,
+            specifiedType: const FullType(String)));
+    }
     if (object.document != null) {
       result
         ..add('document')
@@ -108,6 +120,14 @@ class _$UsuarioSerializer implements StructuredSerializer<Usuario> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
+        case 'lastName':
+          result.lastName = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'email':
+          result.email = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
         case 'document':
           result.document = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
@@ -149,6 +169,10 @@ class _$Usuario extends Usuario {
   @override
   final String name;
   @override
+  final String lastName;
+  @override
+  final String email;
+  @override
   final int document;
   @override
   final double pid;
@@ -169,6 +193,8 @@ class _$Usuario extends Usuario {
       this.nroCelular,
       this.contrasena,
       this.name,
+      this.lastName,
+      this.email,
       this.document,
       this.pid,
       this.pidcash,
@@ -192,6 +218,8 @@ class _$Usuario extends Usuario {
         nroCelular == other.nroCelular &&
         contrasena == other.contrasena &&
         name == other.name &&
+        lastName == other.lastName &&
+        email == other.email &&
         document == other.document &&
         pid == other.pid &&
         pidcash == other.pidcash &&
@@ -210,10 +238,14 @@ class _$Usuario extends Usuario {
                         $jc(
                             $jc(
                                 $jc(
-                                    $jc($jc(0, id.hashCode),
-                                        nroCelular.hashCode),
-                                    contrasena.hashCode),
-                                name.hashCode),
+                                    $jc(
+                                        $jc(
+                                            $jc($jc(0, id.hashCode),
+                                                nroCelular.hashCode),
+                                            contrasena.hashCode),
+                                        name.hashCode),
+                                    lastName.hashCode),
+                                email.hashCode),
                             document.hashCode),
                         pid.hashCode),
                     pidcash.hashCode),
@@ -229,6 +261,8 @@ class _$Usuario extends Usuario {
           ..add('nroCelular', nroCelular)
           ..add('contrasena', contrasena)
           ..add('name', name)
+          ..add('lastName', lastName)
+          ..add('email', email)
           ..add('document', document)
           ..add('pid', pid)
           ..add('pidcash', pidcash)
@@ -257,6 +291,14 @@ class UsuarioBuilder implements Builder<Usuario, UsuarioBuilder> {
   String _name;
   String get name => _$this._name;
   set name(String name) => _$this._name = name;
+
+  String _lastName;
+  String get lastName => _$this._lastName;
+  set lastName(String lastName) => _$this._lastName = lastName;
+
+  String _email;
+  String get email => _$this._email;
+  set email(String email) => _$this._email = email;
 
   int _document;
   int get document => _$this._document;
@@ -290,6 +332,8 @@ class UsuarioBuilder implements Builder<Usuario, UsuarioBuilder> {
       _nroCelular = _$v.nroCelular;
       _contrasena = _$v.contrasena;
       _name = _$v.name;
+      _lastName = _$v.lastName;
+      _email = _$v.email;
       _document = _$v.document;
       _pid = _$v.pid;
       _pidcash = _$v.pidcash;
@@ -322,6 +366,8 @@ class UsuarioBuilder implements Builder<Usuario, UsuarioBuilder> {
             nroCelular: nroCelular,
             contrasena: contrasena,
             name: name,
+            lastName: lastName,
+            email: email,
             document: document,
             pid: pid,
             pidcash: pidcash,

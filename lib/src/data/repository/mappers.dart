@@ -20,6 +20,8 @@ abstract class _Mappers {
     return UsuarioBuilder()
       ..id=usuarioEntity.id
       ..name=usuarioEntity.name
+      ..lastName = usuarioEntity.lastName
+      ..email = usuarioEntity.email
       ..document=usuarioEntity.document
       ..pid=usuarioEntity.pid
       ..pidcash=usuarioEntity.pidcash
@@ -33,6 +35,8 @@ abstract class _Mappers {
     return UsuarioEntityBuilder()
       ..id=usuario.id
       ..name=usuario.name
+      ..lastName = usuario.lastName
+      ..email = usuario.email
       ..document = usuario.document
       ..pid=usuario.pid
       ..pidcash=usuario.pidcash

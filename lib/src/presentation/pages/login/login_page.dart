@@ -36,9 +36,16 @@ class _LoginPageState extends State<LoginPage> {
   void didChangeDependencies() {
     _loginMessage$ ??= BlocProvider.of<LoginBloc>(context).loginMessage$.listen((message) async { 
       if( message is LoginSuccessMessage ){
+        final _prefs = PreferenciasUsuario();
+        final usuario = _prefs.getUsuario();
+        final idNuevoUsuario = _prefs.get(StorageKeys.newAccountFirstLogin);
         mostrarSnackBar('Login successfully');
         await Future.delayed(Duration(milliseconds: 1000));
-        Navigator.of(context).pushReplacementNamed('/home');
+        if( idNuevoUsuario!=null && idNuevoUsuario!="" && num.parse(idNuevoUsuario) == usuario.id ){
+          Navigator.of(context).pushReplacementNamed('/mi_cuenta');
+        }else{
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
         BlocProvider.of<LoginBloc>(context).onChangeNroCelular('');
         BlocProvider.of<LoginBloc>(context).onChangeContrasena('');
       }
@@ -132,8 +139,8 @@ class _LoginPageState extends State<LoginPage> {
                 text: 'aquí', 
                 style: new TextStyle(fontWeight: FontWeight.bold,color: electricVioletColor),
                 recognizer: TapGestureRecognizer()
-                  // ..onTap = () => Navigator.of(context).pushNamed('/registro') 
-                  ..onTap = () => Navigator.of(context).pushNamed('/registro_webview') 
+                  ..onTap = () => Navigator.of(context).pushNamed('/registro') 
+                  // ..onTap = () => Navigator.of(context).pushNamed('/registro_webview') 
               ),
             ],
           ),

@@ -4,6 +4,7 @@ import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src//utils/colors.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
+import 'package:pidos/src/presentation/pages/bottom_nav/dialogs/transferir_dialog.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/icons_widgets/bell_icon.dart';
 import 'package:pidos/src/utils/extensions.dart';
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   double screenSizeHeight;
   double screenSizeWidth;
 
-  final _carruselData = ['slide-app-1.jpg', 'slide-app-2.jpg'];
+  final _carruselData = ['slide-app-2.jpg', 'slide-app-1.jpg'];
 
   /// variable para controlar los radio button
   /// incializa como 1 para marcar el primer radio button
@@ -242,11 +243,16 @@ class _HomePageState extends State<HomePage> {
             //   Navigator.of(contextApp).pushNamed('/transferencia',arguments: true);
             // }
             onPressed: () {
-              final contextApp = GlobalSingleton().contextApp;
-              Navigator.of(contextApp).pushNamed('/action_not_avaible',
-                  arguments:
-                      'En este momento no cuentas con Pidos disponibles para realizar esta acción');
-            }),
+              transferirDialog(
+                context: context,
+                fromPage: '/'
+              );
+              // final contextApp = GlobalSingleton().contextApp;
+              // Navigator.of(contextApp).pushNamed('/action_not_avaible',
+              //     arguments:
+              //         'En este momento no cuentas con Pidos disponibles para realizar esta acción');
+            }
+        ),
       ),
     );
   }

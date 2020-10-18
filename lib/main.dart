@@ -6,8 +6,11 @@ import 'package:pidos/device/size_config/size_config.dart';
 import 'package:pidos/route_generator.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/data/remote/api_service/login_api_service.dart';
+import 'package:pidos/src/data/remote/api_service/transferencia_api_service.dart';
 import 'package:pidos/src/data/remote/network_utils.dart';
+import 'package:pidos/src/data/repository/transferencia_repository_impl.dart';
 import 'package:pidos/src/data/repository/usuario_repository_impl.dart';
+import 'package:pidos/src/domain/repository/transferencia_repository.dart';
 import 'package:pidos/src/domain/repository/usuario_repository.dart';
 import 'package:pidos/src/presentation/blocs/login/login_bloc.dart';
 import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
@@ -33,10 +36,16 @@ void main() async {
     loginApiService: LoginApiService(networkUtil),
     preferenciasUsuario: prefs,
   );
+  final TransferenciaRepository transferenciaRepository = TransferenciaRepositoryImpl(
+    transferenciaApiService: TransferenciaApiService(networkUtil),
+    prefs: prefs
+  );
 
-  runApp(Providers(
+  runApp(
+    Providers(
       providers: [
         Provider<UsuarioRepository>(value: usuarioRepository),
+        Provider<TransferenciaRepository>(value: transferenciaRepository),
       ],
       child: BlocProvider(
         initBloc: () => LoginBloc(usuarioRepository: usuarioRepository),
@@ -64,6 +73,7 @@ class MyApp extends StatelessWidget with PortraitModeMixin {
               accentColor: Color(0xFFf2f2f2),
               unselectedWidgetColor: Color(0xFF2f046b)),
           initialRoute: '/init',
+          // initialRoute: '/ingresa_codigo',
           routes: appRoutes,
         );
       });
@@ -77,7 +87,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final getAuthState = Provider.of<UsuarioRepository>(context).getAuthState;
-    return FutureBuilder(
+    return FutureBuilder<AuthenticationState>(
         future: getAuthState(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -101,6 +111,13 @@ class Home extends StatelessWidget {
 
           if (snapshot.data is AuthenticatedState) {
             print('[HOME] home [3] >> [Authenticated]');
+            final usuarioAuthenticated = snapshot.data.usuario;
+            final _prefs = PreferenciasUsuario();
+            final idNuevoUsuario = _prefs.get(StorageKeys.newAccountFirstLogin);
+            if( idNuevoUsuario!=null && idNuevoUsuario!="" && num.parse(idNuevoUsuario) == usuarioAuthenticated.id ){
+              // _prefs.remove(StorageKeys.newAccountFirstLogin);
+              return appRoutes['/mi_cuenta'](context);
+            }
             return appRoutes['/home'](context);
           }
           return Container(width: 0, height: 0);

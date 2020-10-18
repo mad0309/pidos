@@ -19,6 +19,13 @@ abstract class Usuario implements Built<Usuario, UsuarioBuilder> {
   String get name;
 
   @nullable
+  // @BuiltValueField(wireName: 'last_name')
+  String get lastName;
+
+  @nullable
+  String get email;
+
+  @nullable
   int get document;
 
   @nullable
@@ -28,6 +35,7 @@ abstract class Usuario implements Built<Usuario, UsuarioBuilder> {
   double get pidcash;
 
   @nullable
+  // @BuiltValueField(wireName: 'first_name')
   String get firstName;
   // @BuiltValueField(serialize: false, compare: false)
   @nullable

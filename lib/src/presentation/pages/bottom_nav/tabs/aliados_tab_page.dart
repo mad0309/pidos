@@ -3,6 +3,7 @@ import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/presentation/widgets/bottom_nav_widgets/search_widget.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/utils/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class AliadosTabPage extends StatefulWidget {
@@ -93,7 +94,7 @@ class _AliadosTabPageState extends State<AliadosTabPage> {
                             Expanded(
                               child: Container(
                                 width: double.infinity,
-                                padding: EdgeInsets.only(top:40.0, left: 20.0, right: 20.0),
+                                padding: EdgeInsets.only(top:40.0, left: 40.0, right: 40.0),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.only(
                                     topLeft: const Radius.circular(20.0),
@@ -103,13 +104,20 @@ class _AliadosTabPageState extends State<AliadosTabPage> {
                                 ),
                                 child: SingleChildScrollView(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('Muy Pronto', style: TextStyle( color: primaryColor, fontSize: 35.0, fontWeight: FontWeight.w700 )),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                                        child: Text('encontrarás nuestros aliados aqui',textAlign: TextAlign.center, style: TextStyle( color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.w600 ), ),
-                                      ),
+                                      GestureDetector(
+                                        onTap: _launchURL,
+                                        child: Image(
+                                          image: AssetImage('assets/img/ido-aliado.png'),
+                                          width: 120.0,
+                                        ),
+                                      )
+                                      // Text('Muy Pronto', style: TextStyle( color: primaryColor, fontSize: 35.0, fontWeight: FontWeight.w700 )),
+                                      // Padding(
+                                      //   padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                                      //   child: Text('encontrarás nuestros aliados aqui',textAlign: TextAlign.center, style: TextStyle( color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.w600 ), ),
+                                      // ),
                                     ],
                                   ),
                                 ),
@@ -190,4 +198,14 @@ class _AliadosTabPageState extends State<AliadosTabPage> {
       ),
     );
   }
+
+  _launchURL() async {
+    const url = 'https://idocolombia.com';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
 }

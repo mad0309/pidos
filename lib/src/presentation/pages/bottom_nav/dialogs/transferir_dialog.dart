@@ -1,21 +1,43 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
+import 'package:flutter_provider/flutter_provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:pidos/src/data/constanst.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
+import 'package:pidos/src/domain/repository/transferencia_repository.dart';
+import 'package:pidos/src/presentation/blocs/mi_monedero/mi_monedero_bloc.dart';
 import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
+import 'package:pidos/src/presentation/blocs/transferir_bloc.dart';
+import 'package:pidos/src/presentation/states/transferencia_message.dart';
 import 'package:pidos/src/presentation/widgets/circle_color.dart';
 import 'package:pidos/src/presentation/widgets/inputs_widgets/input_form_dialog.dart';
+import 'package:pidos/src/presentation/widgets/respuesta_dialog.dart';
 import 'package:pidos/src/utils/colors.dart';
 
 
 
 Future<dynamic> transferirDialog({
   @required BuildContext context,
+  @required String fromPage
 }) async {
+  MiMonederoBloc _miMonederoBloc;
+  if( fromPage != '/' ){
+    _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
+  }
   return await showDialog(
     context: context,
-    child: _SystemPadding(
-      child: _TransferenciaDialog(),
+    child: BlocProvider(
+      initBloc: () => TranferirBloc(
+        transferenciaRepository: Provider.of<TransferenciaRepository>(context),
+      ),
+      child: _SystemPadding(
+        child: _TransferenciaDialog(
+          miMonederoBloc: _miMonederoBloc,
+        ),
+      ),
     )
 
   );
@@ -41,6 +63,11 @@ class _SystemPadding extends StatelessWidget {
 
 
 class _TransferenciaDialog extends StatefulWidget {
+  final MiMonederoBloc miMonederoBloc;
+
+  const _TransferenciaDialog({
+    this.miMonederoBloc
+  });
 
   @override
   __TransferenciaDialogState createState() => __TransferenciaDialogState();
@@ -62,6 +89,9 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
   bool pidCash = true;
   bool puntosPids = false;
 
+  TranferirBloc tranferirBloc;
+  StreamSubscription transferenciaMessage$;
+
   @override
   void initState() { 
     final _sharedPrefs = PreferenciasUsuario();
@@ -78,6 +108,47 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     cantidadPidsFocus = FocusNode();
     pidosIdFocus = FocusNode();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    tranferirBloc ??= BlocProvider.of<TranferirBloc>(context);
+    transferenciaMessage$ ??= BlocProvider.of<TranferirBloc>(context).transferenciaMessage$.listen((message) async {
+      final usuario = PreferenciasUsuario().getUsuario();
+      final currentPidId = usuario.document;
+      final destinationPidId = tranferirBloc.destinationPidId$.value;
+      final cantidadPidEnviada = tranferirBloc.cantidadEnPids$.value;
+      if( message is TransferenciaSuccessMessage ){
+        if( widget.miMonederoBloc!=null ){
+          if(tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos){
+            widget.miMonederoBloc.pidosDisponiblesSink$.add(usuario.pid);
+          }else{
+            widget.miMonederoBloc.pidosDisponiblesSink$.add(usuario.pidcash);
+          }
+        }
+        Navigator.of(context).popAndPushNamed('/transferencia', arguments: {
+          'status': true,
+          'currentPidId': currentPidId,
+          'destinationPidId': destinationPidId,
+          'cantidadPidEnviada': cantidadPidEnviada
+        });
+      }
+      if( message is TransferenciaErrorMessage ){
+        Navigator.of(context).popAndPushNamed('/transferencia', arguments: {
+          'status': false,
+          'currentPidId': currentPidId,
+          'destinationPidId': destinationPidId,
+          'cantidadPidEnviada': cantidadPidEnviada
+        });
+      }
+    });
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() { 
+    transferenciaMessage$?.cancel();
+    super.dispose();
   }
 
   _unfocus(){
@@ -108,6 +179,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     TextInputType textInputType,
     String sufix,
     String prefix,
+    Function(String) onChanged
   }){
     return Column(
       children: [
@@ -124,6 +196,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
             inputType: textInputType,
             sufix: sufix,
             prefix: prefix,
+            onChange: onChanged,
           )
         ),
       ],
@@ -169,12 +242,26 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
         child: RaisedButton(
           child: Container( 
             padding: EdgeInsets.symmetric( vertical: 10.0 ),
-            child: Text(
-              _buttonLabel,
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 20.0
-              )
+            child: StreamBuilder<bool>(
+              stream: tranferirBloc.isLoadingTransferencia$,
+              initialData: false,
+              builder: (context, snapshot) {
+                final isLoading = snapshot.data ?? false;
+                if( !isLoading ){
+                  return Text(
+                    _buttonLabel,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20.0
+                    )
+                  );
+                }else{
+                  return SpinKitWave(
+                    color: Colors.white,
+                    size: 19.0,
+                  );
+                }
+              }
             ),
           ),
           shape: RoundedRectangleBorder(
@@ -186,12 +273,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
           // onPressed:() => muyProntoDialog(context: context)
           // onPressed:() => Navigator.of(context).popAndPushNamed('/transferencia', arguments: false),
           onPressed:() {
-            _unfocus();
-            Navigator.of(context).popAndPushNamed(
-              '/action_not_avaible', 
-              arguments: 'En este momento no cuentas con Pidos disponibles para realizar esta acción'
-            );
-
+            _onTaptransferir();
           } 
         ),
       ),
@@ -210,25 +292,44 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _radioButtonWithLabel('Pid Cash', pidCash),
+          StreamBuilder<TipoTransferencia>(
+            stream: tranferirBloc.tipoTransferencia$,
+            initialData: tranferirBloc.tipoTransferencia$.value,
+            builder: (context, snapshot) {
+              final tipoTransferencia = snapshot.data;
+              bool active = false;
+              if( tipoTransferencia == TipoTransferencia.pidCash ){
+                active = true;
+              }else{
+                active = false;
+              }
+              return _radioButtonWithLabel('Pid Cash', active,TipoTransferencia.pidCash);
+            }
+          ),
           SizedBox(width: 15.0),
-          _radioButtonWithLabel('Puntos Pidos', puntosPids),
+          StreamBuilder<TipoTransferencia>(
+            stream: tranferirBloc.tipoTransferencia$,
+            initialData: tranferirBloc.tipoTransferencia$.value,
+            builder: (context, snapshot) {
+              final tipoTransferencia = snapshot.data;
+              bool active = false;
+              if( tipoTransferencia == TipoTransferencia.pidPuntos ){
+                active = true;
+              }else{
+                active = false;
+              }
+              return _radioButtonWithLabel('Puntos Pidos', active, TipoTransferencia.pidPuntos);
+            }
+          ),
         ],
       ),
     );
   }
 
 
-  Widget _radioButtonWithLabel(String title, bool value){
+  Widget _radioButtonWithLabel(String title, bool value, TipoTransferencia tipoTransferencia ){
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          if(!value){
-            pidCash = !pidCash;
-            puntosPids = !puntosPids;
-          }
-        });
-      },
+      onTap: () => tranferirBloc.onChangedtipoTransferecnia(tipoTransferencia),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -298,15 +399,26 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
                   focusNode: cantidadPidsFocus,
                   hintText: 'Ingrese la cantidad',
                   textInputType: TextInputType.number,
-                  sufix: '  pids' ),
-                _titlelWithInputDisabled('Cantidad en Pesos:', '\$100.0 pids'),
+                  sufix: '  pids',
+                  onChanged: onChangePid
+                ),
+                StreamBuilder<double>(
+                  stream: tranferirBloc.cantidadaEnPesos$,
+                  initialData: tranferirBloc.cantidadaEnPesos$.value,
+                  builder: (context, snapshot) {
+                    final cantidadEnPesos = snapshot.data;
+                    return _titlelWithInputDisabled('Cantidad en Pesos:', '\$$cantidadEnPesos');
+                  }
+                ),
                 // _titlelWithInputDisabled('Pidos ID:', 'PID-123456789 - Ricardo Castro'),
                 _titlelWithInputTextField('Pidos ID:', 
                   textEditingController: pidosIdController,
                   focusNode: pidosIdFocus,
                   hintText: 'Ingrese ID',
                   textInputType: TextInputType.number,
-                  prefix: 'PID - '),
+                  prefix: 'PID - ',
+                  onChanged: onChangePidId
+                ),
                 _transferirButton()
               ],
             ),
@@ -315,4 +427,71 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
       )
     );
   }
+
+  void onChangePid(String value){
+    final cantidadPidString = value.replaceAll('  pids', '');
+    if(value.length>0){
+      final cantidadPidNumber = num.parse(cantidadPidString);
+      final canitdadEnPesos = cantidadPidNumber.toInt() * currentValuePidInPesos; 
+      tranferirBloc.onChangedcantidadEnPids(cantidadPidNumber);
+      tranferirBloc.cantidadaEnPesosSink$.add(canitdadEnPesos.toDouble());
+    }else{
+      tranferirBloc.onChangedcantidadEnPids(0);
+      tranferirBloc.cantidadaEnPesosSink$.add(0.0);
+    }
+  }
+  void onChangePidId(String value){
+    final pidIdString = value.replaceAll('PID - ', '');
+    if(value.length>0){
+      tranferirBloc.onChangeDestinationPidId(pidIdString);
+    }else{
+      tranferirBloc.onChangeDestinationPidId(null);
+    }
+  }
+
+  _onTaptransferir() async {
+    _unfocus();
+    final pidsToTransfer = tranferirBloc.cantidadEnPids$.value;
+    final destinationPidId = tranferirBloc.destinationPidId$.value;
+    final usuario = PreferenciasUsuario().getUsuario();
+    final currtentPidPuntos = usuario.pid;
+    final currtentPidCash = usuario.pidcash;
+    double currentPid = 0.0;
+    String message = '';
+    if( pidsToTransfer==null || pidsToTransfer <= 0 ){
+      return respuestaDialog(
+        context: context, 
+        message: 'Ingrese una cantidad de Pids valida', 
+        title: 'Campos incompletos', 
+        icon: Icon(Icons.warning, color: electricVioletColor, size: 30.0)
+      );
+    }else{
+      if( destinationPidId==null || destinationPidId.length==0 ){
+        return respuestaDialog(
+          context: context, 
+          message: 'Ingrese PidID valido', 
+          title: 'Campos incompletos', 
+          icon: Icon(Icons.warning, color: electricVioletColor, size: 30.0)
+        );
+      }
+    }
+    if( tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos ){
+      currentPid = currtentPidPuntos;
+      message = 'En este momento no cuentas con puntos pid disponibles para realizar esta acción';
+    }else{
+      currentPid = currtentPidCash;
+      message = 'En este momento no cuentas con pidcash disponibles para realizar esta acción';
+    }
+    if( currentPid > 0.0 ){
+      // print('TODO OK');
+      tranferirBloc.onSubmitTransferencia();
+    }else{
+      Navigator.of(context).popAndPushNamed(
+        '/action_not_avaible', 
+        arguments: message
+      );
+    }
+
+  }
+
 }

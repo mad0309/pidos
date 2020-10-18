@@ -1,4 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:pidos/src/presentation/blocs/login/ingresa_codigo_bloc.dart';
+import 'package:pidos/src/presentation/states/registro_message.dart';
 import 'package:pidos/src/presentation/widgets/login/verification_input.dart';
 import 'package:pidos/src/utils/colors.dart';
 import 'package:pidos/src/utils/screen_aware_size.dart';
@@ -12,6 +18,8 @@ class IngresaCodigoPage extends StatefulWidget {
 
 class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
 
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   double screenSizeHeight;
   double screenSizeWidth;
 
@@ -21,6 +29,7 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
   TextEditingController _terceroDigitoController;
   TextEditingController _cuartoDigitoController;
   TextEditingController _quintoDigitoController;
+  TextEditingController _sextoDigitoController;
 
   /// Focusnode
   FocusNode _primerDigitoFocus;
@@ -28,6 +37,9 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
   FocusNode _terceroDigitoFocus;
   FocusNode _cuartoDigitoFocus;
   FocusNode _quintoDigitoFocus;
+  FocusNode _sextoDigitoFocus;
+
+  StreamSubscription ingresarCodigoMessage$;
   
 
 
@@ -39,6 +51,7 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
     _terceroDigitoController = TextEditingController(text: '');
     _cuartoDigitoController = TextEditingController(text: '');
     _quintoDigitoController = TextEditingController(text: '');
+    _sextoDigitoController = TextEditingController(text: '');
 
     /// ====== inicilazar foscusNode ====== ///
     _primerDigitoFocus = FocusNode();
@@ -46,7 +59,25 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
     _terceroDigitoFocus = FocusNode();
     _cuartoDigitoFocus = FocusNode();
     _quintoDigitoFocus = FocusNode();
+    _sextoDigitoFocus = FocusNode();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    ingresarCodigoMessage$ ??= BlocProvider.of<IngresaCodigoBloc>(context).ingresarCodigoMessage$.listen((message) async {
+      if( message is CodigoIngresadoSuccessMessage ) {
+        mostrarSnackBar('Codigo Valido');
+        await Future.delayed(Duration(milliseconds: 800));
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+      if( message is CodigoIngresadoErrorMessage ){
+        _cleanControllers();
+        BlocProvider.of<IngresaCodigoBloc>(context).cleanControllers();
+        mostrarSnackBar(message.message ?? 'Ocurrio un error, intentelo más tarde');
+      }
+    });
+    super.didChangeDependencies();
   }
 
 
@@ -58,7 +89,36 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
     _terceroDigitoController?.dispose();
     _cuartoDigitoController?.dispose();
     _quintoDigitoController?.dispose();
+    _sextoDigitoController?.dispose();
+    ingresarCodigoMessage$?.cancel();
     super.dispose();
+  }
+
+  // Metodo para mostrar un snackbar
+  void mostrarSnackBar( String mensaje ) {
+    final snackbar = SnackBar(
+      content: Text( mensaje ),
+      duration: Duration( milliseconds: 3000 ),
+    );
+   scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
+  _unfocus(){
+    _primerDigitoFocus.unfocus();
+    _segundoDigitoFocus.unfocus();
+    _terceroDigitoFocus.unfocus();
+    _cuartoDigitoFocus.unfocus();
+    _quintoDigitoFocus.unfocus();
+    _sextoDigitoFocus.unfocus();
+  }
+
+  _cleanControllers(){
+    _primerDigitoController.text = '';
+    _segundoDigitoController.text = '';
+    _terceroDigitoController.text = '';
+    _cuartoDigitoController.text = '';
+    _quintoDigitoController.text = '';
+    _sextoDigitoController.text = '';
   }
 
 
@@ -108,6 +168,7 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
   /// Seccion para insertar le codigo recivido
   ///
   Widget _ingresaCodigoSection(){
+    final _ingresarCodigoBloc = BlocProvider.of<IngresaCodigoBloc>(context);
     return Column(
       children: [
         Text(
@@ -128,35 +189,114 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
         ),
         Padding(
           padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.042),  //vertical: 25.0
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              VerificationInput(
-                textEditingController: _primerDigitoController,
-                focusNode: _primerDigitoFocus,
-                onSubmit: _onSubmit,
-              ),
-              VerificationInput(
-                textEditingController: _segundoDigitoController,
-                focusNode: _segundoDigitoFocus,
-                onSubmit: _onSubmit,
-              ),
-              VerificationInput(
-                textEditingController: _terceroDigitoController,
-                focusNode: _terceroDigitoFocus,
-                onSubmit: _onSubmit,
-              ),
-              VerificationInput(
-                textEditingController: _cuartoDigitoController,
-                focusNode: _cuartoDigitoFocus,
-                onSubmit: _onSubmit,
-              ),
-              VerificationInput(
-                textEditingController: _quintoDigitoController,
-                focusNode: _quintoDigitoFocus,
-                onSubmit: _onSubmit,
-              ),
-            ],
+          child: StreamBuilder<bool>(
+            stream: _ingresarCodigoBloc.isLoaindgIngresaCodigo$,
+            initialData: false,
+            builder: (context, snapshot) {
+              final isLoading = snapshot.data ?? false;
+              print(isLoading);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: (isLoading) ? (){} : () => FocusScope.of(context).requestFocus(_primerDigitoFocus),
+                    child: VerificationInput(
+                      isLoading: isLoading,
+                      textEditingController: _primerDigitoController,
+                      focusNode: _primerDigitoFocus,
+                      nextFocusNode: _segundoDigitoFocus,
+                      onSubmit: _onSubmit,
+                      onChanged: (value) {
+                        _ingresarCodigoBloc.onChangedPrimerDigito(value);
+                        if (value.length == 1) {
+                          FocusScope.of(context).requestFocus(_segundoDigitoFocus);
+                        }
+                      },
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: (isLoading) ? (){} : () => FocusScope.of(context).requestFocus(_segundoDigitoFocus),
+                    child: VerificationInput(
+                      isLoading: isLoading,
+                      textEditingController: _segundoDigitoController,
+                      focusNode: _segundoDigitoFocus,
+                      nextFocusNode: _terceroDigitoFocus,
+                      onSubmit: _onSubmit,
+                      onChanged: (value) {
+                        _ingresarCodigoBloc.onChangedSegundoDigito(value);
+                        if (value.length == 1) {
+                          FocusScope.of(context).requestFocus(_terceroDigitoFocus);
+                        }
+                      },
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: (isLoading) ? (){} : () => FocusScope.of(context).requestFocus(_terceroDigitoFocus),
+                    child: VerificationInput(
+                      isLoading: isLoading,
+                      textEditingController: _terceroDigitoController,
+                      focusNode: _terceroDigitoFocus,
+                      nextFocusNode: _cuartoDigitoFocus,
+                      onSubmit: _onSubmit,
+                      onChanged: (value) {
+                        _ingresarCodigoBloc.onChangedTercerDigito(value);
+                        if (value.length == 1) {
+                          FocusScope.of(context).requestFocus(_cuartoDigitoFocus);
+                        }
+                      },
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: (isLoading) ? (){} : () => FocusScope.of(context).requestFocus(_cuartoDigitoFocus),
+                    child: VerificationInput(
+                      isLoading: isLoading,
+                      textEditingController: _cuartoDigitoController,
+                      focusNode: _cuartoDigitoFocus,
+                      nextFocusNode: _quintoDigitoFocus,
+                      onSubmit: _onSubmit,
+                      onChanged: (value) {
+                        _ingresarCodigoBloc.onChangedCuartoDigito(value);
+                        if (value.length == 1) {
+                          FocusScope.of(context).requestFocus(_quintoDigitoFocus);
+                        }
+                      },
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: (isLoading) ? (){} : () => FocusScope.of(context).requestFocus(_quintoDigitoFocus),
+                    child: VerificationInput(
+                      isLoading: isLoading,
+                      textEditingController: _quintoDigitoController,
+                      focusNode: _quintoDigitoFocus,
+                      nextFocusNode: _sextoDigitoFocus,
+                      onSubmit: _onSubmit,
+                      onChanged: (value) {
+                        _ingresarCodigoBloc.onChangedQuintoDigito(value);
+                        if (value.length == 1) {
+                          FocusScope.of(context).requestFocus(_sextoDigitoFocus);
+                        }
+                      },
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: (isLoading) ? (){} : () => FocusScope.of(context).requestFocus(_sextoDigitoFocus),
+                    child: VerificationInput(
+                      isLoading: isLoading,
+                      textEditingController: _sextoDigitoController,
+                      focusNode: _sextoDigitoFocus,
+                      nextFocusNode: _sextoDigitoFocus,
+                      onSubmit: _onSubmit,
+                      onChanged: (value) {
+                        _ingresarCodigoBloc.onChangedSextoDigito(value);
+                        if (value.length == 1) {
+                          FocusScope.of(context).requestFocus(_sextoDigitoFocus);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }
           )
         ),
         Text(
@@ -168,6 +308,23 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
             fontWeight: FontWeight.w500
           ),
         ),
+        SizedBox(height: 60.0),
+        StreamBuilder<bool>(
+          stream: _ingresarCodigoBloc.isLoaindgIngresaCodigo$,
+          initialData: false,
+          builder: (context, snapshot) {
+            final isLoading = snapshot.data ?? false;
+            if( isLoading ){
+              return SpinKitCircle(
+              color: primaryColor,
+              size: 30.0,
+            );
+            }else{
+              return Container();
+            }
+            
+          }
+        )
       ],
     );
   }
@@ -176,7 +333,7 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
   /// on submit function
   ///
   void _onSubmit(String value){
-    Navigator.of(context).pushNamed('/registro_form');
+    // Navigator.of(context).pushNamed('/registro_form');
   }
 
 
@@ -188,17 +345,21 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
     screenSizeHeight = MediaQuery.of(context).size.height;
     screenSizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: SizedBox(
           width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _logoImage(),
-              _creaTuCuentSection(),
-              _ingresaCodigoSection()
-            ],
+          child: GestureDetector(
+            onTap: _unfocus,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _logoImage(),
+                _creaTuCuentSection(),
+                _ingresaCodigoSection()
+              ],
+            ),
           ),
         ),
       )

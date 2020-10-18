@@ -31,6 +31,18 @@ class _$UsuarioEntitySerializer implements StructuredSerializer<UsuarioEntity> {
         ..add(serializers.serialize(object.name,
             specifiedType: const FullType(String)));
     }
+    if (object.lastName != null) {
+      result
+        ..add('lastName')
+        ..add(serializers.serialize(object.lastName,
+            specifiedType: const FullType(String)));
+    }
+    if (object.email != null) {
+      result
+        ..add('email')
+        ..add(serializers.serialize(object.email,
+            specifiedType: const FullType(String)));
+    }
     if (object.document != null) {
       result
         ..add('document')
@@ -90,6 +102,14 @@ class _$UsuarioEntitySerializer implements StructuredSerializer<UsuarioEntity> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
+        case 'lastName':
+          result.lastName = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'email':
+          result.email = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
         case 'document':
           result.document = serializers.deserialize(value,
               specifiedType: const FullType(int)) as int;
@@ -127,6 +147,10 @@ class _$UsuarioEntity extends UsuarioEntity {
   @override
   final String name;
   @override
+  final String lastName;
+  @override
+  final String email;
+  @override
   final int document;
   @override
   final double pid;
@@ -145,6 +169,8 @@ class _$UsuarioEntity extends UsuarioEntity {
   _$UsuarioEntity._(
       {this.id,
       this.name,
+      this.lastName,
+      this.email,
       this.document,
       this.pid,
       this.pidcash,
@@ -166,6 +192,8 @@ class _$UsuarioEntity extends UsuarioEntity {
     return other is UsuarioEntity &&
         id == other.id &&
         name == other.name &&
+        lastName == other.lastName &&
+        email == other.email &&
         document == other.document &&
         pid == other.pid &&
         pidcash == other.pidcash &&
@@ -181,7 +209,11 @@ class _$UsuarioEntity extends UsuarioEntity {
             $jc(
                 $jc(
                     $jc(
-                        $jc($jc($jc(0, id.hashCode), name.hashCode),
+                        $jc(
+                            $jc(
+                                $jc($jc($jc(0, id.hashCode), name.hashCode),
+                                    lastName.hashCode),
+                                email.hashCode),
                             document.hashCode),
                         pid.hashCode),
                     pidcash.hashCode),
@@ -195,6 +227,8 @@ class _$UsuarioEntity extends UsuarioEntity {
     return (newBuiltValueToStringHelper('UsuarioEntity')
           ..add('id', id)
           ..add('name', name)
+          ..add('lastName', lastName)
+          ..add('email', email)
           ..add('document', document)
           ..add('pid', pid)
           ..add('pidcash', pidcash)
@@ -216,6 +250,14 @@ class UsuarioEntityBuilder
   String _name;
   String get name => _$this._name;
   set name(String name) => _$this._name = name;
+
+  String _lastName;
+  String get lastName => _$this._lastName;
+  set lastName(String lastName) => _$this._lastName = lastName;
+
+  String _email;
+  String get email => _$this._email;
+  set email(String email) => _$this._email = email;
 
   int _document;
   int get document => _$this._document;
@@ -247,6 +289,8 @@ class UsuarioEntityBuilder
     if (_$v != null) {
       _id = _$v.id;
       _name = _$v.name;
+      _lastName = _$v.lastName;
+      _email = _$v.email;
       _document = _$v.document;
       _pid = _$v.pid;
       _pidcash = _$v.pidcash;
@@ -277,6 +321,8 @@ class UsuarioEntityBuilder
         new _$UsuarioEntity._(
             id: id,
             name: name,
+            lastName: lastName,
+            email: email,
             document: document,
             pid: pid,
             pidcash: pidcash,

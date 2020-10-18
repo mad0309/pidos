@@ -1,4 +1,3 @@
-import 'package:pidos/src/data/exceptions/network_exceptions.dart';
 import 'package:pidos/src/data/local/entities/usuario_entity.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/data/remote/api_result.dart';
@@ -8,6 +7,7 @@ import 'package:pidos/src/domain/repository/usuario_repository.dart';
 import 'package:pidos/src/presentation/states/login_message.dart';
 
 import 'package:pidos/src/presentation/states/auth_state.dart';
+import 'package:pidos/src/presentation/states/registro_message.dart';
 
 part 'mappers.dart';
 
@@ -76,6 +76,61 @@ class UsuarioRepositoryImpl implements UsuarioRepository {
       return true;
     }catch(err){
       print('[USUARIO_REPOSITORY][retornUsuario][ERROR] => $err');
+      throw err;
+    }
+  }
+
+  @override
+  Future<ApiResult<RegistroMessage>> registroUsuario(Usuario usuario) async {
+    try{
+       final resp = await loginApiService.crearUsuario(usuario);
+       if( resp.id>0 ){ 
+         return ApiResult.success(data: RegistroSuccessMessage(resp));
+       }else{
+         throw 'Ocurrio un error durante la transaccion';
+       }
+    }catch(err){
+      print('[USUARIO_REPOSITORY][registroUsuario][ERROR] => $err');
+      throw err;
+    }
+  }
+
+  @override
+  Future<ApiResult<RegistroMessage>> enviarCodigo(Usuario usuario) async {
+    try{
+       final resp = await loginApiService.enviarCodigo(usuario);
+       if( resp['pending'] == true ){ 
+         return ApiResult.success(data: EnviarCodigoSuccessMessage(usuario));
+       }else{
+         throw 'Ocurrio un error durante la transaccion';
+       }
+    }catch(err){
+      print('[USUARIO_REPOSITORY][registroUsuario][ERROR] => $err');
+      throw err;
+    }
+  }
+  @override
+  Future<ApiResult<RegistroMessage>> checkCodigoInsertado(Usuario usuario, String code) async {
+    try{
+       final resp = await loginApiService.checkCode(usuario, code);
+       if( resp['approved'] == true ){
+         preferenciasUsuario.set(StorageKeys.newAccountFirstLogin, usuario.id.toString());
+         return ApiResult.success(data: const CodigoIngresadoSuccessMessage());
+       }else{
+         throw 'Codigo Invalido';
+       }
+    }catch(err){
+      print('[USUARIO_REPOSITORY][registroUsuario][ERROR] => $err');
+      throw err;
+    }
+  }
+  @override
+  Stream<Usuario> retornasSaldo() async* {
+    try{
+       final usuario = await loginApiService.retornaUsuario();
+       yield usuario;
+    }catch(err){
+      print('[USUARIO_REPOSITORY][retornasSaldo][ERROR] => $err');
       throw err;
     }
   }

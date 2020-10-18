@@ -15,6 +15,13 @@ abstract class UsuarioEntity implements Built<UsuarioEntity, UsuarioEntityBuilde
   String get name;
 
   @nullable
+  // @BuiltValueField(wireName: 'last_name')
+  String get lastName;
+
+  @nullable
+  String get email;
+
+  @nullable
   int get document;
 
   @nullable

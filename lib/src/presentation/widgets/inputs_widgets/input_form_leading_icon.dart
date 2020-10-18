@@ -7,12 +7,16 @@ class InputFormLeadingIcon extends StatefulWidget {
   final String placeholderText;
   final String documentType;
   final Function(String) onChange;
+  final TextEditingController textEditingController;
+  final FocusNode focusNode;
 
   InputFormLeadingIcon({
     this.inputType, 
     this.placeholderText, 
     this.documentType,
     this.onChange,
+    this.textEditingController,
+    this.focusNode,
   });
 
   @override
@@ -35,6 +39,8 @@ class _InputFormLeadingIconState extends State<InputFormLeadingIcon> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.textEditingController,
+      focusNode: widget.focusNode,
       keyboardType: widget.inputType,
       textAlign: TextAlign.center, 
       style: TextStyle(

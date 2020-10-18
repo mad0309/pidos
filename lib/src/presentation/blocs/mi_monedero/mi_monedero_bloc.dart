@@ -9,11 +9,15 @@ class MiMonederoBloc extends MyBaseBloc {
 
   final ValueStream<double> pidosDisponibles$;
   final ValueStream<double> pidoscashDisponibles$;
+  final Sink<double> pidosDisponiblesSink$;
+  final Sink<double> pidoscashDisponiblesSink$;
 
 
   MiMonederoBloc._({
     this.pidosDisponibles$,
     this.pidoscashDisponibles$,
+    this.pidosDisponiblesSink$,
+    this.pidoscashDisponiblesSink$,
     //dipose
     @required Function dispose,
   }) : super(dispose);
@@ -32,7 +36,7 @@ class MiMonederoBloc extends MyBaseBloc {
     //Streams
     final pidosDisponibles$ = pidosDisponiblesController
       .shareValueSeededDistinct(seedValue: pidosDisponiblesInit);
-    final pidoscashDisponibles$ = pidosDisponiblesController
+    final pidoscashDisponibles$ = pidcashDisponiblesController
       .shareValueSeededDistinct(seedValue: pidoscashDisponiblesInit);
     
     //subscriptions
@@ -58,6 +62,8 @@ class MiMonederoBloc extends MyBaseBloc {
     return MiMonederoBloc._(
       pidosDisponibles$: pidosDisponibles$,
       pidoscashDisponibles$: pidoscashDisponibles$,
+      pidosDisponiblesSink$: pidosDisponiblesController.sink,
+      pidoscashDisponiblesSink$: pidcashDisponiblesController.sink,
       //dipose
       dispose: dispose
     );

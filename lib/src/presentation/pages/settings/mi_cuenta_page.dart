@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
+import 'package:pidos/src/presentation/blocs/settings/mi_cuenta_bloc.dart';
 import 'package:pidos/src/presentation/widgets/button_submit.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/drawer_nav.dart';
@@ -12,6 +14,10 @@ import 'package:pidos/src/utils/colors.dart';
 
 class MiCuentapPage extends StatefulWidget {
 
+  final Usuario usuarioInit;
+
+  const MiCuentapPage({Key key, this.usuarioInit}) : super(key: key);
+
   @override
   _MiCuentapPageState createState() => _MiCuentapPageState();
 }
@@ -22,6 +28,27 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
   String _perfil = '';
   String _shortName = '';
 
+  TextEditingController nombreController;
+  TextEditingController apellidosController;
+  TextEditingController nroCelularController;
+  TextEditingController emailController;
+  TextEditingController nroDocumentoController;
+  TextEditingController generoController;
+  TextEditingController estadoCivilController;
+  TextEditingController contrasenaController;
+  TextEditingController confirmarContrasenaController;
+
+  FocusNode nombreFocus;
+  FocusNode apellidosFocus;
+  FocusNode nroCelularFocus;
+  FocusNode emailFocus;
+  FocusNode nroDocumentoFocus;
+  FocusNode generoFocus;
+  FocusNode estadoCivilFocus;
+  FocusNode contrasenaFocus;
+  FocusNode confirmarContrasenaFocus;
+
+
   @override
   void initState() { 
     /// ======== get localtion storage ======= ///
@@ -31,7 +58,46 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
     _shortName = usuario.shortName;
     /// ======== get localtion storage ======= ///
     _scaffoldKey = new GlobalKey();
+
+    nombreController = TextEditingController(text: widget.usuarioInit?.name ?? '');
+    apellidosController = TextEditingController(text: '');
+    nroCelularController = TextEditingController(text: widget.usuarioInit?.nroCelular ?? '');
+    emailController = TextEditingController(text: widget.usuarioInit?.email ?? '');
+    nroDocumentoController = TextEditingController(text: widget.usuarioInit?.document.toString() ?? '');
+    generoController = TextEditingController(text: '');
+    estadoCivilController = TextEditingController(text: '');
+    contrasenaController = TextEditingController(text: '');
+    confirmarContrasenaController = TextEditingController(text: '');
+
+    nombreFocus = FocusNode();
+    apellidosFocus = FocusNode();
+    nroCelularFocus = FocusNode();
+    emailFocus = FocusNode();
+    nroDocumentoFocus = FocusNode();
+    generoFocus = FocusNode();
+    estadoCivilFocus = FocusNode();
+    contrasenaFocus = FocusNode();
+    confirmarContrasenaFocus = FocusNode();
+
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+
+  _unfocus(){
+    nombreFocus.unfocus();
+    apellidosFocus.unfocus();
+    nroCelularFocus.unfocus();
+    emailFocus.unfocus();
+    nroDocumentoFocus.unfocus();
+    generoFocus.unfocus();
+    estadoCivilFocus.unfocus();
+    contrasenaFocus.unfocus();
+    confirmarContrasenaFocus.unfocus();
   }
 
 
@@ -40,7 +106,9 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
     String title,
     TextInputType inputType,
     bool obscureText,
-    String placeholderText
+    String placeholderText,
+    TextEditingController textEditingController,
+    FocusNode focusNode
   }){
     return Column(
       children: [
@@ -54,6 +122,8 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
             obscureText: obscureText,
             inputType: inputType,
             placeholderText: placeholderText,
+            textEditingController: textEditingController,
+            focusNode: focusNode,
           )
         ),
       ],
@@ -65,7 +135,9 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
     String title,
     TextInputType inputType,
     String placeholderText,
-    String postalCode
+    String postalCode,
+    TextEditingController textEditingController,
+    FocusNode focusNode
   }){
     return Column(
       children: [
@@ -78,7 +150,9 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
           child: InputFormPrefixIcon(
             inputType: inputType,
             placeholderText: placeholderText,
-            postalCode: postalCode
+            postalCode: postalCode,
+            textEditingController: textEditingController,
+            focusNode: focusNode,
           )
         ),
       ],
@@ -90,7 +164,9 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
     String title,
     TextInputType inputType,
     String placeholderText,
-    String documentType
+    String documentType,
+    TextEditingController textEditingController,
+    FocusNode focusNode
   }){
     return Column(
       children: [
@@ -104,6 +180,8 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
             inputType: inputType,
             placeholderText: placeholderText,
             documentType: documentType,
+            textEditingController: textEditingController,
+            focusNode: focusNode,
           )
         ),
       ],
@@ -167,54 +245,72 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
           placeholderText: 'Ingrese nombre',
           inputType: TextInputType.text,
           obscureText: false,
+          textEditingController: nombreController,
+          focusNode: nombreFocus
         ),
         _titleWithInputForm(
           title: 'Tus Apellidos',
           placeholderText: 'Ingrese apellido',
           inputType: TextInputType.text,
           obscureText: false,
+          textEditingController: apellidosController,
+          focusNode: apellidosFocus
         ),
         _titleWithInputFormWithPrefix(
           title: 'Nº Celular',
           placeholderText: 'Ingrese nro de celular',
           inputType: TextInputType.number,
-          postalCode: '57'
+          postalCode: '57',
+          textEditingController: nroCelularController,
+          focusNode: nroCelularFocus
         ),
         _titleWithInputForm(
           title: 'Correo electrónico',
           placeholderText: 'Ingrese correo',
           inputType: TextInputType.emailAddress,
           obscureText: false,
+          textEditingController: emailController,
+          focusNode: emailFocus
         ),
         _titleWithInputFormWithLeading(
           title: 'Nº de Documento',
           placeholderText: 'Ingrese nro de documento',
           inputType: TextInputType.text,
-          documentType: 'C.C.'
+          documentType: 'C.C.',
+          textEditingController: nroDocumentoController,
+          focusNode: nroDocumentoFocus
         ),
         _titleWithInputForm(
           title: 'Tu Género',
           placeholderText: 'Ingrese sexo',
           inputType: TextInputType.text,
           obscureText: false,
+          textEditingController: generoController,
+          focusNode: generoFocus
         ),
         _titleWithInputForm(
           title: 'Estado Civil',
           placeholderText: 'Ingrese estado civil',
           inputType: TextInputType.text,
           obscureText: false,
+          textEditingController: estadoCivilController,
+          focusNode: estadoCivilFocus
         ),
         _titleWithInputForm(
           title: 'Tu contraseña',
           placeholderText: 'Ingrese contraseña',
           inputType: TextInputType.text,
           obscureText: true,
+          textEditingController: contrasenaController,
+          focusNode: contrasenaFocus
         ),
         _titleWithInputForm(
           title: 'Confirma contraseña',
           placeholderText: 'Repetir contraseña',
           inputType: TextInputType.text,
           obscureText: true,
+          textEditingController: confirmarContrasenaController,
+          focusNode: confirmarContrasenaFocus
         ),
       ],
     );
@@ -225,6 +321,10 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
   ///
   @override
   Widget build(BuildContext context) {
+    final _prefs = PreferenciasUsuario();
+    final idNewUser = _prefs.get(StorageKeys.newAccountFirstLogin);
+    bool isFirstLogin = false;
+    if( idNewUser!=null ) isFirstLogin=true;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -252,27 +352,35 @@ class _MiCuentapPageState extends State<MiCuentapPage> {
       body: SingleChildScrollView(
         child: SizedBox(
           width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 40.0, bottom: 20.0),
-                child: Text('Mi cuenta', style: TextStyle(fontFamily: 'Raleway',color: primaryColor, fontSize: 30.0,fontWeight: FontWeight.w700)),
-              ),
-              ( _perfil != roleUsuarioName[RoleUsuario.cliente] )
-                ? _formPerfilComerciante()
-                : _formPerfilCliente(),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 50.0),
-                child: ButtonSubmit(
-                  color: electricVioletColor,
-                  textColor: Colors.white,
-                  title: 'Editar',
-                  onPressed: (){},
+          child: GestureDetector(
+            onTap: _unfocus,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 40.0, bottom: 20.0),
+                  child: Text('Mi cuenta', style: TextStyle(fontFamily: 'Raleway',color: primaryColor, fontSize: 30.0,fontWeight: FontWeight.w700)),
                 ),
-              ),
-              SizedBox(height: 50.0)
-            ],
+                ( _perfil != roleUsuarioName[RoleUsuario.cliente] )
+                  ? _formPerfilComerciante()
+                  : _formPerfilCliente(),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 50.0),
+                  child: ButtonSubmit(
+                    color: electricVioletColor,
+                    textColor: Colors.white,
+                    title: ( isFirstLogin )  ? 'Siguiente' : 'Editar',
+                    onPressed: ( isFirstLogin ) 
+                      ? () {
+                          _prefs.remove(StorageKeys.newAccountFirstLogin);
+                          Navigator.of(context).pushReplacementNamed('/home');
+                        }
+                      : (){}
+                  ),
+                ),
+                SizedBox(height: 50.0)
+              ],
+            ),
           ),
         ),
       ),

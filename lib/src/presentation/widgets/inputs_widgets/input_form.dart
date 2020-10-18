@@ -8,12 +8,16 @@ class InputForm extends StatefulWidget {
   final String placeholderText;
   final bool obscureText;
   final Function(String) onChange;
+  final TextEditingController textEditingController;
+  final FocusNode focusNode;
 
   InputForm({
     this.inputType, 
     this.placeholderText,
     this.obscureText,
-    this.onChange
+    this.onChange,
+    this.textEditingController,
+    this.focusNode,
   });
 
   @override
@@ -24,6 +28,8 @@ class _InputFormState extends State<InputForm> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.textEditingController,
+      focusNode: widget.focusNode,
       obscureText: widget.obscureText,
       keyboardType: widget.inputType,
       textAlign: TextAlign.center, 

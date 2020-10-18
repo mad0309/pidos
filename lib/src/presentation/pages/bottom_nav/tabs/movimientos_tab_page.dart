@@ -130,7 +130,7 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                         width: 50.0,
                       ),
                       SizedBox(height: 20.0),
-                      Text('Aun no cuenta con movimientos', style: TextStyle(fontFamily: 'Raleway', fontWeight: FontWeight.w700, color: Colors.black.withOpacity(0.6)))
+                      Text('Aún no cuentas con movimientos', style: TextStyle(fontSize: 18.0,fontFamily: 'Raleway', fontWeight: FontWeight.w700, color: Colors.black.withOpacity(0.6)))
                     ],
                   ),
                 );
@@ -152,4 +152,5 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
       ),
     );
   }
+  
 }
