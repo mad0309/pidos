@@ -96,7 +96,7 @@ class EnviarCodigoBloc extends MyBaseBloc{
       final resp = await usuarioRepository.enviarCodigo(Usuario((b) => b
         ..id = id
         ..email = email
-        ..nroCelular = '+51$nroCelular'));
+        ..nroCelular = '+57$nroCelular'));
       yield* resp.maybeWhen(
         success: (message) async* {
           yield message;
