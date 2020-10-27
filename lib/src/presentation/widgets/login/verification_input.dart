@@ -44,7 +44,8 @@ class VerificationInput extends StatelessWidget {
                   onSubmitted: onSubmit,
                   style: (!isLoading) ? null : TextStyle(color: Colors.grey.withOpacity(0.6)),
                   inputFormatters: [
-                    WhitelistingTextInputFormatter.digitsOnly,
+                    // WhitelistingTextInputFormatter.digitsOnly,
+                    FilteringTextInputFormatter.digitsOnly,
                     // new LengthLimitingTextInputFormatter(1),
                     DigitCodeFormatter()
                   ],

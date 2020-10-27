@@ -6,14 +6,16 @@ import 'package:pidos/device/size_config/size_config.dart';
 import 'package:pidos/route_generator.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/data/remote/api_service/login_api_service.dart';
+import 'package:pidos/src/data/remote/api_service/movimientos_api_service.dart';
 import 'package:pidos/src/data/remote/api_service/transferencia_api_service.dart';
 import 'package:pidos/src/data/remote/network_utils.dart';
+import 'package:pidos/src/data/repository/movimientos_repository_impl.dart';
 import 'package:pidos/src/data/repository/transferencia_repository_impl.dart';
 import 'package:pidos/src/data/repository/usuario_repository_impl.dart';
+import 'package:pidos/src/domain/repository/movimientos_repository.dart';
 import 'package:pidos/src/domain/repository/transferencia_repository.dart';
 import 'package:pidos/src/domain/repository/usuario_repository.dart';
 import 'package:pidos/src/presentation/blocs/login/login_bloc.dart';
-import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/states/auth_state.dart';
 import 'package:pidos/src/utils/colors.dart';
 import 'package:pidos/src/utils/portraid_mode_mixin.dart';
@@ -40,20 +42,25 @@ void main() async {
     transferenciaApiService: TransferenciaApiService(networkUtil),
     prefs: prefs
   );
+  final MovimientosRepository movimientosRepository = MovimientosRepositoryImpl(
+    movimientosApiService: MovimientosApiService(networkUtil),
+  );
 
   runApp(
     Providers(
       providers: [
         Provider<UsuarioRepository>(value: usuarioRepository),
         Provider<TransferenciaRepository>(value: transferenciaRepository),
+        Provider<MovimientosRepository>(value: movimientosRepository),
       ],
       child: BlocProvider(
         initBloc: () => LoginBloc(usuarioRepository: usuarioRepository),
-        child: BlocProvider(
-            initBloc: () => ServiciosBloc(
-                preferenciasUsuario: prefs,
-                initActive: prefs.getBool(StorageKeys.pidCash) ?? false),
-            child: MyApp()),
+        child: MyApp(),
+        // child: BlocProvider(
+        //     initBloc: () => ServiciosBloc(
+        //         preferenciasUsuario: prefs,
+        //         initActive: prefs.getBool(StorageKeys.pidCash) ?? false),
+        //     child: MyApp()),
       )));
 }
 

@@ -2,6 +2,7 @@
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/data/remote/api_result.dart';
 import 'package:pidos/src/data/remote/api_service/transferencia_api_service.dart';
+import 'package:pidos/src/domain/models/settings.dart';
 import 'package:pidos/src/domain/repository/transferencia_repository.dart';
 import 'package:pidos/src/presentation/states/transferencia_message.dart';
 
@@ -47,7 +48,7 @@ class TransferenciaRepositoryImpl implements TransferenciaRepository {
   @override
   Future<ApiResult<TransferenciaMessage>> tranferirPidCash({
     int pidCash,
-    String documentDestination
+    String documentDestination,
   }) async {
     try{
       final usuario = prefs.getUsuario();
@@ -65,6 +66,18 @@ class TransferenciaRepositoryImpl implements TransferenciaRepository {
       }else{
         throw 'Ocurrio un error durante la transaccion';
       }
+    }catch(err){
+      print('[TRANSFERENCIA_REPOSITORY_IMPL][tranferirPidPuntos] ERROR => $err');
+      throw err;
+    }
+  }
+
+  @override
+  Stream<List<Settings>> retornaValorActualDelPid() async* {
+    try{
+      final resp = await transferenciaApiService.retornaValorActualDelPid();
+      final settings = Settings().fromMapList(resp['settings']);
+      yield settings;
     }catch(err){
       print('[TRANSFERENCIA_REPOSITORY_IMPL][tranferirPidPuntos] ERROR => $err');
       throw err;

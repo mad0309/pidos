@@ -8,7 +8,6 @@ import 'package:pidos/src/data/exceptions/network_exceptions.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/presentation/blocs/home/home_bloc.dart';
-import 'package:pidos/src/presentation/blocs/mi_monedero/mi_monedero_bloc.dart';
 import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/dialogs/transferir_dialog.dart';
 import 'package:pidos/src/presentation/states/result_state.dart';
@@ -119,78 +118,66 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                   ),
                   (_perfil != roleUsuarioName[RoleUsuario.cliente])
                       ? _cardPidsDisponibles()
-                      : StreamBuilder<bool>(
-                          stream: BlocProvider.of<ServiciosBloc>(context)
-                              .isPidChasActive$,
-                          initialData: BlocProvider.of<ServiciosBloc>(context)
-                              .isPidChasActive$
-                              .value,
-                          builder: (context, snapshot) {
-                            final isActive = snapshot.data ?? false;
-                            if (isActive) {
-                              return Column(children: [
-                                _carrouselCards(),
-                                _dotsIndicator()
-                              ]);
-                            } else {
-                              return _cardPidsDisponibles();
-                            }
-                          })
+                      : _cardPidsDisponibles()
+                      // : StreamBuilder<bool>(
+                      //     stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
+                      //     initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+                      //     builder: (context, snapshot) {
+                      //       final isActive = snapshot.data ?? false;
+                      //       if (isActive) {
+                      //         return Column(children: [
+                      //           _carrouselCards(),
+                      //           _dotsIndicator()
+                      //         ]);
+                      //       } else {
+                      //         return _cardPidsDisponibles();
+                      //       }
+                      //     })
                 ],
               ),
               (_perfil != roleUsuarioName[RoleUsuario.cliente])
                   ? Column(
                       children: [
+                        _transferirButton(),
+                        _comprarButton(context),
                         // Padding(
-                        //   padding: EdgeInsets.only(top: 20.0),
-                        //   child: _mensajeInfoPuntos(),
+                        //   padding: EdgeInsets.only(bottom: 5.0,top: 0.05 * screenSizeHeight), //top: 50.0
+                        //   child: _transferirButton(),
                         // ),
-                        Padding(
-                          // padding: EdgeInsets.only(bottom: 5.0, top: 0.08 * screenSizeHeight), //top: 50.0
-                          padding: EdgeInsets.only(
-                              bottom: 5.0,
-                              top: 0.05 * screenSizeHeight), //top: 50.0
-                          child: _transferirButton(),
-                        ),
                       ],
                     )
-                  : StreamBuilder<bool>(
-                      stream: BlocProvider.of<ServiciosBloc>(context)
-                          .isPidChasActive$,
-                      initialData: BlocProvider.of<ServiciosBloc>(context)
-                          .isPidChasActive$
-                          .value,
-                      builder: (context, snapshot) {
-                        final isActive = snapshot.data ?? false;
-                        if (isActive) {
-                          return Column(
-                            children: [
-                              // Padding(
-                              //   padding: EdgeInsets.only(bottom: 10.0),
-                              //   child: _mensajeInfoPuntos(),
-                              // ),
-                              _transferirButton(),
-                              _comprarButton(context),
-                            ],
-                          );
-                        } else {
-                          return Column(
-                            children: [
-                              // Padding(
-                              //   padding: EdgeInsets.only(top: 20.0),
-                              //   child: _mensajeInfoPuntos(),
-                              // ),
-                              Padding(
-                                // padding: EdgeInsets.only(bottom: 5.0, top: 0.08 * screenSizeHeight), // top: 50.0
-                                padding: EdgeInsets.only(
-                                    bottom: 5.0,
-                                    top: 0.05 * screenSizeHeight), // top: 30.0
-                                child: _transferirButton(),
-                              ),
-                            ],
-                          );
-                        }
-                      }),
+                    : Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 5.0,top: 0.05 * screenSizeHeight), // top: 30.0
+                            child: _transferirButton(),
+                          ),
+                        ],
+                      )
+                  // : StreamBuilder<bool>(
+                  //     stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
+                  //     initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+                  //     builder: (context, snapshot) {
+                  //       final isActive = snapshot.data ?? false;
+                  //       if (isActive) {
+                  //         return Column(
+                  //           children: [
+                  //             _transferirButton(),
+                  //             _comprarButton(context),
+                  //           ],
+                  //         );
+                  //       } else {
+                  //         return Column(
+                  //           children: [
+                  //             Padding(
+                  //               padding: EdgeInsets.only(bottom: 5.0,top: 0.05 * screenSizeHeight), // top: 30.0
+                  //               child: _transferirButton(),
+                  //             ),
+                  //           ],
+                  //         );
+                  //       }
+                  //     }
+                  //   ),
             ],
           ),
         ),
@@ -198,24 +185,28 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
     );
   }
 
-  Widget _mensajeInfoPuntos() {
-    return Padding(
-      padding: EdgeInsets.only(
-          left: screenSizeWidth * 0.111, right: screenSizeWidth * 0.111),
-      child: Row(
-        children: [
-          Icon(Icons.error_outline, size: 30.0, color: Colors.red),
-          SizedBox(width: 5.0),
-          Expanded(
-            child: Text(
-              'Tus puntos pueden tardar un poco enverse reflejados aquí',
-              style: TextStyle(color: Colors.black, fontSize: 13.0),
-            ),
-          )
-        ],
-      ),
-    );
-  }
+  ///
+  /// YA NO SE UTILIZA LE MENSAJE DEBIDO A QUE YA FUNCIONA
+  /// LA TRANSFERENCIA DE PIDOS PUNTOS
+  ///
+  // Widget _mensajeInfoPuntos() {
+  //   return Padding(
+  //     padding: EdgeInsets.only(
+  //         left: screenSizeWidth * 0.111, right: screenSizeWidth * 0.111),
+  //     child: Row(
+  //       children: [
+  //         Icon(Icons.error_outline, size: 30.0, color: Colors.red),
+  //         SizedBox(width: 5.0),
+  //         Expanded(
+  //           child: Text(
+  //             'Tus puntos pueden tardar un poco enverse reflejados aquí',
+  //             style: TextStyle(color: Colors.black, fontSize: 13.0),
+  //           ),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _carrouselCards() {
     return Container(

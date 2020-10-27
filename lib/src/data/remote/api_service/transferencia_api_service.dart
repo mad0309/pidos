@@ -22,8 +22,8 @@ class TransferenciaApiService {
       // throw ApiResult.failure(error: NetworkExceptions.getDioException(err));
       throw err;
     }
-
   }
+
 
   Future<dynamic> trasferirPidCash({
     int pidCash,
@@ -40,6 +40,17 @@ class TransferenciaApiService {
       throw err;
     }
 
+  }
+
+  
+  Future<dynamic> retornaValorActualDelPid() async {
+    try{
+      final resp = await networkUtil.post(url: '/me', data: {});
+      return resp.data;
+    }catch(err){
+      // throw ApiResult.failure(error: NetworkExceptions.getDioException(err));
+      throw err;
+    }
   }
 
 

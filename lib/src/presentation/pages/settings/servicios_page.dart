@@ -2,10 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
-import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/drawer_nav.dart';
 import 'package:pidos/src/utils/colors.dart';
+
+
+
+
+///
+/// 
+/// [DEPRECATED]
+/// SE DESACOPLO EL MODULO DE PIDCASH DE LA APP
+/// PIDOS - 26/10/2020
+/// BY: MAD
+/// 
+///
+
 
 
 class ServiciosPage extends StatefulWidget {
@@ -22,11 +34,11 @@ class _ServiciosPageState extends State<ServiciosPage> {
 
   @override
   void initState() { 
-    _prefs = PreferenciasUsuario();
-    final active = _prefs.getBool(StorageKeys.pidCash);
-    if(active){
-      isPidCashActive = active;
-    }
+    // _prefs = PreferenciasUsuario();
+    // final active = _prefs.getBool(StorageKeys.pidCash);
+    // if(active){
+    //   isPidCashActive = active;
+    // }
     super.initState();
   }
 
@@ -107,7 +119,7 @@ class _ServiciosPageState extends State<ServiciosPage> {
                       onToggle: (val) {
                         setState(() {
                           isPidCashActive=!isPidCashActive;
-                          BlocProvider.of<ServiciosBloc>(context).isPidChasActiveSink$.add(isPidCashActive);
+                          // BlocProvider.of<ServiciosBloc>(context).isPidChasActiveSink$.add(isPidCashActive);
                           // _prefs.setBool(StorageKeys.pidCash, isPidCashActive);
                         });
                       },

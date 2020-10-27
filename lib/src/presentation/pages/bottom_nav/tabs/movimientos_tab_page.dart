@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/domain/models/movimientos.dart';
+import 'package:pidos/src/presentation/blocs/movimientos/movimientos_bloc.dart';
+import 'package:pidos/src/presentation/states/result_state.dart';
 import 'package:pidos/src/presentation/widgets/bottom_nav_widgets/movimientos_widget.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/utils/colors.dart';
+import 'package:pidos/src/utils/extensions.dart';
 
 
 class MovimientosTabPage extends StatefulWidget {
@@ -35,6 +42,7 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
   @override
   Widget build(BuildContext context) {
     final _screenSize = MediaQuery.of(context).size;
+    final _movimientosBloc = BlocProvider.of<MovimientosBloc>(context);
     return Scaffold(
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
@@ -114,42 +122,80 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              if(movimientosLenght == 0){
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 80.0),
-                      Image(
-                        color: Colors.black.withOpacity(0.6),
-                        image: AssetImage('assets/img/movimientos_icon_tab.png'),
-                        fit: BoxFit.cover,
-                        width: 50.0,
-                      ),
-                      SizedBox(height: 20.0),
-                      Text('Aún no cuentas con movimientos', style: TextStyle(fontSize: 18.0,fontFamily: 'Raleway', fontWeight: FontWeight.w700, color: Colors.black.withOpacity(0.6)))
-                    ],
-                  ),
-                );
-              }else{
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-                  child: MovimientosWidget(
-                    fechaMovimiento: '10/Enero/20',
-                    pids: '350',
-                    pidId: 'A900697856',
-                    comerciante: 'Pollos Frisby',
-                    comercianteId: '0012345679',
-                  ),
-                );
-              }
-            }, childCount: 1)
-          )
+          StreamBuilder<ResultState<List<Movimientos>>>(
+            stream: _movimientosBloc.listarMovimientos$,
+            initialData: _movimientosBloc.listarMovimientos$.value,
+            builder: (context, snapshot){
+              final state = snapshot.data;
+              return state.maybeWhen(
+                loading: () => loading(),
+                error: (e) => Container(),
+                data: (lsMovimientos) {
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final movimiento = lsMovimientos[index];
+                      final dia = DateFormat('dd', 'es').format(movimiento.createdAt ?? DateTime.now());
+                      final mes = DateFormat('MMMM', 'es').format(movimiento.createdAt ?? DateTime.now());
+                      final ano = DateFormat('y', 'es').format(movimiento.createdAt ?? DateTime.now());
+                      final fechaDeMovimiento = '$dia/${mes.capitalize()}/$ano';
+                      if( lsMovimientos.length == 0 ){
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(height: 80.0),
+                              Image(
+                                color: Colors.black.withOpacity(0.6),
+                                image: AssetImage('assets/img/movimientos_icon_tab.png'),
+                                fit: BoxFit.cover,
+                                width: 50.0,
+                              ),
+                              SizedBox(height: 20.0),
+                              Text('Aún no cuentas con movimientos', style: TextStyle(fontSize: 18.0,fontFamily: 'Raleway', fontWeight: FontWeight.w700, color: Colors.black.withOpacity(0.6)))
+                            ],
+                          ),
+                        );
+                      }else{
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                          child: MovimientosWidget(
+                            fechaMovimiento: fechaDeMovimiento ?? '',
+                            pids: movimiento.amount?.toString() ?? '0',
+                            pidId: movimiento.generator?.document.toString() ?? '0',
+                            comerciante: movimiento.receptor?.name ?? '', //receptor
+                            comercianteId: movimiento.receptor?.document.toString() ?? ''
+                          ),
+                        );
+                      }
+                    },
+                    childCount: (lsMovimientos.length == 0) ? 1 : lsMovimientos.length)
+                  );
+                },
+                orElse: () => Container()
+              );
+            },
+          ),
         ],
       ),
+    );
+  }
+
+
+  Widget loading(){
+    return SliverList(
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 80.0),
+              SpinKitThreeBounce(size: 25.0, color: primaryColor)
+            ],
+          ),
+        );
+      },childCount: 1)
     );
   }
   

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
+import 'package:flutter_provider/flutter_provider.dart';
 import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/app/tab_navigator.dart';
 import 'package:pidos/device/nav/nav_slide_from_right.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/domain/repository/movimientos_repository.dart';
 import 'package:pidos/src/presentation/blocs/mi_monedero/mi_monedero_bloc.dart';
+import 'package:pidos/src/presentation/blocs/movimientos/movimientos_bloc.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/bottom_navigation.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/main_tabs_page.dart';
 import 'package:pidos/src/presentation/pages/home/home_page.dart';
@@ -126,9 +129,14 @@ class _AppState extends State<App> {
             pidosDisponiblesInit: usuario.pid ?? 0.0,
             pidoscashDisponiblesInit: usuario.pidcash ?? 0.0
           ),
-          child: MainTabsPage(
-            pageController: _pageController,
-            globalScaffoldKey: _globalScaffoldKey
+          child: BlocProvider(
+            initBloc: () => MovimientosBloc(
+              movimientosRepository: Provider.of<MovimientosRepository>(context)
+            ),
+            child: MainTabsPage(
+              pageController: _pageController,
+              globalScaffoldKey: _globalScaffoldKey
+            ),
           ),
         );
       }

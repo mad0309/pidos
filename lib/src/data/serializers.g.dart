@@ -7,6 +7,11 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$_serializers = (new Serializers().toBuilder()
+      ..add(Generator.serializer)
+      ..add(Movimientos.serializer)
+      ..add(Reason.serializer)
+      ..add(Receptor.serializer)
+      ..add(Settings.serializer)
       ..add(Usuario.serializer)
       ..add(UsuarioEntity.serializer))
     .build();

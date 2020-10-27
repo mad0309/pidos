@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:pidos/src/utils/colors.dart';
 
-class InputFormDialog extends StatefulWidget {
+class InputFormPesosDialog extends StatefulWidget {
 
   final TextEditingController textEditingController;
   final TextInputType inputType;
   final FocusNode focusNode;
   final String placeholderText;
   final Function(String) onChange;
-  final String sufix;
-  final String prefix;
+  // final String sufix;
+  // final String prefix;
 
-  const InputFormDialog({
+  const InputFormPesosDialog({
     this.textEditingController, 
     this.inputType, 
     this.focusNode, 
     this.placeholderText,
     this.onChange,
-    this.sufix = '',
-    this.prefix = '',
+    // this.sufix = '',
+    // this.prefix = '',
   });
   
   @override
   _InputFormDialogState createState() => _InputFormDialogState();
 }
 
-class _InputFormDialogState extends State<InputFormDialog> {
+class _InputFormDialogState extends State<InputFormPesosDialog> {
   
   Widget build(BuildContext context) {
     return TextField(
@@ -41,10 +42,9 @@ class _InputFormDialogState extends State<InputFormDialog> {
       ),
       cursorColor: primaryColor,
       inputFormatters: [
-        // WhitelistingTextInputFormatter.digitsOnly,
-        FilteringTextInputFormatter.digitsOnly,
+        WhitelistingTextInputFormatter.digitsOnly,
         new LengthLimitingTextInputFormatter(15),
-        new SufixInputFormatter(widget.sufix ?? '', widget.prefix ?? '')
+        // new PaymentInputFormatter()
       ],
       decoration: InputDecoration(
         isDense: true,
@@ -68,54 +68,47 @@ class _InputFormDialogState extends State<InputFormDialog> {
 }
 
 
-class SufixInputFormatter extends TextInputFormatter {
+class PaymentInputFormatter extends TextInputFormatter {
 
-  final String sufix;
-  final String prefix;
 
-  SufixInputFormatter(this.sufix,this.prefix);
+  PaymentInputFormatter();
 
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
     var text = newValue.text;
     var buf = '';
-    bool isPrefix = (prefix.length>0) ? true : false;
-    bool isSufix = (sufix.length>0) ? true : false;
 
-    if (newValue.selection.baseOffset == 0) {
-      return newValue;
-    }
+    // if (newValue.selection.baseOffset == 0) {
+    //   if( text.length> 0){
+    //     return oldValue;
+    //   }else{
+    //     return newValue;
+    //   }
+    // }
+    // text = text.replaceAll('\$', '');
+    // if( text.length>1 ){
+    //   text = text.substring(0, text.length - 5);
+    // }
+    // NumberFormat format = NumberFormat('#,###.000');
+    // double pesos = double.parse(text);
+    // buf = format.format(pesos);
+    // buf = '\$$buf,00';
+    // if(pesos>=1000.0){
+    //  buf =  buf.replaceFirst(',', '.');
+    // }
+    double value = double.parse(newValue.text);
+
+        final formatter = NumberFormat.simpleCurrency(locale: "pt_Br");
+
+        buf = formatter.format(value/100);
+
+    return newValue.copyWith(
+      text: buf,
+      selection: new TextSelection.collapsed(offset: buf.length));
+      // selection: new TextSelection.collapsed(offset: buf.length));
+      // selection: new TextSelection.collapsed(offset: newValue.selection.baseOffset + 2  ));
     
-    if(isPrefix){
-      if(text.length>0){
-        buf = text.replaceAll(prefix, '');
-        buf = buf.replaceAll(' ', '');
-        buf = '$prefix' + buf;
-      }else{
-        buf = text.replaceAll(sufix, '');
-        buf = buf.trim();
-      }
-    }else{
-      if(text.length>0){
-        buf = text.replaceAll('  $sufix', '');
-        buf = buf.replaceAll(' ', '');
-        buf = buf + '$sufix';
-      }else{
-        buf = text.replaceAll(sufix, '');
-        buf = buf.trim();
-      }
-    }
-
-    if(isPrefix){
-      return newValue.copyWith(
-        text: buf,
-        selection: new TextSelection.collapsed(offset: buf.length));        
-    }else{
-      return newValue.copyWith(
-        text: buf,
-        selection: new TextSelection.collapsed(offset: (buf.length == 0) ? buf.length: buf.length - ('$sufix').length));
-    }
     
   }
 }

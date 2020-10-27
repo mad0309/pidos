@@ -12,7 +12,7 @@ class StorageKeys {
   // static final String perfil ="PERFIL";
   // static final String pid ="PID";
   // static final String shortName ="SHORTNAME";
-  static final String pidCash ="PIDCASH";
+  // static final String pidCash ="PIDCASH";
 }
 
 class PreferenciasUsuario {

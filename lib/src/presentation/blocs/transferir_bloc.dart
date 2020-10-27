@@ -4,33 +4,36 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:pidos/src/data/exceptions/network_exceptions.dart';
 import 'package:pidos/src/data/remote/api_result.dart';
+import 'package:pidos/src/domain/models/settings.dart';
 import 'package:pidos/src/domain/repository/transferencia_repository.dart';
 import 'package:pidos/src/presentation/blocs/provider/my_base_bloc.dart';
+import 'package:pidos/src/presentation/states/result_state.dart';
 import 'package:pidos/src/presentation/states/transferencia_message.dart';
 import 'package:rxdart/rxdart.dart';
 
 enum TipoTransferencia {
   pidPuntos,
-  pidCash
+  // pidCash
 }
 
 final Map<TipoTransferencia, String> tipoTranferenciaNombre = {
   TipoTransferencia.pidPuntos: 'Puntos Pids',
-  TipoTransferencia.pidCash: 'Pid Cash'
+  // TipoTransferencia.pidCash: 'Pid Cash'
 };
 
 class TranferirBloc extends MyBaseBloc {
 
   final Function onSubmitTransferencia;
-  final Function(int) onChangedcantidadEnPids;
+  final Function(int) onChangedcantidadEnPids;//
   final Function(TipoTransferencia) onChangedtipoTransferecnia;
   final ValueStream<TipoTransferencia> tipoTransferencia$;
   final ValueStream<double> cantidadaEnPesos$;
   final ValueStream<int> cantidadEnPids$;
   final ValueStream<String> destinationPidId$;
-  final Sink<double> cantidadaEnPesosSink$;
-  final Function(String) onChangeDestinationPidId;
+  final Sink<double> cantidadaEnPesosSink$;//
+  final Function(String) onChangeDestinationPidId;//
   final Stream<TransferenciaMessage> transferenciaMessage$;
+  final ValueStream<ResultState<List<Settings>>> valorActualPidEnPesos$;
 
 
   final Stream<bool> isLoadingTransferencia$;
@@ -47,6 +50,7 @@ class TranferirBloc extends MyBaseBloc {
     this.cantidadEnPids$,
     this.destinationPidId$,
     this.transferenciaMessage$,
+    this.valorActualPidEnPesos$,
 
     //dispose
     @required Function dispose,
@@ -64,6 +68,7 @@ class TranferirBloc extends MyBaseBloc {
     final tipoTransferecniaController = BehaviorSubject<TipoTransferencia>.seeded(TipoTransferencia.pidPuntos);
     final cantidadaEnPesosController = PublishSubject<double>();
     final destinationPidIdController = BehaviorSubject<String>();
+    final valorActualPidEnPesosController = PublishSubject<void>();
     
 
     //streams
@@ -76,6 +81,12 @@ class TranferirBloc extends MyBaseBloc {
         destinationPidId: destinationPidIdController.value))
       .share()
       .publish();
+
+    final valorActualPidEnPesos$ = valorActualPidEnPesosController
+      .startWith(null)
+      .switchMap((value) => retornaValorActualDelPid(transferenciaRepository: transferenciaRepository))
+      .publishValueSeeded(ResultState.loading());
+
     final tipoTransferencia$ = tipoTransferecniaController.shareValue();
     final cantidadaEnPesos$ = cantidadaEnPesosController.shareValueSeeded(0.0);
     final cantidadEnPids$ = cantidadEnPidsController.shareValueSeeded(0);
@@ -91,8 +102,10 @@ class TranferirBloc extends MyBaseBloc {
       cantidadaEnPesos$.listen((value) => print('[TRANSFERIR_BLOC] cantidadaEnPesos=$value')),
       cantidadEnPids$.listen((value) => print('[TRANSFERIR_BLOC] cantidadEnPids=$value')),
       destinationPidId$.listen((value) => print('[TRANSFERIR_BLOC] destinationPidId=$value')),
+      valorActualPidEnPesos$.listen((value) => print('[TRANSFERIR_BLOC] valorActualPidEnPesos=$value')),
       
       transferenciaMessage$.connect(),
+      valorActualPidEnPesos$.connect(),
     ];
 
 
@@ -106,6 +119,7 @@ class TranferirBloc extends MyBaseBloc {
         cantidadaEnPesosController.close(),
         destinationPidIdController.close(),
         isLoadingTransferenciaController.close(),
+        valorActualPidEnPesosController.close(),
       ]);
       print('[TRANFERIR_BLOC] dispose');
     };
@@ -122,9 +136,18 @@ class TranferirBloc extends MyBaseBloc {
       cantidadaEnPesosSink$: cantidadaEnPesosController.sink,
       cantidadEnPids$: cantidadEnPids$,
       destinationPidId$: destinationPidId$,
-      transferenciaMessage$: transferenciaMessage$
+      transferenciaMessage$: transferenciaMessage$,
+      valorActualPidEnPesos$: valorActualPidEnPesos$
     );
 
+  }
+
+
+  Future<void> resetValues(){
+    onChangedcantidadEnPids(0);
+    onChangeDestinationPidId(null);
+    cantidadaEnPesosSink$.add(0.0);
+    return Future.value();
   }
 
 
@@ -166,6 +189,18 @@ class TranferirBloc extends MyBaseBloc {
       isLoadingSink$.add(false);
     }
   }
+
+  static Stream<ResultState<List<Settings>>> retornaValorActualDelPid({
+    TransferenciaRepository transferenciaRepository,
+  }){
+    return transferenciaRepository.retornaValorActualDelPid()
+    .map((settings) => ResultState.data(data: settings))
+    .onErrorReturnWith((e) => ResultState.error(error: e))
+    .startWith(ResultState.loading());
+  }
+
+
+
 
    //metodo que maneja excepciones
   static String _handleExceptionMessage(dynamic err){

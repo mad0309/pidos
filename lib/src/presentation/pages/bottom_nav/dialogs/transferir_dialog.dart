@@ -5,30 +5,29 @@ import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:flutter_provider/flutter_provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:pidos/app/global_singleton.dart';
-import 'package:pidos/src/data/constanst.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/domain/models/settings.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/domain/repository/transferencia_repository.dart';
 import 'package:pidos/src/presentation/blocs/home/home_bloc.dart';
-import 'package:pidos/src/presentation/blocs/mi_monedero/mi_monedero_bloc.dart';
-import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/blocs/transferir_bloc.dart';
+import 'package:pidos/src/presentation/states/result_state.dart';
 import 'package:pidos/src/presentation/states/transferencia_message.dart';
-import 'package:pidos/src/presentation/widgets/circle_color.dart';
 import 'package:pidos/src/presentation/widgets/inputs_widgets/input_form_dialog.dart';
+import 'package:pidos/src/presentation/widgets/inputs_widgets/input_form_pesos_dialog.dart';
 import 'package:pidos/src/presentation/widgets/respuesta_dialog.dart';
 import 'package:pidos/src/utils/colors.dart';
 
-
+/// 
+/// SE ELIMINO LOS RADIOBUTTONS
+/// POR EL DESACOPLAMINETO DE PIDCASH DE LA APP
+/// BY: MAD | 26/10/2020
+/// 
 
 Future<dynamic> transferirDialog({
   @required BuildContext context,
   // @required String fromPage
 }) async {
-  MiMonederoBloc _miMonederoBloc;
-  // if( fromPage != '/' ){
-  //   _miMonederoBloc = BlocProvider.of<MiMonederoBloc>(context);
-  // }
   return await showDialog(
     context: context,
     child: BlocProvider(
@@ -36,9 +35,7 @@ Future<dynamic> transferirDialog({
         transferenciaRepository: Provider.of<TransferenciaRepository>(context),
       ),
       child: _SystemPadding(
-        child: _TransferenciaDialog(
-          // miMonederoBloc: _miMonederoBloc,
-        ),
+        child: _TransferenciaDialog(),
       ),
     )
 
@@ -80,8 +77,10 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
 
   TextEditingController cantidadPidsController;
   TextEditingController pidosIdController;
+  TextEditingController pesosController;
   FocusNode cantidadPidsFocus;
   FocusNode pidosIdFocus;
+  FocusNode pesosFocus;
 
 
   //label del boton
@@ -94,6 +93,9 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
   TranferirBloc tranferirBloc;
   StreamSubscription transferenciaMessage$;
   HomeBloc homeBloc;
+
+  double currentValuePidPuntos;
+  // double currentValuePidCash;
 
   @override
   void initState() { 
@@ -110,8 +112,10 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
 
     cantidadPidsController = TextEditingController(text: '');
     pidosIdController = TextEditingController(text: '');
+    pesosController = TextEditingController(text: '');
     cantidadPidsFocus = FocusNode();
     pidosIdFocus = FocusNode();
+    pesosFocus = FocusNode();
     super.initState();
   }
 
@@ -133,6 +137,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
         });
       }
       if( message is TransferenciaErrorMessage ){
+        homeBloc.retornaSaldo();
         Navigator.of(context).popAndPushNamed('/transferencia', arguments: {
           'status': false,
           'currentPidId': currentPidId,
@@ -153,6 +158,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
   _unfocus(){
     cantidadPidsFocus.unfocus();
     pidosIdFocus.unfocus();
+    pesosFocus.unfocus();
   }
 
   /// construye el titulo con el input text disabled
@@ -166,6 +172,21 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
         Padding(
           padding: EdgeInsets.symmetric(vertical: 5.0),
           child: _textDisabledContainer(content)
+        ),
+      ],
+    );
+  }
+  /// construye el titulo con el input text disabled isLoading
+  Widget _titlelWithInputDisabledLoading(String title){
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: Text(title, style: TextStyle(fontSize: 15.0, color: Color(0xFF666666))),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: _textDisabledContainerLoading()
         ),
       ],
     );
@@ -201,6 +222,33 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
       ],
     );
   }
+  /// construye el titulo con el input text field para PESOS
+  Widget _titlelWithInputForPesosTextField(String title,{
+    TextEditingController textEditingController,
+    FocusNode focusNode,
+    String hintText = '',
+    TextInputType textInputType,
+    Function(String) onChanged
+  }){
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: Text(title, style: TextStyle(fontSize: 15.0, color: Color(0xFF666666))),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: InputFormPesosDialog(
+            textEditingController: textEditingController,
+            focusNode: focusNode,
+            placeholderText: hintText,
+            inputType: textInputType,
+            onChange: onChanged,
+          )
+        ),
+      ],
+    );
+  }
 
   /// input text disabled
   Widget _textDisabledContainer(String content){
@@ -212,6 +260,21 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
         borderRadius: BorderRadius.circular(20.0)
       ),
       child: Text(content, textAlign: TextAlign.center,style: TextStyle(fontSize: 15.0, color: Color(0xFF666666))),
+    );
+  }
+  /// input text disabled
+  Widget _textDisabledContainerLoading(){
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10.0),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: secundaryColor,
+        borderRadius: BorderRadius.circular(20.0)
+      ),
+      child: SpinKitThreeBounce(
+        size: 15.0,
+        color: primaryColor.withOpacity(0.5)
+      ),
     );
   }
 
@@ -285,77 +348,91 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     );
   }
 
-  Widget _radioButtonRow(){
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          StreamBuilder<TipoTransferencia>(
-            stream: tranferirBloc.tipoTransferencia$,
-            initialData: tranferirBloc.tipoTransferencia$.value,
-            builder: (context, snapshot) {
-              final tipoTransferencia = snapshot.data;
-              bool active = false;
-              if( tipoTransferencia == TipoTransferencia.pidCash ){
-                active = true;
-              }else{
-                active = false;
-              }
-              return _radioButtonWithLabel('Pid Cash', active,TipoTransferencia.pidCash);
-            }
-          ),
-          SizedBox(width: 15.0),
-          StreamBuilder<TipoTransferencia>(
-            stream: tranferirBloc.tipoTransferencia$,
-            initialData: tranferirBloc.tipoTransferencia$.value,
-            builder: (context, snapshot) {
-              final tipoTransferencia = snapshot.data;
-              bool active = false;
-              if( tipoTransferencia == TipoTransferencia.pidPuntos ){
-                active = true;
-              }else{
-                active = false;
-              }
-              return _radioButtonWithLabel('Puntos Pidos', active, TipoTransferencia.pidPuntos);
-            }
-          ),
-        ],
-      ),
-    );
-  }
+
+  ///
+  /// [DEPRECATED]
+  /// SE ELIMINO LOS RADIOBUTTONS
+  /// POR EL DESACOPLAMINETO DE PIDCASH DE LA APP
+  ///
+
+  // Widget _radioButtonRow(){
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(vertical: 10.0),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         StreamBuilder<TipoTransferencia>(
+  //           stream: tranferirBloc.tipoTransferencia$,
+  //           initialData: tranferirBloc.tipoTransferencia$.value,
+  //           builder: (context, snapshot) {
+  //             final tipoTransferencia = snapshot.data;
+  //             bool active = false;
+  //             if( tipoTransferencia == TipoTransferencia.pidCash ){
+  //               active = true;
+  //             }else{
+  //               active = false;
+  //             }
+  //             return _radioButtonWithLabel('Pid Cash', active,TipoTransferencia.pidCash);
+  //           }
+  //         ),
+  //         SizedBox(width: 15.0),
+  //         StreamBuilder<TipoTransferencia>(
+  //           stream: tranferirBloc.tipoTransferencia$,
+  //           initialData: tranferirBloc.tipoTransferencia$.value,
+  //           builder: (context, snapshot) {
+  //             final tipoTransferencia = snapshot.data;
+  //             bool active = false;
+  //             if( tipoTransferencia == TipoTransferencia.pidPuntos ){
+  //               active = true;
+  //             }else{
+  //               active = false;
+  //             }
+  //             return _radioButtonWithLabel('Puntos Pidos', active, TipoTransferencia.pidPuntos);
+  //           }
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
 
-  Widget _radioButtonWithLabel(String title, bool value, TipoTransferencia tipoTransferencia ){
-    return GestureDetector(
-      onTap: () => tranferirBloc.onChangedtipoTransferecnia(tipoTransferencia),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _radioButton(value),
-          SizedBox(width: 5.0),
-          Text(title, style: TextStyle(fontSize: 18.0, color: Colors.black, fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
+  // Widget _radioButtonWithLabel(String title, bool value, TipoTransferencia tipoTransferencia ){
+  //   return GestureDetector(
+  //     onTap: () async {
+  //       if( tranferirBloc.tipoTransferencia$.value.toString() != tipoTransferencia.toString() ){
+  //         cantidadPidsController.text = '';
+  //         pidosIdController.text = '';
+  //         await tranferirBloc.resetValues();
+  //       }
+  //       tranferirBloc.onChangedtipoTransferecnia(tipoTransferencia);
+  //     },
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         _radioButton(value),
+  //         SizedBox(width: 5.0),
+  //         Text(title, style: TextStyle(fontSize: 18.0, color: Colors.black, fontWeight: FontWeight.w600)),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _radioButton(bool active){
-    return CircleWidget(
-      width: 20.0, //width: 40.0,
-      height: 20.0, //height: 40.0
-      color: Colors.transparent,
-      borderColor: primaryColor,
-      borderWidth: 2.5,
-      widget: Center(
-        child: CircleWidget(
-          width: 10.0, //width: 15.0, 
-          height: 10.0,  //height: 15.0,  
-          color: (active) ?  primaryColor : Colors.transparent
-        ),
-      ),
-    );
-  }
+  // Widget _radioButton(bool active){
+  //   return CircleWidget(
+  //     width: 20.0, //width: 40.0,
+  //     height: 20.0, //height: 40.0
+  //     color: Colors.transparent,
+  //     borderColor: primaryColor,
+  //     borderWidth: 2.5,
+  //     widget: Center(
+  //       child: CircleWidget(
+  //         width: 10.0, //width: 15.0, 
+  //         height: 10.0,  //height: 15.0,  
+  //         color: (active) ?  primaryColor : Colors.transparent
+  //       ),
+  //     ),
+  //   );
+  // }
 
 
   /// 
@@ -380,44 +457,99 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _titulo(),
-                StreamBuilder<bool>(
-                  stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
-                  initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+                // StreamBuilder<bool>(
+                //   stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
+                //   initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+                //   builder: (context, snapshot) {
+                //     final isActive = snapshot.data ?? false;
+                //     if(isActive){
+                //       return _radioButtonRow(); 
+                //     }else{
+                //       return Container();
+                //     }
+                //   }
+                // ),
+                // _titlelWithInputDisabled('Cantidad en PIDS:', '300 pids'),
+                StreamBuilder<ResultState<List<Settings>>>(
+                  stream: tranferirBloc.valorActualPidEnPesos$,
+                  initialData: tranferirBloc.valorActualPidEnPesos$.value,
                   builder: (context, snapshot) {
-                    final isActive = snapshot.data ?? false;
-                    if(isActive){
-                      return _radioButtonRow(); 
-                    }else{
-                      return Container();
-                    }
+                    final state = snapshot.data;
+                    return state.maybeWhen(
+                      loading: () => _titlelWithInputDisabledLoading('Cantidad en PIDS:'),
+                      error: (e) => _titlelWithInputDisabled('Cantidad en PIDS:', 'No hay conexión, intentelo más tarde'),
+                      data: (lsSettings) { 
+                        currentValuePidPuntos = double.parse(lsSettings[1].value);
+                        // currentValuePidCash = double.parse(lsSettings[0].value);
+                        return _titlelWithInputTextField('Cantidad en PIDS:',
+                          textEditingController: cantidadPidsController,
+                          focusNode: cantidadPidsFocus,
+                          hintText: 'Ingrese cantidad en pids',
+                          textInputType: TextInputType.number,
+                          sufix: '  pids',
+                          onChanged: onChangePid
+                        );
+                      },
+                      orElse: () => Container()
+                    );
                   }
                 ),
-                // _titlelWithInputDisabled('Cantidad en PIDS:', '300 pids'),
-                _titlelWithInputTextField('Cantidad en PIDS:',
-                  textEditingController: cantidadPidsController,
-                  focusNode: cantidadPidsFocus,
-                  hintText: 'Ingrese la cantidad',
-                  textInputType: TextInputType.number,
-                  sufix: '  pids',
-                  onChanged: onChangePid
-                ),
+                // StreamBuilder<ResultState<List<Settings>>>(
+                //   stream: tranferirBloc.valorActualPidEnPesos$,
+                //   initialData: tranferirBloc.valorActualPidEnPesos$.value,
+                //   builder: (context, snapshot) {
+                //     final state = snapshot.data;
+                //     return state.maybeWhen(
+                //       loading: () => _titlelWithInputDisabledLoading('Cantidad en Pesos:'),
+                //       error: (e) => _titlelWithInputDisabled('Cantidad en Pesos:', 'No hay conexión, intentelo más tarde'),
+                //       data: (lsSettings) { 
+                //         currentValuePidPuntos = double.parse(lsSettings[1].value);
+                //         // currentValuePidCash = double.parse(lsSettings[0].value);
+                //         return _titlelWithInputForPesosTextField('Cantidad en Pesos:', 
+                //           textEditingController: pesosController,
+                //           focusNode: pesosFocus,
+                //           hintText: 'Ingrese cantidad en pesos:',
+                //           textInputType: TextInputType.number,
+                //           onChanged: onChangePesos
+                //         );
+                //       },
+                //       orElse: () => Container()
+                //     );
+                //   }
+                // ),
                 StreamBuilder<double>(
                   stream: tranferirBloc.cantidadaEnPesos$,
                   initialData: tranferirBloc.cantidadaEnPesos$.value,
                   builder: (context, snapshot) {
                     final cantidadEnPesos = snapshot.data;
-                    return _titlelWithInputDisabled('Cantidad en Pesos:', '\$$cantidadEnPesos');
+                    return _titlelWithInputDisabled('Cantidad en Pesos:', '\$${cantidadEnPesos.toInt()}.000,00');
                   }
                 ),
-                // _titlelWithInputDisabled('Pidos ID:', 'PID-123456789 - Ricardo Castro'),
-                _titlelWithInputTextField('Pidos ID:', 
-                  textEditingController: pidosIdController,
-                  focusNode: pidosIdFocus,
-                  hintText: 'Ingrese ID',
-                  textInputType: TextInputType.number,
-                  prefix: 'PID - ',
-                  onChanged: onChangePidId
+                StreamBuilder<ResultState<List<Settings>>>(
+                  stream: tranferirBloc.valorActualPidEnPesos$,
+                  initialData: tranferirBloc.valorActualPidEnPesos$.value,
+                  builder: (context, snapshot) {
+                    final state = snapshot.data;
+                    return state.maybeWhen(
+                      loading: () => _titlelWithInputDisabledLoading('Pidos ID:'),
+                      error: (e) => _titlelWithInputDisabled('Pidos ID:', 'No hay conexión, intentelo más tarde'),
+                      data: (lsSettings) { 
+                        currentValuePidPuntos = double.parse(lsSettings[1].value);
+                        // currentValuePidCash = double.parse(lsSettings[0].value);
+                        return _titlelWithInputTextField('Pidos ID:', 
+                          textEditingController: pidosIdController,
+                          focusNode: pidosIdFocus,
+                          hintText: 'Ingrese ID',
+                          textInputType: TextInputType.number,
+                          prefix: 'PID - ',
+                          onChanged: onChangePidId
+                        );
+                      },
+                      orElse: () => Container()
+                    );
+                  }
                 ),
+                
                 _transferirButton()
               ],
             ),
@@ -429,6 +561,10 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
 
   void onChangePid(String value){
     final cantidadPidString = value.replaceAll('  pids', '');
+    double currentValuePidInPesos = 0.0;
+    if( tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos ){
+      currentValuePidInPesos = currentValuePidPuntos;
+    }
     if(value.length>0){
       final cantidadPidNumber = num.parse(cantidadPidString);
       final canitdadEnPesos = cantidadPidNumber.toInt() * currentValuePidInPesos; 
@@ -447,6 +583,15 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
       tranferirBloc.onChangeDestinationPidId(null);
     }
   }
+  // void onChangePesos(String value){
+  //   final pesosInString = value.replaceAll('\$', '');
+  //   if(value.length>0){
+  //     final pesos = double.parse(pesosInString);
+  //     tranferirBloc.cantidadaEnPesosSink$.add(pesos);
+  //   }else{
+  //     tranferirBloc.cantidadaEnPesosSink$.add(0.0);
+  //   }
+  // }
 
   _onTaptransferir() async {
     _unfocus();
@@ -477,10 +622,11 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     if( tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos ){
       currentPid = currtentPidPuntos;
       message = 'En este momento no cuentas con puntos pid disponibles para realizar esta acción';
-    }else{
-      currentPid = currtentPidCash;
-      message = 'En este momento no cuentas con pidcash disponibles para realizar esta acción';
     }
+    // else{
+    //   currentPid = currtentPidCash;
+    //   message = 'En este momento no cuentas con pidcash disponibles para realizar esta acción';
+    // }
     if( currentPid > 0.0 ){
       // print('TODO OK');
       tranferirBloc.onSubmitTransferencia();
