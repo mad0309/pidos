@@ -43,6 +43,8 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
   Widget build(BuildContext context) {
     final _screenSize = MediaQuery.of(context).size;
     final _movimientosBloc = BlocProvider.of<MovimientosBloc>(context);
+    final _prefs = PreferenciasUsuario();
+    final idUsuario = _prefs.getUsuario().id;
     return Scaffold(
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
@@ -133,11 +135,7 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                 data: (lsMovimientos) {
                   return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      final movimiento = lsMovimientos[index];
-                      final dia = DateFormat('dd', 'es').format(movimiento.createdAt ?? DateTime.now());
-                      final mes = DateFormat('MMMM', 'es').format(movimiento.createdAt ?? DateTime.now());
-                      final ano = DateFormat('y', 'es').format(movimiento.createdAt ?? DateTime.now());
-                      final fechaDeMovimiento = '$dia/${mes.capitalize()}/$ano';
+                      
                       if( lsMovimientos.length == 0 ){
                         return Center(
                           child: Column(
@@ -157,9 +155,20 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                           ),
                         );
                       }else{
+                        final movimiento = lsMovimientos[index];
+                        final dia = DateFormat('dd', 'es').format(movimiento.createdAt ?? DateTime.now());
+                        final mes = DateFormat('MMMM', 'es').format(movimiento.createdAt ?? DateTime.now());
+                        final ano = DateFormat('y', 'es').format(movimiento.createdAt ?? DateTime.now());
+                        final fechaDeMovimiento = '$dia/${mes.capitalize()}/$ano';
+                        final idGenrador = movimiento.generator.id;
+                        bool isEnviado = false;
+                        if( idGenrador == idUsuario ) {
+                          isEnviado = true;
+                        }
                         return Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
                           child: MovimientosWidget(
+                            isEnviado: isEnviado,
                             fechaMovimiento: fechaDeMovimiento ?? '',
                             pids: movimiento.amount?.toString() ?? '0',
                             pidId: movimiento.generator?.document.toString() ?? '0',

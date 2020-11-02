@@ -145,13 +145,16 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         SizedBox(height: _screenSizeHeight * 0.016 ), //height: 10.0
-        Text(
-          '¿Olvidaste tu contraseña?',
-          style: TextStyle(
-            fontSize: 16.0,
-            color: Colors.black,
-            fontWeight: FontWeight.w300,
-            decoration: TextDecoration.underline,
+        GestureDetector(
+          onTap: () => Navigator.of(context).pushNamed('/recuperar_contrasena'),
+          child: Text(
+            '¿Olvidaste tu contraseña?',
+            style: TextStyle(
+              fontSize: 16.0,
+              color: Colors.black,
+              fontWeight: FontWeight.w300,
+              decoration: TextDecoration.underline,
+            ),
           ),
         ),
         SizedBox(height: _screenSizeHeight * 0.0337 ) //height: 20.0

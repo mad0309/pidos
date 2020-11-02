@@ -9,6 +9,7 @@ import 'package:pidos/src/domain/repository/usuario_repository.dart';
 import 'package:pidos/src/presentation/blocs/home/home_bloc.dart';
 import 'package:pidos/src/presentation/blocs/login/enviar_codigo_bloc.dart';
 import 'package:pidos/src/presentation/blocs/login/ingresa_codigo_bloc.dart';
+import 'package:pidos/src/presentation/blocs/login/recuperar_contrasena_bloc.dart';
 import 'package:pidos/src/presentation/blocs/login/registro_bloc.dart';
 import 'package:pidos/src/presentation/blocs/settings/mi_cuenta_bloc.dart';
 import 'package:pidos/src/presentation/pages/comprar_pidcash/compra_detalle_page.dart/compra_detalle_page.dart';
@@ -16,6 +17,8 @@ import 'package:pidos/src/presentation/pages/comprar_pidcash/comprar_pidcash_pag
 import 'package:pidos/src/presentation/pages/login/enviar_codigo_page.dart';
 import 'package:pidos/src/presentation/pages/login/ingresa_codigo_page.dart';
 import 'package:pidos/src/presentation/pages/login/login_page.dart';
+import 'package:pidos/src/presentation/pages/login/recuperar_contrasena_message_page.dart';
+import 'package:pidos/src/presentation/pages/login/recuperar_contrasena_page.dart';
 import 'package:pidos/src/presentation/pages/login/registro_form_page.dart';
 import 'package:pidos/src/presentation/pages/login/registro_page.dart';
 import 'package:pidos/src/presentation/pages/no_action_avaible_page.dart';
@@ -98,5 +101,18 @@ final appRoutes = <String, WidgetBuilder>{
     final String message = ModalRoute.of(context).settings.arguments;
     return NoActionAvaiblePage(text: message ?? '');
   },
+  '/recuperar_contrasena': ( BuildContext context  ) {
+    final usuarioRepository = Provider.of<UsuarioRepository>(context);
+    return BlocProvider(
+      initBloc: () => RecuperarContrasenaBloc(
+        usuarioRepository: usuarioRepository
+      ),
+      child: RecuperarContrasenaPage()
+    );
+  },
+  '/recuperar_contrasena_message': ( BuildContext context  ) {
+    final bool success = ModalRoute.of(context).settings.arguments;
+    return RecuperarContrasenaMessagePage(success: success ?? false);
+  } 
   // '/registro_webview': ( BuildContext context  ) => RegistroWebviewPage()
 };
