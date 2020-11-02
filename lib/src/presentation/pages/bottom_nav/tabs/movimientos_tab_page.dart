@@ -11,20 +11,16 @@ import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/utils/colors.dart';
 import 'package:pidos/src/utils/extensions.dart';
 
-
 class MovimientosTabPage extends StatefulWidget {
   final GlobalKey<ScaffoldState> globalScaffoldKey;
 
-  MovimientosTabPage({
-    this.globalScaffoldKey
-  });
+  MovimientosTabPage({this.globalScaffoldKey});
 
   @override
   _MovimientosTabPageState createState() => _MovimientosTabPageState();
 }
 
 class _MovimientosTabPageState extends State<MovimientosTabPage> {
-
   String _shortName;
   int movimientosLenght = 0;
 
@@ -34,7 +30,6 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
     _shortName = usuario.shortName;
     super.initState();
   }
-  
 
   ///
   /// METODO BUILD
@@ -44,13 +39,13 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
     final _screenSize = MediaQuery.of(context).size;
     final _movimientosBloc = BlocProvider.of<MovimientosBloc>(context);
     return Scaffold(
-      extendBodyBehindAppBar: true, 
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        elevation: 0.0, 
+        elevation: 0.0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios,color: cyanColor),
-          onPressed:() => Navigator.of(context).pop(),
+          icon: Icon(Icons.arrow_back_ios, color: cyanColor),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           InkResponse(
@@ -77,7 +72,8 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
             expandedHeight: _screenSize.height * 0.25,
             backgroundColor: primaryColor,
             flexibleSpace: FlexibleSpaceBar(
-              collapseMode: CollapseMode.none, //give effect if there was an image
+              collapseMode:
+                  CollapseMode.none, //give effect if there was an image
               titlePadding: EdgeInsets.zero,
               centerTitle: true,
               title: Column(
@@ -89,8 +85,12 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                   ),
                   Flexible(
                     flex: 1,
-                    child:
-                        Text("Tus movimientos", textAlign: TextAlign.center,style: TextStyle(fontFamily: 'Raleway',fontWeight: FontWeight.w600),),
+                    child: Text(
+                      "Tus movimientos",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontFamily: 'Raleway', fontWeight: FontWeight.w600),
+                    ),
                   ),
                   Flexible(
                     flex: 1,
@@ -98,7 +98,6 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                   ),
                 ],
               ),
-              
             ),
           ),
           SliverToBoxAdapter(
@@ -112,10 +111,10 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                     height: 20.0,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(20.0),
-                          topRight: const Radius.circular(20.0),
-                        ),
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(20.0),
+                        topRight: const Radius.circular(20.0),
+                      ),
                     ),
                   ),
                 ],
@@ -125,20 +124,15 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
           StreamBuilder<ResultState<List<Movimientos>>>(
             stream: _movimientosBloc.listarMovimientos$,
             initialData: _movimientosBloc.listarMovimientos$.value,
-            builder: (context, snapshot){
+            builder: (context, snapshot) {
               final state = snapshot.data;
               return state.maybeWhen(
-                loading: () => loading(),
-                error: (e) => Container(),
-                data: (lsMovimientos) {
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final movimiento = lsMovimientos[index];
-                      final dia = DateFormat('dd', 'es').format(movimiento.createdAt ?? DateTime.now());
-                      final mes = DateFormat('MMMM', 'es').format(movimiento.createdAt ?? DateTime.now());
-                      final ano = DateFormat('y', 'es').format(movimiento.createdAt ?? DateTime.now());
-                      final fechaDeMovimiento = '$dia/${mes.capitalize()}/$ano';
-                      if( lsMovimientos.length == 0 ){
+                  loading: () => loading(),
+                  error: (e) => Container(),
+                  data: (lsMovimientos) {
+                    return SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                      if (lsMovimientos.length == 0) {
                         return Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -147,33 +141,53 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                               SizedBox(height: 80.0),
                               Image(
                                 color: Colors.black.withOpacity(0.6),
-                                image: AssetImage('assets/img/movimientos_icon_tab.png'),
+                                image: AssetImage(
+                                    'assets/img/movimientos_icon_tab.png'),
                                 fit: BoxFit.cover,
                                 width: 50.0,
                               ),
                               SizedBox(height: 20.0),
-                              Text('Aún no cuentas con movimientos', style: TextStyle(fontSize: 18.0,fontFamily: 'Raleway', fontWeight: FontWeight.w700, color: Colors.black.withOpacity(0.6)))
+                              Text('Aún no cuentas con movimientos',
+                                  style: TextStyle(
+                                      fontSize: 18.0,
+                                      fontFamily: 'Raleway',
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black.withOpacity(0.6)))
                             ],
                           ),
                         );
-                      }else{
+                      } else {
+                        final movimiento = lsMovimientos[index];
+                        final dia = DateFormat('dd', 'es')
+                            .format(movimiento.createdAt ?? DateTime.now());
+                        final mes = DateFormat('MMMM', 'es')
+                            .format(movimiento.createdAt ?? DateTime.now());
+                        final ano = DateFormat('y', 'es')
+                            .format(movimiento.createdAt ?? DateTime.now());
+                        final fechaDeMovimiento =
+                            '$dia/${mes.capitalize()}/$ano';
                         return Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 8.0),
                           child: MovimientosWidget(
-                            fechaMovimiento: fechaDeMovimiento ?? '',
-                            pids: movimiento.amount?.toString() ?? '0',
-                            pidId: movimiento.generator?.document.toString() ?? '0',
-                            comerciante: movimiento.receptor?.name ?? '', //receptor
-                            comercianteId: movimiento.receptor?.document.toString() ?? ''
-                          ),
+                              fechaMovimiento: fechaDeMovimiento ?? '',
+                              pids: movimiento.amount?.toString() ?? '0',
+                              pidId:
+                                  movimiento.generator?.document.toString() ??
+                                      '0',
+                              comerciante:
+                                  movimiento.receptor?.name ?? '', //receptor
+                              comercianteId:
+                                  movimiento.receptor?.document.toString() ??
+                                      ''),
                         );
                       }
                     },
-                    childCount: (lsMovimientos.length == 0) ? 1 : lsMovimientos.length)
-                  );
-                },
-                orElse: () => Container()
-              );
+                            childCount: (lsMovimientos.length == 0)
+                                ? 1
+                                : lsMovimientos.length));
+                  },
+                  orElse: () => Container());
             },
           ),
         ],
@@ -181,22 +195,19 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
     );
   }
 
-
-  Widget loading(){
+  Widget loading() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate((context, index) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 80.0),
-              SpinKitThreeBounce(size: 25.0, color: primaryColor)
-            ],
-          ),
-        );
-      },childCount: 1)
-    );
+        delegate: SliverChildBuilderDelegate((context, index) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 80.0),
+            SpinKitThreeBounce(size: 25.0, color: primaryColor)
+          ],
+        ),
+      );
+    }, childCount: 1));
   }
-  
 }
