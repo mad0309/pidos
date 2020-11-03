@@ -79,5 +79,20 @@ class LoginApiService {
     }
   }
 
+  Future<bool> recuprarContrasena(String email) async {
+    try{
+      final resp = await networkUtil.post(url: '/password/reset', data: {
+        "email": email
+      });
+      if(resp.data['error'] != null && resp.data['error'] == false){
+        return true;
+      }else{
+        return false;
+      }
+    }catch(err){
+      throw err;
+    }
+  }
+
 
 }

@@ -9,13 +9,15 @@ class MovimientosWidget extends StatelessWidget {
   final String pidId;
   final String comerciante;
   final String comercianteId;
+  final bool isEnviado;
 
   const MovimientosWidget({
     @required this.fechaMovimiento,
     @required this.pids,
     @required this.pidId,
     @required this.comerciante,
-    @required this.comercianteId
+    @required this.comercianteId,
+    @required this.isEnviado
   });
 
   @override
@@ -40,9 +42,28 @@ class MovimientosWidget extends StatelessWidget {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(this.fechaMovimiento, style: TextStyle(fontSize: 18.0,color: Colors.black, fontWeight: FontWeight.w600)),
-              Text('$pids PIDS', style: TextStyle(fontSize: 18.0,color: Colors.green, fontWeight: FontWeight.w700)),
+              Text(this.fechaMovimiento, style: TextStyle(fontSize: 16.0,color: Colors.black, fontWeight: FontWeight.w600)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '$pids PIDS', 
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: (isEnviado) ? Colors.red : Colors.green, 
+                      fontWeight: FontWeight.w700)),
+                  Text(
+                    (isEnviado) ? '(Enviado)' :'(Recibido)', 
+                    style: TextStyle(
+                      fontSize: 12.0,
+                      color: Color(0xFF4D4D4D), 
+                      fontWeight: FontWeight.w300)),
+                  
+                ],
+              ),
             ],
           ),
           Row(
@@ -56,7 +77,7 @@ class MovimientosWidget extends StatelessWidget {
                   Text('$comerciante', style: TextStyle(fontSize: 16.0,color: Colors.black, fontWeight: FontWeight.w300)),
                 ],
               ),
-              Text('$comercianteId', style: TextStyle(fontSize: 16.0,color: Colors.black, fontWeight: FontWeight.w300)),
+              Text('$comercianteId', style: TextStyle(fontSize: 16.0,color: Colors.black, fontWeight: FontWeight.w400)),
             ],
           ),
         ],

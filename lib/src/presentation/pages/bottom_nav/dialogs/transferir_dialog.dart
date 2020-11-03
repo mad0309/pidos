@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:flutter_provider/flutter_provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/settings.dart';
@@ -163,6 +164,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
 
   /// construye el titulo con el input text disabled
   Widget _titlelWithInputDisabled(String title, String content){
+
     return Column(
       children: [
         Padding(
@@ -522,7 +524,13 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
                   initialData: tranferirBloc.cantidadaEnPesos$.value,
                   builder: (context, snapshot) {
                     final cantidadEnPesos = snapshot.data;
-                    return _titlelWithInputDisabled('Cantidad en Pesos:', '\$${cantidadEnPesos.toInt()}.000,00');
+                    NumberFormat format = NumberFormat('#,###.000');
+                    String pesosString = format.format(cantidadEnPesos);
+                    if(cantidadEnPesos>=1000.0){
+                     pesosString =  pesosString.replaceAll(',', '.');
+                    }
+                    pesosString = '\$$pesosString,oo';
+                    return _titlelWithInputDisabled('Cantidad en Pesos:', (cantidadEnPesos>0.0) ? pesosString : '0.000,oo');
                   }
                 ),
                 StreamBuilder<ResultState<List<Settings>>>(

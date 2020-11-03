@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget with PortraitModeMixin {
               accentColor: Color(0xFFf2f2f2),
               unselectedWidgetColor: Color(0xFF2f046b)),
           initialRoute: '/init',
-          // initialRoute: '/ingresa_codigo',
+          // initialRoute: '/recuperar_contrasena_message',
           routes: appRoutes,
         );
       });

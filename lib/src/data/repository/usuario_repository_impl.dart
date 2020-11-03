@@ -7,6 +7,7 @@ import 'package:pidos/src/domain/repository/usuario_repository.dart';
 import 'package:pidos/src/presentation/states/login_message.dart';
 
 import 'package:pidos/src/presentation/states/auth_state.dart';
+import 'package:pidos/src/presentation/states/recuperar_contrasena_message.dart';
 import 'package:pidos/src/presentation/states/registro_message.dart';
 
 part 'mappers.dart';
@@ -134,6 +135,23 @@ class UsuarioRepositoryImpl implements UsuarioRepository {
       throw err;
     }
   }
+
+  @override
+  Future<ApiResult<RecuperarContrasenaMessage>> recuperarContrasena(String  email) async {
+    try{
+       final resp = await loginApiService.recuprarContrasena(email);
+       if( resp ){ 
+         return ApiResult.success(data: RecuperarContrasenaSuccessMessage());
+       }else{
+         return null;
+        //  return ApiResult.failure(error: RecuperarContrasenaErrorMessage('Error inesperado intentelo más tarde'));
+       }
+    }catch(err){
+      print('[USUARIO_REPOSITORY][registroUsuario][ERROR] => $err');
+      throw err;
+    }
+  }
+
 
   
 
