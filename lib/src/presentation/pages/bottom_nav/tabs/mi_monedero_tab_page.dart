@@ -26,6 +26,9 @@ class MiMonederoTabPage extends StatefulWidget {
 }
 
 class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   double screenSizeHeight;
   double screenSizeWidth;
 
@@ -64,6 +67,15 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
   void dispose() {
     _pageController?.dispose();
     super.dispose();
+  }
+
+  // Metodo para mostrar un snackbar
+  void mostrarSnackBar( String mensaje ) {
+    final snackbar = SnackBar(
+      content: Text( mensaje ),
+      duration: Duration( milliseconds: 3000 ),
+    );
+   scaffoldKey.currentState.showSnackBar(snackbar);
   }
 
   ///
@@ -272,6 +284,11 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                             );
                           },
                           error: (NetworkExceptions error){
+                            error.maybeWhen(
+                              unauthorizedRequest: () => Navigator.of(context).pushReplacementNamed('/login'),
+                              noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
+                              orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde')
+                            );
                             return Container();
                           },
                           data: (Usuario saldo) {
@@ -370,6 +387,11 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                             );
                           },
                           error: (NetworkExceptions error){
+                            error.maybeWhen(
+                              unauthorizedRequest: () => Navigator.of(context).pushReplacementNamed('/login'),
+                              noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
+                              orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde')
+                            );
                             return Container();
                           },
                           data: (Usuario saldo) {
@@ -494,6 +516,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
     screenSizeHeight = MediaQuery.of(context).size.height;
     screenSizeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: scaffoldKey,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,

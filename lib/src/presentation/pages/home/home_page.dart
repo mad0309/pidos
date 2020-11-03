@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   double screenSizeHeight;
   double screenSizeWidth;
+  Future<void> timer;
 
   final _carruselData = ['slide-app-2.jpg', 'slide-app-1.jpg'];
 
@@ -49,6 +50,12 @@ class _HomePageState extends State<HomePage> {
     // _shortName = _sharedPrefs.get(StorageKeys.shortName);
     /// ======= =========================== ===== ///
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    timer ??= Future.delayed(Duration(minutes: 10), () => Navigator.of(context).pushReplacementNamed('/login'));
+    super.didChangeDependencies();
   }
 
   ///

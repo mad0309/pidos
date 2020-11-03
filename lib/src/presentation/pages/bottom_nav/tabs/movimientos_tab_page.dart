@@ -25,6 +25,8 @@ class MovimientosTabPage extends StatefulWidget {
 
 class _MovimientosTabPageState extends State<MovimientosTabPage> {
 
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   String _shortName;
   int movimientosLenght = 0;
 
@@ -33,6 +35,15 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
     final usuario = PreferenciasUsuario().getUsuario();
     _shortName = usuario.shortName;
     super.initState();
+  }
+
+  // Metodo para mostrar un snackbar
+  void mostrarSnackBar( String mensaje ) {
+    final snackbar = SnackBar(
+      content: Text( mensaje ),
+      duration: Duration( milliseconds: 3000 ),
+    );
+   scaffoldKey.currentState.showSnackBar(snackbar);
   }
   
 
@@ -46,6 +57,7 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
     final _prefs = PreferenciasUsuario();
     final idUsuario = _prefs.getUsuario().id;
     return Scaffold(
+      key: scaffoldKey,
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -131,7 +143,14 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
               final state = snapshot.data;
               return state.maybeWhen(
                 loading: () => loading(),
-                error: (e) => Container(),
+                error: (e) {
+                  e.maybeWhen(
+                    unauthorizedRequest: () => Navigator.of(context).pushReplacementNamed('/login'),
+                    noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
+                    orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde')
+                  );
+                  return Container();
+                },
                 data: (lsMovimientos) {
                   return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
