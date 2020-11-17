@@ -21,6 +21,16 @@ final Map<TipoTransferencia, String> tipoTranferenciaNombre = {
   // TipoTransferencia.pidCash: 'Pid Cash'
 };
 
+enum IngresaValorEn {
+  pids,
+  pesos
+}
+
+final Map<IngresaValorEn, String> ingresaValorEnNombre = {
+  IngresaValorEn.pids: 'Pids',
+  IngresaValorEn.pesos: 'Pesos'
+};
+
 class TranferirBloc extends MyBaseBloc {
 
   final Function onSubmitTransferencia;
@@ -34,6 +44,8 @@ class TranferirBloc extends MyBaseBloc {
   final Function(String) onChangeDestinationPidId;//
   final Stream<TransferenciaMessage> transferenciaMessage$;
   final ValueStream<ResultState<List<Settings>>> valorActualPidEnPesos$;
+  final ValueStream<IngresaValorEn> ingresaValorEn$;
+  final Function(IngresaValorEn) onChangedIngresaValorEn;
 
 
   final Stream<bool> isLoadingTransferencia$;
@@ -51,6 +63,8 @@ class TranferirBloc extends MyBaseBloc {
     this.destinationPidId$,
     this.transferenciaMessage$,
     this.valorActualPidEnPesos$,
+    this.ingresaValorEn$,
+    this.onChangedIngresaValorEn,
 
     //dispose
     @required Function dispose,
@@ -69,6 +83,7 @@ class TranferirBloc extends MyBaseBloc {
     final cantidadaEnPesosController = PublishSubject<double>();
     final destinationPidIdController = BehaviorSubject<String>();
     final valorActualPidEnPesosController = PublishSubject<void>();
+    final ingresaValorEnController = BehaviorSubject.seeded(IngresaValorEn.pids);
     
 
     //streams
@@ -91,6 +106,7 @@ class TranferirBloc extends MyBaseBloc {
     final cantidadaEnPesos$ = cantidadaEnPesosController.shareValueSeeded(0.0);
     final cantidadEnPids$ = cantidadEnPidsController.shareValueSeeded(0);
     final destinationPidId$ = destinationPidIdController.shareValue();
+    final ingresaValorEn$ = ingresaValorEnController.shareValue();
 
 
     //subscriptions
@@ -103,6 +119,7 @@ class TranferirBloc extends MyBaseBloc {
       cantidadEnPids$.listen((value) => print('[TRANSFERIR_BLOC] cantidadEnPids=$value')),
       destinationPidId$.listen((value) => print('[TRANSFERIR_BLOC] destinationPidId=$value')),
       valorActualPidEnPesos$.listen((value) => print('[TRANSFERIR_BLOC] valorActualPidEnPesos=$value')),
+      ingresaValorEn$.listen((value) => print('[TRANSFERIR_BLOC] ingresaValorEn=$value')),
       
       transferenciaMessage$.connect(),
       valorActualPidEnPesos$.connect(),
@@ -120,6 +137,7 @@ class TranferirBloc extends MyBaseBloc {
         destinationPidIdController.close(),
         isLoadingTransferenciaController.close(),
         valorActualPidEnPesosController.close(),
+        ingresaValorEnController.close(),
       ]);
       print('[TRANFERIR_BLOC] dispose');
     };
@@ -137,7 +155,9 @@ class TranferirBloc extends MyBaseBloc {
       cantidadEnPids$: cantidadEnPids$,
       destinationPidId$: destinationPidId$,
       transferenciaMessage$: transferenciaMessage$,
-      valorActualPidEnPesos$: valorActualPidEnPesos$
+      valorActualPidEnPesos$: valorActualPidEnPesos$,
+      ingresaValorEn$: ingresaValorEn$,
+      onChangedIngresaValorEn: ingresaValorEnController.sink.add
     );
 
   }
@@ -145,7 +165,7 @@ class TranferirBloc extends MyBaseBloc {
 
   Future<void> resetValues(){
     onChangedcantidadEnPids(0);
-    onChangeDestinationPidId(null);
+    // onChangeDestinationPidId(null);
     cantidadaEnPesosSink$.add(0.0);
     return Future.value();
   }

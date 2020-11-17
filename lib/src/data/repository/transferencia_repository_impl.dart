@@ -1,4 +1,5 @@
 
+import 'package:pidos/src/data/exceptions/network_exceptions.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/data/remote/api_result.dart';
 import 'package:pidos/src/data/remote/api_service/transferencia_api_service.dart';
@@ -36,7 +37,8 @@ class TransferenciaRepositoryImpl implements TransferenciaRepository {
         await prefs.saveUsuarioDomain(nuevousuario);
         return ApiResult.success(data: const TransferenciaSuccessMessage());
       }else{
-        throw 'Ocurrio un error durante la transaccion';
+        // throw 'Ocurrio un error durante la transaccion';
+        throw ApiResult.failure(error: NetworkExceptions.defaultError('Ocurrio un error durante la transaccion'));
       }
       
     }catch(err){
@@ -64,7 +66,8 @@ class TransferenciaRepositoryImpl implements TransferenciaRepository {
         await prefs.saveUsuarioDomain(nuevousuario);
         return ApiResult.success(data: const TransferenciaSuccessMessage());
       }else{
-        throw 'Ocurrio un error durante la transaccion';
+        // throw 'Ocurrio un error durante la transaccion';
+        throw ApiResult.failure(error: NetworkExceptions.defaultError('Ocurrio un error durante la transaccion'));
       }
     }catch(err){
       print('[TRANSFERENCIA_REPOSITORY_IMPL][tranferirPidPuntos] ERROR => $err');

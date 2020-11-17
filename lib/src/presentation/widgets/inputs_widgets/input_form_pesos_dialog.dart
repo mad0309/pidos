@@ -10,8 +10,6 @@ class InputFormPesosDialog extends StatefulWidget {
   final FocusNode focusNode;
   final String placeholderText;
   final Function(String) onChange;
-  // final String sufix;
-  // final String prefix;
 
   const InputFormPesosDialog({
     this.textEditingController, 
@@ -19,8 +17,6 @@ class InputFormPesosDialog extends StatefulWidget {
     this.focusNode, 
     this.placeholderText,
     this.onChange,
-    // this.sufix = '',
-    // this.prefix = '',
   });
   
   @override
@@ -42,9 +38,9 @@ class _InputFormDialogState extends State<InputFormPesosDialog> {
       ),
       cursorColor: primaryColor,
       inputFormatters: [
-        WhitelistingTextInputFormatter.digitsOnly,
-        new LengthLimitingTextInputFormatter(15),
-        // new PaymentInputFormatter()
+        FilteringTextInputFormatter.digitsOnly,
+        // new LengthLimitingTextInputFormatter(15),
+        new PaymentInputFormatter()
       ],
       decoration: InputDecoration(
         isDense: true,
@@ -79,35 +75,21 @@ class PaymentInputFormatter extends TextInputFormatter {
     var text = newValue.text;
     var buf = '';
 
-    // if (newValue.selection.baseOffset == 0) {
-    //   if( text.length> 0){
-    //     return oldValue;
-    //   }else{
-    //     return newValue;
-    //   }
-    // }
-    // text = text.replaceAll('\$', '');
-    // if( text.length>1 ){
-    //   text = text.substring(0, text.length - 5);
-    // }
-    // NumberFormat format = NumberFormat('#,###.000');
-    // double pesos = double.parse(text);
-    // buf = format.format(pesos);
-    // buf = '\$$buf,00';
-    // if(pesos>=1000.0){
-    //  buf =  buf.replaceFirst(',', '.');
-    // }
-    double value = double.parse(newValue.text);
-
-        final formatter = NumberFormat.simpleCurrency(locale: "pt_Br");
-
-        buf = formatter.format(value/100);
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+    text = text.replaceAll('\$', '');
+    text = text.replaceAll(',oo', '');
+    
+    NumberFormat format = NumberFormat('#,###');
+    double pesos = double.parse(text);
+    buf = format.format(pesos);
+    buf = buf.replaceAll(',', '.');
+    buf = '\$$buf,oo';
 
     return newValue.copyWith(
       text: buf,
-      selection: new TextSelection.collapsed(offset: buf.length));
-      // selection: new TextSelection.collapsed(offset: buf.length));
-      // selection: new TextSelection.collapsed(offset: newValue.selection.baseOffset + 2  ));
+      selection: new TextSelection.collapsed(offset: buf.length - 3 ));
     
     
   }
