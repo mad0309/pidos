@@ -68,5 +68,16 @@ enum RoleUsuario {
 }
 Map<RoleUsuario, String> roleUsuarioName = {
   RoleUsuario.cliente: 'client',
-  RoleUsuario.comerciante: 'comerciante'
+  RoleUsuario.comerciante: 'company'
+};
+
+
+//tipo registro
+enum TipoRegistro { 
+  persona, 
+  empresa
+}
+Map<TipoRegistro, String> tipoRegistroName = {
+  TipoRegistro.persona: 'Persona',
+  TipoRegistro.empresa: 'Empresa Aliada'
 };

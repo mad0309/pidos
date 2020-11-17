@@ -1,7 +1,9 @@
 
 
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:pidos/src/data/exceptions/network_exceptions.dart';
 import 'package:pidos/src/data/remote/api_result.dart';
 import 'package:pidos/src/data/remote/network_utils.dart';
@@ -49,6 +51,37 @@ class LoginApiService {
       return Usuario.fromJson(resp.data);
     }catch(err){
       // throw ApiResult.failure(error: NetworkExceptions.getDioException(err));
+      throw err;
+    }
+  }
+  Future<Usuario> crearEmpresa({
+    String razonSocial,
+    String nit,
+    String correoEmpresa,
+    String contrasena,
+    File rut,
+    File camaraDeComercio,
+    File cedula,
+    File logo,
+  }) async {
+    try{
+    String rutFileName = rut.path.split('/').last;
+    String camaraDeComercioFileName = camaraDeComercio.path.split('/').last;
+    String cedulaFileName = cedula.path.split('/').last;
+    String logoFileName = logo.path.split('/').last;
+    FormData formData = FormData.fromMap({
+        "name": razonSocial,
+        'document': nit,
+        'email': correoEmpresa,
+        'password': contrasena,
+        'file_rut': await MultipartFile.fromFile(rut.path,filename: rutFileName),
+        'file_id': await MultipartFile.fromFile(camaraDeComercio.path,filename: camaraDeComercioFileName),
+        'file_document': await MultipartFile.fromFile(cedula.path,filename: cedulaFileName),
+        'logo': await MultipartFile.fromFile(logo.path,filename: logoFileName),
+    });
+      final resp = await networkUtil.post(url: '/company/create', data: formData);
+      return Usuario.fromJson(resp.data);
+    }catch(err){
       throw err;
     }
   }

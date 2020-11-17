@@ -1,5 +1,7 @@
 
 
+import 'dart:io';
+
 import 'package:pidos/src/data/remote/api_result.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/presentation/states/auth_state.dart';
@@ -13,6 +15,16 @@ abstract class UsuarioRepository {
   Future<ApiResult<LoginMessage>> login(Usuario user);
   Future<bool> logut();
   Future<ApiResult<RegistroMessage>> registroUsuario(Usuario usuario);
+  Future<ApiResult<RegistroMessage>> registroEmpresa({
+    String razonSocial,
+    String nit,
+    String correoEmpresa,
+    String contrasena,
+    File rut,
+    File camaraDeComercio,
+    File cedula,
+    File logo,
+  });
   Future<ApiResult<RegistroMessage>> enviarCodigo(Usuario usuario);
   Future<ApiResult<RegistroMessage>> checkCodigoInsertado(Usuario usuario, String code);
   Stream<Usuario> retornasSaldo();

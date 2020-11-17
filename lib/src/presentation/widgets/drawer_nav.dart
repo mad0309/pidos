@@ -17,8 +17,8 @@ class DrawerNav extends StatelessWidget {
     final _screenSize = MediaQuery.of(context).size;
     final _sharedPrefs = PreferenciasUsuario();
     final usuario = _sharedPrefs.getUsuario();
-    final _shortName = usuario.shortName;
-    final _username = usuario.name;
+    final _shortName = usuario.shortName ?? '';
+    final _username = usuario.name ?? '';
     return SizedBox(
       width: _screenSize.width * 0.6,
       child: Drawer(
