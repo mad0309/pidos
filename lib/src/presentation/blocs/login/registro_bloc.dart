@@ -1,6 +1,7 @@
 
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pidos/src/data/exceptions/network_exceptions.dart';
@@ -22,6 +23,17 @@ class RegistroBloc extends MyBaseBloc {
   final Function(String) onChangedNroDocumento;
   final Function(String) onChangedContrasena;
   final Function(String) onChangedRepetirContrasena;
+  final Function(TipoRegistro) onChangedTipoRegistro;
+  final Function(String) onChangedRazonSocial;
+  final Function(String) onChangedNit;
+  final Function(String) onChangedCorreoEmpresa;
+  final Function(String) onChangedContrasenaEmpresa;
+  final Function(String) onChangedRepetirContrasenaEmpresa;
+  final Function(File) onChangedRUT;
+  final Function(File) onChangedCamaraDeComercio;
+  final Function(File) onChangedCedula;
+  final Function(File) onChangedLogo;
+  
 
   final ValueStream<String> nombre$;
   final ValueStream<String> apellido$;
@@ -29,7 +41,10 @@ class RegistroBloc extends MyBaseBloc {
   final ValueStream<String> nroDocumento$;
   final ValueStream<String> contrasena$;
   final ValueStream<String> repetirContrasena$;
+  final ValueStream<TipoRegistro> tipoRegistro$;
   
+  final Function cleanControllers;
+  final Stream<void> cleanControllers$;
 
 
   RegistroBloc._({
@@ -43,6 +58,17 @@ class RegistroBloc extends MyBaseBloc {
     this.onChangedNroDocumento,
     this.onChangedContrasena,
     this.onChangedRepetirContrasena,
+    this.onChangedTipoRegistro,
+
+    this.onChangedRazonSocial,
+    this.onChangedNit,
+    this.onChangedCorreoEmpresa,
+    this.onChangedContrasenaEmpresa,
+    this.onChangedRepetirContrasenaEmpresa,
+    this.onChangedRUT,
+    this.onChangedCamaraDeComercio,
+    this.onChangedCedula,
+    this.onChangedLogo,
 
     this.nombre$,
     this.apellido$,
@@ -50,6 +76,10 @@ class RegistroBloc extends MyBaseBloc {
     this.nroDocumento$,
     this.contrasena$,
     this.repetirContrasena$,
+    this.tipoRegistro$,
+
+    this.cleanControllers,
+    this.cleanControllers$,
     //dispose
     @required Function dispose,
   }) : super(dispose);
@@ -67,19 +97,49 @@ class RegistroBloc extends MyBaseBloc {
     final nroDocumentoController = BehaviorSubject<String>();
     final contrasenaController = BehaviorSubject<String>();
     final repetirContrasenaController = BehaviorSubject<String>();
+    final tipoRegistroController = BehaviorSubject<TipoRegistro>.seeded(TipoRegistro.persona);
+
+    final razonSocialController = BehaviorSubject<String>();
+    final nitController = BehaviorSubject<String>();
+    final correoEmpresaController = BehaviorSubject<String>();
+    final contrasenaEmpresaController = BehaviorSubject<String>();
+    final repetirContrasenaEmpresaController = BehaviorSubject<String>();
+    final rutController = BehaviorSubject<File>();
+    final camaraDeComercioController = BehaviorSubject<File>();
+    final cedulaController = BehaviorSubject<File>();
+    final logoController = BehaviorSubject<File>();
+
+    final cleanControllersController = PublishSubject<void>();
 
 
     //streams
     final registroMessage$ = onSubmitController
-      .exhaustMap((_) => _onSubmitForm(
-        usuarioRepository: usuarioRepository,
-        isLoadingSink$: isLoadingController.sink,
-        nombre: nombreController.value,
-        apellido: apellidoController.value,
-        email: emailController.value,
-        nroDocumento: nroDocumentoController.value,
-        contrasena: contrasenaController.value,
-        repetirContrasena: repetirContrasenaController.value))
+      .exhaustMap((_) {
+        if( tipoRegistroController.value == TipoRegistro.persona ) {
+          return _onSubmitForm(
+            usuarioRepository: usuarioRepository,
+            isLoadingSink$: isLoadingController.sink,
+            nombre: nombreController.value,
+            apellido: apellidoController.value,
+            email: emailController.value,
+            nroDocumento: nroDocumentoController.value,
+            contrasena: contrasenaController.value,
+            repetirContrasena: repetirContrasenaController.value);
+        }else{
+          return _onSubmitFormEmpresa(
+            usuarioRepository: usuarioRepository,
+            isLoadingSink$: isLoadingController.sink,
+            razonSocial: razonSocialController.value,
+            nit: nitController.value,
+            correoEmpresa: correoEmpresaController.value,
+            contrasenaEmpresa: contrasenaEmpresaController.value,
+            confirmarContrasenaEmpresa: repetirContrasenaEmpresaController.value,
+            rut: rutController.value,
+            camaraDeComercio: camaraDeComercioController.value,
+            cedula: cedulaController.value,
+            logo: logoController.value);
+        }
+      })
       .share()
       .publish();
     final nombre$ = nombreController.shareValue();
@@ -88,17 +148,22 @@ class RegistroBloc extends MyBaseBloc {
     final nroDocumento$ = nroDocumentoController.shareValue();
     final contrasena$ = contrasenaController.shareValue();
     final repetirContrasena$ = repetirContrasenaController.shareValue();
+    final tipoRegistro$ = tipoRegistroController.distinct().shareValue();
+    final cleanControllers$ = cleanControllersController.share();
     
     
     //subscriptions
     final subscriptions = <StreamSubscription>[
-      nombre$.listen((value) => print('[LOGIN_BLOC] nombre=$value')),
-      apellido$.listen((value) => print('[LOGIN_BLOC] apellido=$value')),
-      email$.listen((value) => print('[LOGIN_BLOC] email=$value')),
-      nroDocumento$.listen((value) => print('[LOGIN_BLOC] nroDocumento=$value')),
-      contrasena$.listen((value) => print('[LOGIN_BLOC] contrasena=$value')),
-      repetirContrasena$.listen((value) => print('[LOGIN_BLOC] repetirContrasena=$value')),
-      registroMessage$.listen((message) => print('[LOGIN_BLOC] registroMessage=$message')),
+      nombre$.listen((value) => print('[REGISTRO_BLOC] nombre=$value')),
+      apellido$.listen((value) => print('[REGISTRO_BLOC] apellido=$value')),
+      email$.listen((value) => print('[REGISTRO_BLOC] email=$value')),
+      nroDocumento$.listen((value) => print('[REGISTRO_BLOC] nroDocumento=$value')),
+      contrasena$.listen((value) => print('[REGISTRO_BLOC] contrasena=$value')),
+      repetirContrasena$.listen((value) => print('[REGISTRO_BLOC] repetirContrasena=$value')),
+      tipoRegistro$.listen((value) => print('[REGISTRO_BLOC] tipoRegistro=$value')),
+      registroMessage$.listen((message) => print('[REGISTRO_BLOC] registroMessage=$message')),
+      cleanControllers$.listen((_) => print('[REGISTRO_BLOC] cleanControllers executed')),
+      
       registroMessage$.connect(),
     ];
 
@@ -115,8 +180,20 @@ class RegistroBloc extends MyBaseBloc {
         nroDocumentoController.close(),
         contrasenaController.close(),
         repetirContrasenaController.close(),
+        tipoRegistroController.close(),
+        cleanControllersController.close(),
+
+        razonSocialController.close(),
+        nitController.close(),
+        correoEmpresaController.close(),
+        contrasenaEmpresaController.close(),
+        repetirContrasenaEmpresaController.close(),
+        rutController.close(),
+        camaraDeComercioController.close(),
+        cedulaController.close(),
+        logoController.close(),
       ]);
-      print('[LOGIN_BLOC] dispose');
+      print('[REGISTRO_BLOC] dispose');
     };
 
     return RegistroBloc._(
@@ -130,6 +207,17 @@ class RegistroBloc extends MyBaseBloc {
       onChangedNroDocumento: nroDocumentoController.sink.add,
       onChangedContrasena: contrasenaController.sink.add,
       onChangedRepetirContrasena: repetirContrasenaController.sink.add,
+      onChangedTipoRegistro: tipoRegistroController.sink.add,
+
+      onChangedRazonSocial: razonSocialController.sink.add,
+      onChangedNit: nitController.sink.add,
+      onChangedCorreoEmpresa: correoEmpresaController.sink.add,
+      onChangedContrasenaEmpresa: contrasenaEmpresaController.sink.add,
+      onChangedRepetirContrasenaEmpresa: repetirContrasenaEmpresaController.sink.add,
+      onChangedRUT: rutController.sink.add,
+      onChangedCamaraDeComercio: camaraDeComercioController.sink.add,
+      onChangedCedula: cedulaController.sink.add,
+      onChangedLogo: logoController.sink.add,
 
       nombre$: nombre$,
       apellido$: apellido$,
@@ -137,6 +225,10 @@ class RegistroBloc extends MyBaseBloc {
       nroDocumento$: nroDocumento$,
       contrasena$: contrasena$,
       repetirContrasena$: repetirContrasena$,
+      tipoRegistro$: tipoRegistro$,
+
+      cleanControllers: () => cleanControllersController.add(null),
+      cleanControllers$: cleanControllers$
     );
 
   }
@@ -178,6 +270,49 @@ class RegistroBloc extends MyBaseBloc {
       isLoadingSink$.add(false);
     }
   }
+  //static method
+  static Stream<RegistroMessage> _onSubmitFormEmpresa({
+    UsuarioRepository usuarioRepository,
+    Sink<bool> isLoadingSink$,
+    String razonSocial,
+    String nit,
+    String correoEmpresa,
+    String contrasenaEmpresa,
+    String confirmarContrasenaEmpresa,
+    File rut,
+    File camaraDeComercio,
+    File cedula,
+    File logo
+  }) async* {
+    try{
+      isLoadingSink$.add(true);
+      final resp = await usuarioRepository.registroEmpresa(
+        razonSocial: razonSocial,
+        nit: nit,
+        correoEmpresa: correoEmpresa,
+        contrasena: contrasenaEmpresa,
+        rut: rut,
+        camaraDeComercio: camaraDeComercio,
+        cedula: cedula,
+        logo: logo,
+      );
+
+      yield* resp.maybeWhen(
+        success: (message) async* {
+          yield message;
+        },
+        orElse: () async * {
+          yield const RegistroEmpresaErrorMessage();
+        }
+      );
+      
+    }catch(err){
+      String error = _handleExceptionMessage(err);
+      yield RegistroEmpresaErrorMessage(error);
+    }finally{
+      isLoadingSink$.add(false);
+    }
+  }
 
   //metodo que maneja excepciones
   static String _handleExceptionMessage(dynamic err){
@@ -191,6 +326,21 @@ class RegistroBloc extends MyBaseBloc {
       }
     );
     return error;
+  }
+
+
+
+  //Functions
+  void cleanInputsText(){
+    onChangedNombre('');
+    onChangedApellido('');
+    onChangedEmail('');
+    onChangedNroDocumento('');
+    onChangedContrasena('');
+    onChangedRepetirContrasena('');
+
+    // clean textEditingsControllers
+    cleanControllers();
   }
 
 }

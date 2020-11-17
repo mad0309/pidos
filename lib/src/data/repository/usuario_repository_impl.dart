@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:pidos/src/data/local/entities/usuario_entity.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/data/remote/api_result.dart';
@@ -47,15 +49,19 @@ class UsuarioRepositoryImpl implements UsuarioRepository {
       //set shortname and only first name
       String shortName = '';
       String firstName = '';
-      final nameParts = usuario.name.split(' ');
-      firstName = nameParts[0];
-      for(String part in nameParts ){
-        if(shortName.length<2){
-          final firstWord = part.substring(0,1);
-          shortName = shortName + firstWord.toUpperCase();
-        }else{
-          break;
+      if(usuario.name!=null && usuario.name.length>0){
+        final nameParts = usuario.name.split(' ');
+        firstName = nameParts[0];
+        for(String part in nameParts ){
+          if(shortName.length<2){
+            final firstWord = part.substring(0,1);
+            shortName = shortName + firstWord.toUpperCase();
+          }else{
+            break;
+          }
         }
+      }else{
+        // usuario.name = '';
       }
       //
       final usuarioWithShortName = usuario.rebuild((b) => b
@@ -87,6 +93,38 @@ class UsuarioRepositoryImpl implements UsuarioRepository {
        final resp = await loginApiService.crearUsuario(usuario);
        if( resp.id>0 ){ 
          return ApiResult.success(data: RegistroSuccessMessage(resp));
+       }else{
+         throw 'Ocurrio un error durante la transaccion';
+       }
+    }catch(err){
+      print('[USUARIO_REPOSITORY][registroUsuario][ERROR] => $err');
+      throw err;
+    }
+  }
+  @override
+  Future<ApiResult<RegistroMessage>> registroEmpresa({
+    String razonSocial,
+    String nit,
+    String correoEmpresa,
+    String contrasena,
+    File rut,
+    File camaraDeComercio,
+    File cedula,
+    File logo,
+  }) async {
+    try{
+       final resp = await loginApiService.crearEmpresa(
+          razonSocial: razonSocial,
+          nit: nit,
+          correoEmpresa: correoEmpresa,
+          contrasena: contrasena,
+          rut: rut,
+          camaraDeComercio: camaraDeComercio,
+          cedula: cedula,
+          logo: logo,
+       );
+       if( resp.id>0 ){ 
+         return ApiResult.success(data: RegistroEmpresaSuccessMessage());
        }else{
          throw 'Ocurrio un error durante la transaccion';
        }

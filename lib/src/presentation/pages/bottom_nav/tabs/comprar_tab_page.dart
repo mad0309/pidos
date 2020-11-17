@@ -119,7 +119,7 @@ class _ComprarTabPageState extends State<ComprarTabPage> {
               padding: EdgeInsets.symmetric(vertical: screenSizeHeight  * 0.033), //vertical: 20.0
               child: Text('\$00.0', style: TextStyle(color: Colors.black,fontSize: 25.0, fontWeight: FontWeight.w700)),
             ),
-            _comprarButton()
+            // _comprarButton()
             
           ],
         ),

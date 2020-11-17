@@ -23,6 +23,19 @@ class RegistroErrorMessage implements RegistroMessage {
   @override
   String toString() => 'RegistroErrorMessage{message=$message}';
 }
+class RegistroEmpresaSuccessMessage implements RegistroMessage {
+  // final Usuario usuario;
+  const RegistroEmpresaSuccessMessage();
+}
+
+class RegistroEmpresaErrorMessage implements RegistroMessage {
+  final String message;
+
+  const RegistroEmpresaErrorMessage([this.message]);
+
+  @override
+  String toString() => 'RegistroEmpresaErrorMessage{message=$message}';
+}
 
 class EnviarCodigoSuccessMessage implements RegistroMessage {
   final Usuario usuario;

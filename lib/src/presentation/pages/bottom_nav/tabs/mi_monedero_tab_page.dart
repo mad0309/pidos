@@ -151,7 +151,8 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                   ? Column(
                       children: [
                         _transferirButton(),
-                        _comprarButton(context),
+                        //TODO: COMENTADO POR AHORA 16/11/2020 PARA QUE SEA ACEPTADO EN APPLE
+                        // _comprarButton(context),
                         // Padding(
                         //   padding: EdgeInsets.only(bottom: 5.0,top: 0.05 * screenSizeHeight), //top: 50.0
                         //   child: _transferirButton(),
