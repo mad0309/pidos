@@ -9,6 +9,8 @@ class StorageKeys {
   static final String token = "TOKEN";
   static final String usuario = "USUARIO";
   static final String newAccountFirstLogin = "FIRSTLOGIN";
+  static final String lastHourActive = "LASTHOURACTIVE";
+  
   // static final String perfil ="PERFIL";
   // static final String pid ="PID";
   // static final String shortName ="SHORTNAME";

@@ -29,6 +29,7 @@ class RegistroBloc extends MyBaseBloc {
   final Function(String) onChangedCorreoEmpresa;
   final Function(String) onChangedContrasenaEmpresa;
   final Function(String) onChangedRepetirContrasenaEmpresa;
+  final Function(String) onChangedcodigoDeVendedor;
   final Function(File) onChangedRUT;
   final Function(File) onChangedCamaraDeComercio;
   final Function(File) onChangedCedula;
@@ -65,6 +66,7 @@ class RegistroBloc extends MyBaseBloc {
     this.onChangedCorreoEmpresa,
     this.onChangedContrasenaEmpresa,
     this.onChangedRepetirContrasenaEmpresa,
+    this.onChangedcodigoDeVendedor,
     this.onChangedRUT,
     this.onChangedCamaraDeComercio,
     this.onChangedCedula,
@@ -104,6 +106,7 @@ class RegistroBloc extends MyBaseBloc {
     final correoEmpresaController = BehaviorSubject<String>();
     final contrasenaEmpresaController = BehaviorSubject<String>();
     final repetirContrasenaEmpresaController = BehaviorSubject<String>();
+    final codigoDeVendedorController = BehaviorSubject<String>();
     final rutController = BehaviorSubject<File>();
     final camaraDeComercioController = BehaviorSubject<File>();
     final cedulaController = BehaviorSubject<File>();
@@ -134,6 +137,7 @@ class RegistroBloc extends MyBaseBloc {
             correoEmpresa: correoEmpresaController.value,
             contrasenaEmpresa: contrasenaEmpresaController.value,
             confirmarContrasenaEmpresa: repetirContrasenaEmpresaController.value,
+            codigoDeVendedor: codigoDeVendedorController.value,
             rut: rutController.value,
             camaraDeComercio: camaraDeComercioController.value,
             cedula: cedulaController.value,
@@ -188,6 +192,7 @@ class RegistroBloc extends MyBaseBloc {
         correoEmpresaController.close(),
         contrasenaEmpresaController.close(),
         repetirContrasenaEmpresaController.close(),
+        codigoDeVendedorController.close(),
         rutController.close(),
         camaraDeComercioController.close(),
         cedulaController.close(),
@@ -214,6 +219,7 @@ class RegistroBloc extends MyBaseBloc {
       onChangedCorreoEmpresa: correoEmpresaController.sink.add,
       onChangedContrasenaEmpresa: contrasenaEmpresaController.sink.add,
       onChangedRepetirContrasenaEmpresa: repetirContrasenaEmpresaController.sink.add,
+      onChangedcodigoDeVendedor: codigoDeVendedorController.sink.add,
       onChangedRUT: rutController.sink.add,
       onChangedCamaraDeComercio: camaraDeComercioController.sink.add,
       onChangedCedula: cedulaController.sink.add,
@@ -279,6 +285,7 @@ class RegistroBloc extends MyBaseBloc {
     String correoEmpresa,
     String contrasenaEmpresa,
     String confirmarContrasenaEmpresa,
+    String codigoDeVendedor,
     File rut,
     File camaraDeComercio,
     File cedula,
@@ -291,6 +298,7 @@ class RegistroBloc extends MyBaseBloc {
         nit: nit,
         correoEmpresa: correoEmpresa,
         contrasena: contrasenaEmpresa,
+        codigoDeVendedor: codigoDeVendedor,
         rut: rut,
         camaraDeComercio: camaraDeComercio,
         cedula: cedula,

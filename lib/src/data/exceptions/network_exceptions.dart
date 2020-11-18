@@ -80,10 +80,15 @@ abstract class NetworkExceptions with _$NetworkExceptions {
                messageError = data['password'][0];
                return NetworkExceptions.defaultError(messageError);
             }else{
-              if(data['error'] != null){
-              messageError = data['error'];
-              return NetworkExceptions.defaultError(messageError);
-            }
+              if( data['message'] !=null ){
+                messageError = data['message'];
+                return NetworkExceptions.defaultError(messageError);
+              }else{
+                if(data['error'] != null){
+                  messageError = data['error'];
+                  return NetworkExceptions.defaultError(messageError);
+                }
+              }
             }
             
           }

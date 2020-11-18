@@ -107,6 +107,7 @@ class UsuarioRepositoryImpl implements UsuarioRepository {
     String nit,
     String correoEmpresa,
     String contrasena,
+    String codigoDeVendedor,
     File rut,
     File camaraDeComercio,
     File cedula,
@@ -118,6 +119,7 @@ class UsuarioRepositoryImpl implements UsuarioRepository {
           nit: nit,
           correoEmpresa: correoEmpresa,
           contrasena: contrasena,
+          codigoDeVendedor: codigoDeVendedor,
           rut: rut,
           camaraDeComercio: camaraDeComercio,
           cedula: cedula,
@@ -129,7 +131,10 @@ class UsuarioRepositoryImpl implements UsuarioRepository {
          throw 'Ocurrio un error durante la transaccion';
        }
     }catch(err){
-      print('[USUARIO_REPOSITORY][registroUsuario][ERROR] => $err');
+      print('[USUARIO_REPOSITORY][registroEmpresa][ERROR] => $err');
+      // if( err.response!=null ){
+
+      // }
       throw err;
     }
   }

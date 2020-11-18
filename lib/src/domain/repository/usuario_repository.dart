@@ -20,6 +20,7 @@ abstract class UsuarioRepository {
     String nit,
     String correoEmpresa,
     String contrasena,
+    String codigoDeVendedor,
     File rut,
     File camaraDeComercio,
     File cedula,

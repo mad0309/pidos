@@ -45,6 +45,7 @@ class _RegistroPageState extends State<RegistroPage> {
   FocusNode correoEmpresaFocus;
   FocusNode contrasenaEmpresaFocus;
   FocusNode repetirContrasenaEmpresaFocus;
+  FocusNode codigoDeVendedorFocus;
 
   @override
   void initState() {
@@ -61,6 +62,7 @@ class _RegistroPageState extends State<RegistroPage> {
     correoEmpresaFocus = FocusNode();
     contrasenaEmpresaFocus = FocusNode();
     repetirContrasenaEmpresaFocus = FocusNode();
+    codigoDeVendedorFocus = FocusNode();
     super.initState();
   }
 
@@ -110,6 +112,13 @@ class _RegistroPageState extends State<RegistroPage> {
     emailFocus.unfocus();
     contrasenaFocus.unfocus();
     confirmarContrasenaFocus.unfocus();
+
+    razonSocialFocus.unfocus();
+    nitFocus.unfocus();
+    correoEmpresaFocus.unfocus();
+    contrasenaEmpresaFocus.unfocus();
+    repetirContrasenaEmpresaFocus.unfocus();
+    codigoDeVendedorFocus.unfocus();
   }
 
   ///
@@ -237,50 +246,57 @@ class _RegistroPageState extends State<RegistroPage> {
       body: Stack(
         children: [
           _backgroundImage(),
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _logoImage(),
-                _creaTuCuentSection(),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildTipoRegistro(TipoRegistro.persona),
-                      SizedBox(width: 20.0),
-                      _buildTipoRegistro(TipoRegistro.empresa)
-                    ],
-                  ),
-                ),
-                StreamBuilder<TipoRegistro>(
-                  stream: _registroBloc.tipoRegistro$,
-                  initialData: _registroBloc.tipoRegistro$.value,
-                  builder: (context, snapshot) {
-                    final tipoRegistro = snapshot.data;
-                    if( tipoRegistro == TipoRegistro.persona) {
-                      return _RegistroForm(
-                        nombreFocus: nombreFocus,
-                        nroDocumentoFocus: nroDocumentoFocus,
-                        apellidosFocus: apellidosFocus,
-                        emailFocus: emailFocus,
-                        contrasenaFocus: contrasenaFocus,
-                        confirmarContrasenaFocus: confirmarContrasenaFocus,
-                      );  
-                    }else{
-                      return _RegistroEmpresaForm(
-                        razonSocialFocus: razonSocialFocus,
-                        nitFocus: nitFocus,
-                        correoEmpresaFocus: correoEmpresaFocus,
-                        contrasenaEmpresaFocus: contrasenaEmpresaFocus,
-                        repetirContrasenaEmpresaFocus: repetirContrasenaEmpresaFocus,
-                      );
-                    }
-                  }
-                ),
-              ],
-            )
+          GestureDetector(
+            onTap: _unfocus,
+            child: Container(
+              color: Colors.transparent,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _logoImage(),
+                    _creaTuCuentSection(),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildTipoRegistro(TipoRegistro.persona),
+                          SizedBox(width: 20.0),
+                          _buildTipoRegistro(TipoRegistro.empresa)
+                        ],
+                      ),
+                    ),
+                    StreamBuilder<TipoRegistro>(
+                      stream: _registroBloc.tipoRegistro$,
+                      initialData: _registroBloc.tipoRegistro$.value,
+                      builder: (context, snapshot) {
+                        final tipoRegistro = snapshot.data;
+                        if( tipoRegistro == TipoRegistro.persona) {
+                          return _RegistroForm(
+                            nombreFocus: nombreFocus,
+                            nroDocumentoFocus: nroDocumentoFocus,
+                            apellidosFocus: apellidosFocus,
+                            emailFocus: emailFocus,
+                            contrasenaFocus: contrasenaFocus,
+                            confirmarContrasenaFocus: confirmarContrasenaFocus,
+                          );  
+                        }else{
+                          return _RegistroEmpresaForm(
+                            razonSocialFocus: razonSocialFocus,
+                            nitFocus: nitFocus,
+                            correoEmpresaFocus: correoEmpresaFocus,
+                            contrasenaEmpresaFocus: contrasenaEmpresaFocus,
+                            repetirContrasenaEmpresaFocus: repetirContrasenaEmpresaFocus,
+                            codigoDeVendedorFocus: codigoDeVendedorFocus,
+                          );
+                        }
+                      }
+                    ),
+                  ],
+                )
+              ),
+            ),
           ),
         ],
       ),
@@ -328,11 +344,12 @@ class __RegistroFormState extends State<_RegistroForm> {
 
   StreamSubscription cleanControllers$;
 
-  
+  bool isIos = false;
 
   /// Metodo de ciclo de vida
   @override
   void initState() { 
+    if( Platform.isIOS ) isIos = true;
     // nroCelularController = TextEditingController(text: '');
     nombreController = TextEditingController(text: '');
     apellidosController = TextEditingController(text: '');
@@ -383,7 +400,7 @@ class __RegistroFormState extends State<_RegistroForm> {
         Padding(
             padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
             child: Text(
-              'Tus nombres',
+              'Tus nombres${isIos?'*':''}',
               style: TextStyle(
                 fontSize: 15.0,
                 color: primaryColor,
@@ -412,7 +429,7 @@ class __RegistroFormState extends State<_RegistroForm> {
         Padding(
             padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
             child: Text(
-              'Tus apellidos',
+              'Tus apellidos${isIos?'*':''}',
               style: TextStyle(
                 fontSize: 15.0,
                 color: primaryColor,
@@ -439,7 +456,7 @@ class __RegistroFormState extends State<_RegistroForm> {
         Padding(
             padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
             child: Text(
-              'Correo electrónico',
+              'Correo electrónico${isIos?'*':''}',
               style: TextStyle(
                 fontSize: 15.0,
                 color: primaryColor,
@@ -506,7 +523,7 @@ class __RegistroFormState extends State<_RegistroForm> {
         Padding(
             padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
             child: Text(
-              'Tu contraseña',
+              'Tu contraseña${isIos?'*':''}',
               style: TextStyle(
                 fontSize: 15.0,
                 color: primaryColor,
@@ -534,7 +551,7 @@ class __RegistroFormState extends State<_RegistroForm> {
         Padding(
             padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
             child: Text(
-              'Confirma contraseña',
+              'Confirma contraseña${isIos?'*':''}',
               style: TextStyle(
                 fontSize: 15.0,
                 color: primaryColor,
@@ -607,24 +624,44 @@ class __RegistroFormState extends State<_RegistroForm> {
     final nroDocumento = registroBloc.nroDocumento$.value;
     final contrasena = registroBloc.contrasena$.value;
     final repetirContrasena = registroBloc.repetirContrasena$.value;
-
-    if(
-      (nombre!=null && nombre!='') &&
-      (apellido!=null && apellido!='') &&
-      (email!=null && email!='') &&
-      // (nroDocumento!=null && nroDocumento!='') &&
-      (contrasena!=null && contrasena!='') &&
-      (repetirContrasena!=null && repetirContrasena!='')
-    ){
-      registroBloc.onSubmit();
+    if( Platform.isIOS ){
+      if(
+        (nombre!=null && nombre!='') &&
+        (apellido!=null && apellido!='') &&
+        (email!=null && email!='') && 
+        // (nroDocumento!=null && nroDocumento!='') &&
+        (contrasena!=null && contrasena!='') &&
+        (repetirContrasena!=null && repetirContrasena!='')
+      ){
+        registroBloc.onSubmit();
+      }else{
+        respuestaDialog(
+          context: context, 
+          message: 'Porfavor complete todo los campos del formulario', 
+          title: 'Campos incompletos', 
+          icon: Icon(Icons.warning, color: electricVioletColor, size: 30.0)
+        );
+      }
     }else{
-      respuestaDialog(
-        context: context, 
-        message: 'Porfavor complete todo los campos del formulario', 
-        title: 'Campos incompletos', 
-        icon: Icon(Icons.warning, color: electricVioletColor, size: 30.0)
-      );
+      if(
+        (nombre!=null && nombre!='') &&
+        (apellido!=null && apellido!='') &&
+        (email!=null && email!='') && 
+        (nroDocumento!=null && nroDocumento!='') &&
+        (contrasena!=null && contrasena!='') &&
+        (repetirContrasena!=null && repetirContrasena!='')
+      ){
+        registroBloc.onSubmit();
+      }else{
+        respuestaDialog(
+          context: context, 
+          message: 'Porfavor complete todo los campos del formulario', 
+          title: 'Campos incompletos', 
+          icon: Icon(Icons.warning, color: electricVioletColor, size: 30.0)
+        );
+      }
     }
+    
   }
 
 
@@ -665,13 +702,15 @@ class _RegistroEmpresaForm extends StatefulWidget {
   final FocusNode correoEmpresaFocus;
   final FocusNode contrasenaEmpresaFocus;
   final FocusNode repetirContrasenaEmpresaFocus;
+  final FocusNode codigoDeVendedorFocus;
 
   const _RegistroEmpresaForm({
     this.razonSocialFocus, 
     this.nitFocus, 
     this.correoEmpresaFocus, 
     this.contrasenaEmpresaFocus,
-    this.repetirContrasenaEmpresaFocus
+    this.repetirContrasenaEmpresaFocus,
+    this.codigoDeVendedorFocus
   });
 
   @override
@@ -690,6 +729,7 @@ class __RegistroEmpresaFormState extends State<_RegistroEmpresaForm> {
   TextEditingController correoEmpresaController;
   TextEditingController contrasenaEmpresaController;
   TextEditingController repetirContrasenaController;
+  TextEditingController codigoDeVendedorController;
 
   File rutFile;
   File camaraDeComercioFile;
@@ -709,6 +749,7 @@ class __RegistroEmpresaFormState extends State<_RegistroEmpresaForm> {
     correoEmpresaController = TextEditingController(text: '');
     contrasenaEmpresaController = TextEditingController(text: '');
     repetirContrasenaController = TextEditingController(text: '');
+    codigoDeVendedorController = TextEditingController(text: '');
     super.initState();
   }
 
@@ -868,12 +909,43 @@ class __RegistroEmpresaFormState extends State<_RegistroEmpresaForm> {
             textEditingController: repetirContrasenaController,
             inputType: TextInputType.text,
             obscureText: true,
-            placeholderText: 'confirme contraseña',
+            placeholderText: 'Confirme contraseña',
             onChange: _regsitroBloc.onChangedRepetirContrasenaEmpresa,
           )
       ],
     );
   }
+
+  ///
+  /// Caja de texto para ingresar codigo de vendedor
+  ///
+  Widget _codigoDeVendedor(){
+    return Column(
+      children: [
+        Padding(
+            padding: EdgeInsets.symmetric(vertical: screenSizeHeight * 0.016 ), // vertical: 10.0
+            child: Text(
+              'Codigo de vendedor',
+              style: TextStyle(
+                fontSize: 15.0,
+                color: primaryColor,
+                fontWeight: FontWeight.w700
+              )),
+          ),
+          // SizedBox(height: 10.0),
+          InputLoginWidget(
+            focusNode: widget.codigoDeVendedorFocus,
+            textEditingController: codigoDeVendedorController,
+            inputType: TextInputType.number,
+            obscureText: false,
+            placeholderText: 'Ingrese codigo de vendedor',
+            onChange: _regsitroBloc.onChangedcodigoDeVendedor
+          )
+      ],
+    );
+  }
+
+
   ///
   /// Caja de texto para ingresar rut
   ///
@@ -1100,6 +1172,7 @@ class __RegistroEmpresaFormState extends State<_RegistroEmpresaForm> {
           _correoEmpresaSection(),
           _contrasenaEmpresaSection(),
           _confirmarContrasenaEmpresaSection(),
+          _codigoDeVendedor(),
           _rutSection(),
           _camaraDeComercioSection(),
           _cedulaSection(),

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:intl/intl.dart';
 import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src//utils/colors.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
+import 'package:pidos/src/presentation/blocs/login/login_bloc.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/dialogs/transferir_dialog.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/icons_widgets/bell_icon.dart';
+import 'package:pidos/src/presentation/widgets/sesion_expirada_dialog.dart';
 import 'package:pidos/src/utils/extensions.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,7 +23,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   double screenSizeHeight;
   double screenSizeWidth;
   Future<void> timer;
@@ -39,6 +42,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    _inactivarSesion();
+    WidgetsBinding.instance.addObserver(this);
     /// ======= get data from local storage ===== ///
     final _sharedPrefs = PreferenciasUsuario();
     usuario = _sharedPrefs.getUsuario();
@@ -54,8 +59,68 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void didChangeDependencies() {
-    timer ??= Future.delayed(Duration(minutes: 10), () => Navigator.of(context).pushReplacementNamed('/login'));
+    timer ??= Future.delayed(Duration(minutes: 10), () async {
+      final contextApp = GlobalSingleton().contextApp;
+      await sesionExpiradaDialog(
+        context: context,
+        title: 'Sesion expirada',
+        message: 'Por favor ingrese nuevamente',
+        icon: Icon(Icons.timer, color: primaryColor)
+      );
+      BlocProvider.of<LoginBloc>(context).logout();
+      Navigator.of(contextApp).pushReplacementNamed('/login');
+    });
     super.didChangeDependencies();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      print('THE APP IS ON RESUMED');
+    }
+    if (state == AppLifecycleState.paused) {
+      print('THE APP IS PAUSED');
+    }
+    if (state == AppLifecycleState.detached) {
+      _setLastActivehour();
+      print('THE APP IS DETACHED');
+    }
+    if (state == AppLifecycleState.inactive) {
+      print('THE APP IS INACTIVE');
+    }
+  }
+
+  @override
+  void dispose() { 
+    print('[HOME_PAGE] dispose');
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  _setLastActivehour(){
+    final prefs = PreferenciasUsuario();
+    prefs.set(StorageKeys.lastHourActive, DateTime.now().toIso8601String());
+  }
+
+  _inactivarSesion() async {
+    final prefs = PreferenciasUsuario();
+    final lastHourString = prefs.get(StorageKeys.lastHourActive);
+    if( lastHourString!=null && lastHourString!='' ){
+      final lastHour = DateTime.parse(lastHourString);
+      final now = DateTime.now();
+      final diferencia = lastHour.difference(now);
+      if( diferencia.inMinutes >= 10 ) {
+        final contextApp = GlobalSingleton().contextApp;
+        await sesionExpiradaDialog(
+          context: context,
+          title: 'Sesion expirada',
+          message: 'Por favor ingrese nuevamente',
+          icon: Icon(Icons.timer, color: primaryColor)
+        );
+        BlocProvider.of<LoginBloc>(context).logout();
+        Navigator.of(contextApp).pushReplacementNamed('/login');
+      }
+    }
   }
 
   ///

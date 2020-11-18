@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/movimientos.dart';
+import 'package:pidos/src/presentation/blocs/login/login_bloc.dart';
 import 'package:pidos/src/presentation/blocs/movimientos/movimientos_bloc.dart';
 import 'package:pidos/src/presentation/states/result_state.dart';
 import 'package:pidos/src/presentation/widgets/bottom_nav_widgets/movimientos_widget.dart';
@@ -144,12 +146,13 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                   loading: () => loading(),
                   error: (e) {
                     e.maybeWhen(
-                        unauthorizedRequest: () => Navigator.of(context)
-                            .pushReplacementNamed('/login'),
-                        noInternetConnection: () =>
-                            mostrarSnackBar('No hay conexion a internet'),
-                        orElse: () => mostrarSnackBar(
-                            'Ocurrio un error intentelo más tarde'));
+                        unauthorizedRequest: () {
+                          final contextApp = GlobalSingleton().contextApp;
+                          BlocProvider.of<LoginBloc>(context).logout();
+                          Navigator.of(contextApp).pushReplacementNamed('/login');
+                        },
+                        noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
+                        orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde'));
                     return Container();
                   },
                   data: (lsMovimientos) {

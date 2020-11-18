@@ -8,11 +8,13 @@ import 'package:pidos/src/data/exceptions/network_exceptions.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/presentation/blocs/home/home_bloc.dart';
+import 'package:pidos/src/presentation/blocs/login/login_bloc.dart';
 import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/pages/bottom_nav/dialogs/transferir_dialog.dart';
 import 'package:pidos/src/presentation/states/result_state.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/circle_color.dart';
+import 'package:pidos/src/presentation/widgets/sesion_expirada_dialog.dart';
 import 'package:pidos/src/utils/colors.dart';
 import 'package:pidos/src/utils/extensions.dart';
 
@@ -286,7 +288,17 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                           },
                           error: (NetworkExceptions error){
                             error.maybeWhen(
-                              unauthorizedRequest: () => Navigator.of(context).pushReplacementNamed('/login'),
+                              unauthorizedRequest: () async {
+                                await sesionExpiradaDialog(
+                                  context: context,
+                                  title: 'Sesion expirada',
+                                  message: 'Por favor ingrese nuevamente',
+                                  icon: Icon(Icons.timer, color: primaryColor)
+                                );
+                                final contextApp = GlobalSingleton().contextApp;
+                                BlocProvider.of<LoginBloc>(context).logout();
+                                Navigator.of(contextApp).pushReplacementNamed('/login');
+                              },
                               noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
                               orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde')
                             );
@@ -389,7 +401,17 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                           },
                           error: (NetworkExceptions error){
                             error.maybeWhen(
-                              unauthorizedRequest: () => Navigator.of(context).pushReplacementNamed('/login'),
+                              unauthorizedRequest: () async {
+                                final contextApp = GlobalSingleton().contextApp;
+                                await sesionExpiradaDialog(
+                                  context: context,
+                                  title: 'Sesion expirada',
+                                  message: 'Por favor ingrese nuevamente',
+                                  icon: Icon(Icons.timer, color: primaryColor)
+                                );
+                                BlocProvider.of<LoginBloc>(context).logout();
+                                Navigator.of(contextApp).pushReplacementNamed('/login');
+                              },
                               noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
                               orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde')
                             );

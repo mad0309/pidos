@@ -32,6 +32,13 @@ class _LoginPageState extends State<LoginPage> {
   FocusNode contrasenaFocus =FocusNode();
 
   @override
+  void initState() {
+    final prefs = PreferenciasUsuario();
+    prefs.remove(StorageKeys.lastHourActive);
+    super.initState();
+  }
+
+  @override
   void didChangeDependencies() {
     _loginMessage$ ??= BlocProvider.of<LoginBloc>(context).loginMessage$.listen((message) async { 
       if( message is LoginSuccessMessage ){
