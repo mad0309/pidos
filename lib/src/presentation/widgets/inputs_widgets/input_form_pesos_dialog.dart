@@ -10,6 +10,7 @@ class InputFormPesosDialog extends StatefulWidget {
   final FocusNode focusNode;
   final String placeholderText;
   final Function(String) onChange;
+  final Color borderColor;
 
   const InputFormPesosDialog({
     this.textEditingController, 
@@ -17,6 +18,7 @@ class InputFormPesosDialog extends StatefulWidget {
     this.focusNode, 
     this.placeholderText,
     this.onChange,
+    this.borderColor = Colors.transparent,
   });
   
   @override
@@ -51,11 +53,11 @@ class _InputFormDialogState extends State<InputFormPesosDialog> {
         contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0 ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),
-          borderSide: BorderSide(color: Colors.transparent, width: 2),
+          borderSide: BorderSide(color: widget.borderColor ?? Colors.transparent, width: 2),
           ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),
-          borderSide: BorderSide(color: Colors.transparent, width: 2),
+          borderSide: BorderSide(color: widget.borderColor ?? Colors.transparent, width: 2),
         ),
       ),
       onChanged: widget.onChange ?? (value){},

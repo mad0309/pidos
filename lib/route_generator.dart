@@ -12,6 +12,7 @@ import 'package:pidos/src/presentation/blocs/login/ingresa_codigo_bloc.dart';
 import 'package:pidos/src/presentation/blocs/login/recuperar_contrasena_bloc.dart';
 import 'package:pidos/src/presentation/blocs/login/registro_bloc.dart';
 import 'package:pidos/src/presentation/blocs/settings/mi_cuenta_bloc.dart';
+import 'package:pidos/src/presentation/blocs/validators/validator.dart';
 import 'package:pidos/src/presentation/pages/comprar_pidcash/compra_detalle_page.dart/compra_detalle_page.dart';
 import 'package:pidos/src/presentation/pages/comprar_pidcash/comprar_pidcash_page.dart';
 import 'package:pidos/src/presentation/pages/login/enviar_codigo_page.dart';
@@ -55,7 +56,8 @@ final appRoutes = <String, WidgetBuilder>{
     final usuarioRepository = Provider.of<UsuarioRepository>(context);
     return BlocProvider(
       initBloc: () => RegistroBloc(
-        usuarioRepository: usuarioRepository
+        usuarioRepository: usuarioRepository,
+        validators: Validators()
       ),
       child: RegistroPage()
     );

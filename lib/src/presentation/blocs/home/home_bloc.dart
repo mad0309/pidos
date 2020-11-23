@@ -1,12 +1,17 @@
 
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:meta/meta.dart';
+import 'package:pidos/app/global_singleton.dart';
 import 'package:pidos/src/data/exceptions/network_exceptions.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/domain/repository/usuario_repository.dart';
+import 'package:pidos/src/presentation/blocs/login/login_bloc.dart';
 import 'package:pidos/src/presentation/blocs/provider/my_base_bloc.dart';
 import 'package:pidos/src/presentation/states/result_state.dart';
+import 'package:pidos/src/presentation/widgets/sesion_expirada_dialog.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeBloc extends MyBaseBloc {
@@ -69,8 +74,27 @@ class HomeBloc extends MyBaseBloc {
   }) {
     return usuarioRepository.retornasSaldo()
       .map((saldo) => ResultState.data(data: saldo))
-      .onErrorReturnWith((error) => ResultState.error(error: NetworkExceptions.getDioException(error)))
+      .onErrorReturnWith((error) {
+        final err = NetworkExceptions.getDioException(error);
+        err.maybeWhen(
+          unauthorizedRequest: () => _getoutSession(),
+          orElse: (){}
+        );
+        return ResultState.error(error: err);
+      })
       .startWith(ResultState.loading());
+  }
+
+
+  static _getoutSession() async {
+    final contextApp = GlobalSingleton().contextApp;
+    if( contextApp!=null ){
+      await sesionExpiradaDialog(
+        context: contextApp,
+      );
+      BlocProvider.of<LoginBloc>(contextApp).logout();
+      Navigator.of(contextApp).pushReplacementNamed('/login');
+    }
   }
 
 

@@ -81,3 +81,10 @@ Map<TipoRegistro, String> tipoRegistroName = {
   TipoRegistro.persona: 'Persona',
   TipoRegistro.empresa: 'Empresa Aliada'
 };
+
+//tipo registro
+enum TerminosYPoliticasDeUso { 
+  terminosYcondiones, 
+  politcasDePrivacidad,
+  politicaDeDatos
+}

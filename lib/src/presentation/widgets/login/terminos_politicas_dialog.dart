@@ -1,31 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:pidos/src/presentation/widgets/button_submit.dart';
+import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/utils/colors.dart';
 
-/// (Dialog)
-/// Cuadro de dialogo
-///
-Future<dynamic> sesionExpiradaDialog({
-  @required BuildContext context,
-}) async {
-  return await showDialog(
-    barrierDismissible: false,
-    context: context,
-    child: _SesionExpirada()
-  );
-}
 
-
-
-class _SesionExpirada extends StatefulWidget {
-
-
+class TerminosYPoliticasDialog extends StatefulWidget {
   @override
-  __SesionExpiradaState createState() => __SesionExpiradaState();
+  State<StatefulWidget> createState() => TerminosYPoliticasDialogState();
 }
 
-class __SesionExpiradaState extends State<_SesionExpirada> with SingleTickerProviderStateMixin {
-
+class TerminosYPoliticasDialogState extends State<TerminosYPoliticasDialog> with SingleTickerProviderStateMixin {
   AnimationController controller;
   Animation<double> scaleAnimation;
   // Animation<double> opacityAnimation;
@@ -35,6 +18,8 @@ class __SesionExpiradaState extends State<_SesionExpirada> with SingleTickerProv
     super.initState();
 
     controller = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    // opacityAnimation = Tween<double>(begin: 0.0, end: 0.4).animate(
+    //     CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn));
     scaleAnimation = CurvedAnimation(parent: controller, curve: Curves.elasticInOut);
 
     controller.addListener(() {
@@ -44,7 +29,6 @@ class __SesionExpiradaState extends State<_SesionExpirada> with SingleTickerProv
     controller.forward();
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -69,16 +53,24 @@ class __SesionExpiradaState extends State<_SesionExpirada> with SingleTickerProv
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Sesion expirada', style: TextStyle(color: primaryColor, fontWeight: FontWeight.w600, fontSize: 16.0 )),
+                    Text('Terminos y políticas uso', style: TextStyle(color: primaryColor, fontWeight: FontWeight.w600, fontSize: 16.0 )),
                     Text(
-                      'Por favor intente logearse nuevamente', 
+                      'Revisa o descarga nuestros terminos y políticas de uso de Pidos', 
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Color(0xFF666666), fontWeight: FontWeight.w300,fontSize: 15.0 ) 
                     ),
                     SizedBox(height: 5.0),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 0.0),
-                      child: _buttons(title: 'Entendido')
+                      child: _buttons(title: 'Términos y condiciones', terminosYPoliticasDeUso: TerminosYPoliticasDeUso.terminosYcondiones)
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 0.0),
+                      child: _buttons(title: 'Políticas de privacidad', terminosYPoliticasDeUso: TerminosYPoliticasDeUso.politcasDePrivacidad)
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 0.0),
+                      child: _buttons(title: 'Política de datos', terminosYPoliticasDeUso: TerminosYPoliticasDeUso.politicaDeDatos)
                     ),
                   ],
                 ),
@@ -93,7 +85,7 @@ class __SesionExpiradaState extends State<_SesionExpirada> with SingleTickerProv
   ///
   /// Boton de enviar
   ///
-  Widget _buttons({String title }){
+  Widget _buttons({String title, TerminosYPoliticasDeUso terminosYPoliticasDeUso }){
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.0 ), //vertical: 5.0, horizontal: 50.0
       child: SizedBox(
@@ -115,10 +107,9 @@ class __SesionExpiradaState extends State<_SesionExpirada> with SingleTickerProv
           color: primaryColor,
           elevation: 0.0,
           textColor: Colors.white,
-          onPressed: () => Navigator.of(context).pop()
+          onPressed: () => Navigator.of(context).pop(terminosYPoliticasDeUso)
         ),
       ),
     );
   }
-
 }

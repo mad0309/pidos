@@ -291,9 +291,6 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                               unauthorizedRequest: () async {
                                 await sesionExpiradaDialog(
                                   context: context,
-                                  title: 'Sesion expirada',
-                                  message: 'Por favor ingrese nuevamente',
-                                  icon: Icon(Icons.timer, color: primaryColor)
                                 );
                                 final contextApp = GlobalSingleton().contextApp;
                                 BlocProvider.of<LoginBloc>(context).logout();
@@ -405,9 +402,6 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                                 final contextApp = GlobalSingleton().contextApp;
                                 await sesionExpiradaDialog(
                                   context: context,
-                                  title: 'Sesion expirada',
-                                  message: 'Por favor ingrese nuevamente',
-                                  icon: Icon(Icons.timer, color: primaryColor)
                                 );
                                 BlocProvider.of<LoginBloc>(context).logout();
                                 Navigator.of(contextApp).pushReplacementNamed('/login');

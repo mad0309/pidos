@@ -61,14 +61,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void didChangeDependencies() {
     timer ??= Future.delayed(Duration(minutes: 10), () async {
       final contextApp = GlobalSingleton().contextApp;
-      await sesionExpiradaDialog(
-        context: context,
-        title: 'Sesion expirada',
-        message: 'Por favor ingrese nuevamente',
-        icon: Icon(Icons.timer, color: primaryColor)
-      );
-      BlocProvider.of<LoginBloc>(context).logout();
-      Navigator.of(contextApp).pushReplacementNamed('/login');
+      if( contextApp!=null ){
+        await sesionExpiradaDialog(
+          context: context,
+        );
+        BlocProvider.of<LoginBloc>(context).logout();
+        Navigator.of(contextApp).pushReplacementNamed('/login');
+      }
     });
     super.didChangeDependencies();
   }
@@ -113,9 +112,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         final contextApp = GlobalSingleton().contextApp;
         await sesionExpiradaDialog(
           context: context,
-          title: 'Sesion expirada',
-          message: 'Por favor ingrese nuevamente',
-          icon: Icon(Icons.timer, color: primaryColor)
         );
         BlocProvider.of<LoginBloc>(context).logout();
         Navigator.of(contextApp).pushReplacementNamed('/login');

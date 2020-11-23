@@ -12,6 +12,7 @@ class InputLoginWidget extends StatefulWidget {
   final TextEditingController textEditingController;
   final FocusNode focusNode;
   final Function onChange;
+  final Color borderColor;
 
   InputLoginWidget({
     @required this.focusNode,
@@ -20,7 +21,8 @@ class InputLoginWidget extends StatefulWidget {
     @required this.placeholderText,
     @required this.textEditingController,
     this.prefixIcon,
-    this.onChange
+    this.onChange,
+    this.borderColor = Colors.transparent
   });
 
 
@@ -60,11 +62,11 @@ class _InputLoginWidgetState extends State<InputLoginWidget> {
         contentPadding: EdgeInsets.symmetric(vertical: _screenSizeHeight * 0.017,horizontal: _screenSizeWidth * 0.027 ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),
-          borderSide: BorderSide(color: Colors.transparent, width: 2),
+          borderSide: BorderSide(color: widget.borderColor ?? Colors.transparent, width: 2),
           ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),
-          borderSide: BorderSide(color: Colors.transparent, width: 2),
+          borderSide: BorderSide(color: widget.borderColor ?? Colors.transparent, width: 2),
         ),
       ),
       onChanged: widget.onChange ?? (value){},

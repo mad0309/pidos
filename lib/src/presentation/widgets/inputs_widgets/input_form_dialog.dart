@@ -11,6 +11,7 @@ class InputFormDialog extends StatefulWidget {
   final Function(String) onChange;
   final String sufix;
   final String prefix;
+  final Color borderColor;
 
   const InputFormDialog({
     this.textEditingController, 
@@ -20,6 +21,7 @@ class InputFormDialog extends StatefulWidget {
     this.onChange,
     this.sufix = '',
     this.prefix = '',
+    this.borderColor = Colors.transparent
   });
   
   @override
@@ -55,11 +57,11 @@ class _InputFormDialogState extends State<InputFormDialog> {
         contentPadding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 10.0 ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),
-          borderSide: BorderSide(color: Colors.transparent, width: 2),
+          borderSide: BorderSide(color: widget.borderColor ?? Colors.transparent, width: 2),
           ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(30.0)),
-          borderSide: BorderSide(color: Colors.transparent, width: 2),
+          borderSide: BorderSide(color: widget.borderColor ?? Colors.transparent, width: 2),
         ),
       ),
       onChanged: widget.onChange ?? (value){},

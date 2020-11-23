@@ -74,8 +74,12 @@ class _TransferenciaDialog extends StatefulWidget {
   __TransferenciaDialogState createState() => __TransferenciaDialogState();
 }
 
-class __TransferenciaDialogState extends State<_TransferenciaDialog> {
+class __TransferenciaDialogState extends State<_TransferenciaDialog> with TickerProviderStateMixin {
 
+  AnimationController ingreseCantidadPidsAnimationController;
+  AnimationController pidosIdAnimationController;
+  Animation _ingreseCantidadPidsColorTween;
+  Animation _pidosIdColorTween;
 
   TextEditingController cantidadPidsController;
   TextEditingController pidosIdController;
@@ -98,9 +102,24 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
 
   double currentValuePidPuntos;
   // double currentValuePidCash;
+  AnimationController controller;
+  Animation<double> scaleAnimation;
 
   @override
   void initState() { 
+    controller = AnimationController(vsync: this, duration: Duration(milliseconds: 800));
+    ingreseCantidadPidsAnimationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    pidosIdAnimationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    _ingreseCantidadPidsColorTween = ColorTween(begin: Colors.transparent, end: Colors.red).animate(ingreseCantidadPidsAnimationController);
+    _pidosIdColorTween = ColorTween(begin: Colors.transparent, end: Colors.red).animate(pidosIdAnimationController);
+    scaleAnimation = CurvedAnimation(parent: controller, curve: Curves.elasticOut);
+
+    controller.addListener(() {
+      setState(() {});
+    });
+
+    controller.forward();
+
     final _sharedPrefs = PreferenciasUsuario();
     final usuario = _sharedPrefs.getUsuario();
     _perfil = usuario.role;
@@ -154,6 +173,8 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
   @override
   void dispose() { 
     transferenciaMessage$?.cancel();
+    ingreseCantidadPidsAnimationController?.dispose();
+    pidosIdAnimationController?.dispose();
     super.dispose();
   }
 
@@ -214,7 +235,8 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     TextInputType textInputType,
     String sufix,
     String prefix,
-    Function(String) onChanged
+    Function(String) onChanged,
+    Color borderColor
   }){
     return Column(
       children: [
@@ -228,6 +250,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
             sufix: sufix,
             prefix: prefix,
             onChange: onChanged,
+            borderColor: borderColor,
           )
         ),
       ],
@@ -239,7 +262,8 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     FocusNode focusNode,
     String hintText = '',
     TextInputType textInputType,
-    Function(String) onChanged
+    Function(String) onChanged,
+    Color borderColor,
   }){
     return Column(
       children: [
@@ -251,6 +275,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
             placeholderText: hintText,
             inputType: textInputType,
             onChange: onChanged,
+            borderColor: borderColor
           )
         ),
       ],
@@ -265,7 +290,8 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     TextInputType textInputType,
     String sufix,
     String prefix,
-    Function(String) onChanged
+    Function(String) onChanged,
+    Color borderColor
   }){
     return Column(
       children: [
@@ -283,6 +309,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
             sufix: sufix,
             prefix: prefix,
             onChange: onChanged,
+            borderColor: borderColor,
           )
         ),
       ],
@@ -515,13 +542,19 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
           data: (lsSettings) { 
             currentValuePidPuntos = double.parse(lsSettings[1].value);
             // currentValuePidCash = double.parse(lsSettings[0].value);
-            return _inputTextFieldPid(
-              textEditingController: cantidadPidsController,
-              focusNode: cantidadPidsFocus,
-              hintText: 'Ingrese cantidad en pids',
-              textInputType: TextInputType.number,
-              sufix: '  pids',
-              onChanged: onChangePid
+            return AnimatedBuilder(
+              animation: _ingreseCantidadPidsColorTween,
+              builder: (context, snapshot) {
+                return _inputTextFieldPid(
+                  textEditingController: cantidadPidsController,
+                  focusNode: cantidadPidsFocus,
+                  hintText: 'Ingrese cantidad en pids',
+                  textInputType: TextInputType.number,
+                  sufix: '  pids',
+                  onChanged: onChangePid,
+                  borderColor: _ingreseCantidadPidsColorTween?.value
+                );
+              }
             );
           },
           orElse: () => Container()
@@ -543,12 +576,18 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
           error: (e) => _titlelWithInputDisabled('Cantidad en Pesos:', 'No hay conexión, intentelo más tarde'),
           data: (lsSettings) { 
             currentValuePidPuntos = double.parse(lsSettings[1].value);
-            return _inputTextFieldPesos(
-              textEditingController: pesosController,
-              focusNode: pesosFocus,
-              hintText: 'Ingrese cantidad en pesos',
-              textInputType: TextInputType.number,
-              onChanged: onChangePesos,
+            return AnimatedBuilder(
+              animation: _ingreseCantidadPidsColorTween,
+              builder: (context, snapshot) {
+                return _inputTextFieldPesos(
+                  textEditingController: pesosController,
+                  focusNode: pesosFocus,
+                  hintText: 'Ingrese cantidad en pesos',
+                  textInputType: TextInputType.number,
+                  onChanged: onChangePesos,
+                  borderColor: _ingreseCantidadPidsColorTween?.value
+                );
+              }
             );
           },
           orElse: () => Container()
@@ -597,80 +636,89 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
   /// 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      // contentPadding: EdgeInsets.all(0.0),
-      // scrollable: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      insetPadding: EdgeInsets.all(15.0),
-      child: GestureDetector(
-        onTap: _unfocus,
-        child: Container(
-          padding: EdgeInsets.all(30.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _titulo(),
-                Text('Ingresa valor en: '),
-                _radioButtonRow(),
-                StreamBuilder<IngresaValorEn>(
-                  stream: tranferirBloc.ingresaValorEn$,
-                  initialData: tranferirBloc.ingresaValorEn$.value,
-                  builder: (context, snapshot) {
-                    final ingresaValorEn = snapshot.data;
-                    if( ingresaValorEnNombre[ingresaValorEn] == 'Pids' ){
-                      return _cantidadEnPids();
-                    }else{
-                      return _cantidadEnPesos();
+    return ScaleTransition(
+      scale: scaleAnimation,
+      child: Dialog(
+        // contentPadding: EdgeInsets.all(0.0),
+        // scrollable: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        insetPadding: EdgeInsets.all(15.0),
+        child: GestureDetector(
+          onTap: _unfocus,
+          child: Container(
+            padding: EdgeInsets.all(30.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _titulo(),
+                  Text('Ingresa valor en: '),
+                  _radioButtonRow(),
+                  StreamBuilder<IngresaValorEn>(
+                    stream: tranferirBloc.ingresaValorEn$,
+                    initialData: tranferirBloc.ingresaValorEn$.value,
+                    builder: (context, snapshot) {
+                      final ingresaValorEn = snapshot.data;
+                      if( ingresaValorEnNombre[ingresaValorEn] == 'Pids' ){
+                        return _cantidadEnPids();
+                      }else{
+                        return _cantidadEnPesos();
+                      }
                     }
-                  }
-                ),
-                StreamBuilder<IngresaValorEn>(
-                  stream: tranferirBloc.ingresaValorEn$,
-                  initialData: tranferirBloc.ingresaValorEn$.value,
-                  builder: (context, snapshot) {
-                    final ingresaValorEn = snapshot.data;
-                    if( ingresaValorEnNombre[ingresaValorEn] == 'Pids' ){
-                      return _cantidadEnPesosDisabled();
-                    }else{
-                      return _cantidadEnPidsDisabled();
+                  ),
+                  StreamBuilder<IngresaValorEn>(
+                    stream: tranferirBloc.ingresaValorEn$,
+                    initialData: tranferirBloc.ingresaValorEn$.value,
+                    builder: (context, snapshot) {
+                      final ingresaValorEn = snapshot.data;
+                      if( ingresaValorEnNombre[ingresaValorEn] == 'Pids' ){
+                        return _cantidadEnPesosDisabled();
+                      }else{
+                        return _cantidadEnPidsDisabled();
+                      }
                     }
-                  }
-                ),
-                StreamBuilder<ResultState<List<Settings>>>(
-                  stream: tranferirBloc.valorActualPidEnPesos$,
-                  initialData: tranferirBloc.valorActualPidEnPesos$.value,
-                  builder: (context, snapshot) {
-                    final state = snapshot.data;
-                    return state.maybeWhen(
-                      loading: () => _titlelWithInputDisabledLoading('Pidos ID:'),
-                      error: (e) => _titlelWithInputDisabled('Pidos ID:', 'No hay conexión, intentelo más tarde'),
-                      data: (lsSettings) { 
-                        currentValuePidPuntos = double.parse(lsSettings[1].value);
-                        // currentValuePidCash = double.parse(lsSettings[0].value);
-                        return _titlelWithInputTextField('Pidos ID:', 
-                          textEditingController: pidosIdController,
-                          focusNode: pidosIdFocus,
-                          hintText: 'Ingrese ID',
-                          textInputType: TextInputType.number,
-                          prefix: 'PID - ',
-                          onChanged: onChangePidId
-                        );
-                      },
-                      orElse: () => Container()
-                    );
-                  }
-                ),
-                
-                _transferirButton()
-              ],
+                  ),
+                  StreamBuilder<ResultState<List<Settings>>>(
+                    stream: tranferirBloc.valorActualPidEnPesos$,
+                    initialData: tranferirBloc.valorActualPidEnPesos$.value,
+                    builder: (context, snapshot) {
+                      final state = snapshot.data;
+                      return state.maybeWhen(
+                        loading: () => _titlelWithInputDisabledLoading('Pidos ID:'),
+                        error: (e) => _titlelWithInputDisabled('Pidos ID:', 'No hay conexión, intentelo más tarde'),
+                        data: (lsSettings) { 
+                          currentValuePidPuntos = double.parse(lsSettings[1].value);
+                          // currentValuePidCash = double.parse(lsSettings[0].value);
+                          return AnimatedBuilder(
+                            animation: _pidosIdColorTween,
+                            builder: (context, child) {
+                              return _titlelWithInputTextField('Pidos ID:', 
+                                textEditingController: pidosIdController,
+                                focusNode: pidosIdFocus,
+                                hintText: 'Ingrese ID',
+                                textInputType: TextInputType.number,
+                                prefix: 'PID - ',
+                                onChanged: onChangePidId,
+                                borderColor: _pidosIdColorTween?.value
+                              );
+                            }
+                          );
+                        },
+                        orElse: () => Container()
+                      );
+                    }
+                  ),
+                  
+                  _transferirButton()
+                ],
+              ),
             ),
           ),
-        ),
-      )
+        )
+      ),
     );
   }
 
@@ -723,22 +771,17 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> {
     final currtentPidCash = usuario.pidcash;
     double currentPid = 0.0;
     String message = '';
+    bool isValid = true;
     if( pidsToTransfer==null || pidsToTransfer <= 0 ){
-      return respuestaDialog(
-        context: context, 
-        message: 'Ingrese una cantidad de Pids valida', 
-        title: 'Campos incompletos', 
-        icon: Icon(Icons.warning, color: electricVioletColor, size: 30.0)
-      );
-    }else{
-      if( destinationPidId==null || destinationPidId.length==0 ){
-        return respuestaDialog(
-          context: context, 
-          message: 'Ingrese PidID valido', 
-          title: 'Campos incompletos', 
-          icon: Icon(Icons.warning, color: electricVioletColor, size: 30.0)
-        );
-      }
+      ingreseCantidadPidsAnimationController.reverse(from: 1.0);
+      isValid = false;
+    }
+    if( destinationPidId==null || destinationPidId.length==0 ){
+      pidosIdAnimationController.reverse(from: 1.0);
+      isValid = false;
+    }
+    if( !isValid ){
+      return null;
     }
     if( tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos ){
       currentPid = currtentPidPuntos;
