@@ -13,12 +13,12 @@ import 'package:rxdart/rxdart.dart';
 
 enum TipoTransferencia {
   pidPuntos,
-  // pidCash
+  pidCash
 }
 
 final Map<TipoTransferencia, String> tipoTranferenciaNombre = {
   TipoTransferencia.pidPuntos: 'Puntos Pids',
-  // TipoTransferencia.pidCash: 'Pid Cash'
+  TipoTransferencia.pidCash: 'Créditos Pásalo'
 };
 
 enum IngresaValorEn {

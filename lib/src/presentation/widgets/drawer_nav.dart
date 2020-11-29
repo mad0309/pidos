@@ -58,13 +58,13 @@ class DrawerNav extends StatelessWidget {
                   child: Text('Mi cuenta',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
                 ),
               ),
-              // InkWell(
-              //   onTap: () => Navigator.popAndPushNamed(context, '/servicios'),
-              //   child: Padding(
-              //     padding: EdgeInsets.symmetric(vertical: 10.0),
-              //     child: Text('Servicios',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
-              //   ),
-              // ),
+              InkWell(
+                onTap: () => Navigator.popAndPushNamed(context, '/servicios'),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text('Servicios',textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.w600)),
+                ),
+              ),
               InkWell(
                 onTap: () => Navigator.popAndPushNamed(context, '/ayuda'),
                 child: Padding(
@@ -89,7 +89,8 @@ class DrawerNav extends StatelessWidget {
               InkWell(
                 onTap: () {
                   BlocProvider.of<LoginBloc>(context).logout();
-                  Navigator.pushReplacementNamed(context, '/login');
+                  // Navigator.pushReplacementNamed(context, '/login');
+                  Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
                 },
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.0),

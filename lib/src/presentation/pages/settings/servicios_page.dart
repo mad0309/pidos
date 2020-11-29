@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:pidos/src/data/local/preferencias_usuario.dart';
+import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/widgets/circle_avatar_name.dart';
 import 'package:pidos/src/presentation/widgets/drawer_nav.dart';
 import 'package:pidos/src/utils/colors.dart';
@@ -11,9 +12,8 @@ import 'package:pidos/src/utils/colors.dart';
 
 ///
 /// 
-/// [DEPRECATED]
-/// SE DESACOPLO EL MODULO DE PIDCASH DE LA APP
-/// PIDOS - 26/10/2020
+/// REACTIVACION DE PIDCASH CON EL NOMBRE DE PASALO
+/// PIDOS - 28/11/2020
 /// BY: MAD
 /// 
 ///
@@ -34,11 +34,11 @@ class _ServiciosPageState extends State<ServiciosPage> {
 
   @override
   void initState() { 
-    // _prefs = PreferenciasUsuario();
-    // final active = _prefs.getBool(StorageKeys.pidCash);
-    // if(active){
-    //   isPidCashActive = active;
-    // }
+    _prefs = PreferenciasUsuario();
+    final active = _prefs.getBool(StorageKeys.pidCash);
+    if(active){
+      isPidCashActive = active;
+    }
     super.initState();
   }
 
@@ -110,7 +110,7 @@ class _ServiciosPageState extends State<ServiciosPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Pid Cash', style: TextStyle(color: primaryColor, fontSize: 22.0,fontWeight: FontWeight.w700)),
+                    Text('Pásalo', style: TextStyle(color: primaryColor, fontSize: 22.0,fontWeight: FontWeight.w700)),
                     FlutterSwitch(
                       activeColor: primaryColor,
                       inactiveColor: Color(0xFF666666),
@@ -119,7 +119,7 @@ class _ServiciosPageState extends State<ServiciosPage> {
                       onToggle: (val) {
                         setState(() {
                           isPidCashActive=!isPidCashActive;
-                          // BlocProvider.of<ServiciosBloc>(context).isPidChasActiveSink$.add(isPidCashActive);
+                          BlocProvider.of<ServiciosBloc>(context).isPidChasActiveSink$.add(isPidCashActive);
                           // _prefs.setBool(StorageKeys.pidCash, isPidCashActive);
                         });
                       },
