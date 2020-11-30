@@ -47,8 +47,8 @@ android {
         applicationId "com.mad.pidos"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 15
-        versionName "1.5.0"
+        versionCode 16
+        versionName "1.5.1"
     }
 
     signingConfigs {
