@@ -149,7 +149,8 @@ class _MovimientosTabPageState extends State<MovimientosTabPage> {
                         unauthorizedRequest: () {
                           final contextApp = GlobalSingleton().contextApp;
                           BlocProvider.of<LoginBloc>(context).logout();
-                          Navigator.of(contextApp).pushReplacementNamed('/login');
+                          // Navigator.of(contextApp).pushReplacementNamed('/login');
+                          Navigator.of(contextApp).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
                         },
                         noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
                         orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde'));

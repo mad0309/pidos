@@ -93,7 +93,8 @@ class HomeBloc extends MyBaseBloc {
         context: contextApp,
       );
       BlocProvider.of<LoginBloc>(contextApp).logout();
-      Navigator.of(contextApp).pushReplacementNamed('/login');
+      // Navigator.of(contextApp).pushReplacementNamed('/login');
+      Navigator.of(contextApp).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
     }
   }
 

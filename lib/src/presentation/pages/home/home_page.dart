@@ -59,14 +59,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   void didChangeDependencies() {
-    timer ??= Future.delayed(Duration(minutes: 10), () async {
+    timer ??= Future.delayed(Duration(minutes: 100), () async {
       final contextApp = GlobalSingleton().contextApp;
       if( contextApp!=null ){
         await sesionExpiradaDialog(
           context: context,
         );
         BlocProvider.of<LoginBloc>(context).logout();
-        Navigator.of(contextApp).pushReplacementNamed('/login');
+        // Navigator.of(contextApp).pushReplacementNamed('/login');
+        Navigator.of(contextApp)..pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
       }
     });
     super.didChangeDependencies();
@@ -114,7 +115,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           context: context,
         );
         BlocProvider.of<LoginBloc>(context).logout();
-        Navigator.of(contextApp).pushReplacementNamed('/login');
+        // Navigator.of(contextApp).pushReplacementNamed('/login');
+        Navigator.of(contextApp)..pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
       }
     }
   }

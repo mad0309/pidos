@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc_pattern/flutter_bloc_pattern.dart';
@@ -11,12 +12,14 @@ import 'package:pidos/src/domain/models/settings.dart';
 import 'package:pidos/src/domain/models/usuario.dart';
 import 'package:pidos/src/domain/repository/transferencia_repository.dart';
 import 'package:pidos/src/presentation/blocs/home/home_bloc.dart';
+import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/blocs/transferir_bloc.dart';
 import 'package:pidos/src/presentation/states/result_state.dart';
 import 'package:pidos/src/presentation/states/transferencia_message.dart';
 import 'package:pidos/src/presentation/widgets/circle_color.dart';
 import 'package:pidos/src/presentation/widgets/inputs_widgets/input_form_dialog.dart';
 import 'package:pidos/src/presentation/widgets/inputs_widgets/input_form_pesos_dialog.dart';
+import 'package:pidos/src/presentation/widgets/ios/ios_select_picker.dart';
 import 'package:pidos/src/presentation/widgets/respuesta_dialog.dart';
 import 'package:pidos/src/utils/colors.dart';
 
@@ -96,12 +99,14 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
   bool pidCash = true;
   bool puntosPids = false;
 
+  bool isServicePasaloActive = false;
+
   TranferirBloc tranferirBloc;
   StreamSubscription transferenciaMessage$;
   HomeBloc homeBloc;
 
   double currentValuePidPuntos;
-  // double currentValuePidCash;
+  double currentValuePidCash;
   AnimationController controller;
   Animation<double> scaleAnimation;
 
@@ -130,6 +135,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
     }
     final contextApp = GlobalSingleton().contextApp;
     homeBloc = BlocProvider.of<HomeBloc>(contextApp);
+    isServicePasaloActive = BlocProvider.of<ServiciosBloc>(contextApp).isPidChasActive$.value ?? false;
 
     cantidadPidsController = TextEditingController(text: '');
     pidosIdController = TextEditingController(text: '');
@@ -541,7 +547,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
           error: (e) => _titlelWithInputDisabled('Cantidad en PIDS:', 'No hay conexión, intentelo más tarde'),
           data: (lsSettings) { 
             currentValuePidPuntos = double.parse(lsSettings[1].value);
-            // currentValuePidCash = double.parse(lsSettings[0].value);
+            currentValuePidCash = double.parse(lsSettings[0].value);
             return AnimatedBuilder(
               animation: _ingreseCantidadPidsColorTween,
               builder: (context, snapshot) {
@@ -576,6 +582,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
           error: (e) => _titlelWithInputDisabled('Cantidad en Pesos:', 'No hay conexión, intentelo más tarde'),
           data: (lsSettings) { 
             currentValuePidPuntos = double.parse(lsSettings[1].value);
+            currentValuePidCash = double.parse(lsSettings[0].value);
             return AnimatedBuilder(
               animation: _ingreseCantidadPidsColorTween,
               builder: (context, snapshot) {
@@ -631,6 +638,128 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
   }
 
 
+
+  ///
+  /// Dropdown elige un servicio
+  ///
+  Widget _eligeUnServicioDropDown(){
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      child: StreamBuilder<TipoTransferencia>(
+        stream: tranferirBloc.tipoTransferencia$,
+        initialData: tranferirBloc.tipoTransferencia$.value,
+        builder: (context, snapshot) {
+          final tipoTranferencia = snapshot.data;
+          return CustomDropDown(
+            value: tipoTranferencia,
+            items: [
+              DropdownMenuItem(
+                value: TipoTransferencia.pidPuntos,
+                child: Center(
+                  child: Text(
+                    tipoTranferenciaNombre[TipoTransferencia.pidPuntos],
+                    style: TextStyle(fontSize: 15.0, color: Color(0xFF666666)),
+                  ),
+                ),
+              ),
+              DropdownMenuItem(
+                value: TipoTransferencia.pidCash,
+                child: Center(
+                  child: Text(
+                    tipoTranferenciaNombre[TipoTransferencia.pidCash],
+                    style: TextStyle(fontSize: 15.0, color: Color(0xFF666666)),
+                  ),
+                ),
+              ),
+            ].cast<DropdownMenuItem<TipoTransferencia>>(),
+            onChanged: (value) async {
+              if( value != tipoTranferencia ){
+                _resetValues();
+              }
+              tranferirBloc.onChangedtipoTransferecnia(value);
+            } 
+          );
+        }
+      ),
+    );
+  }
+
+  _resetValues() async {
+    cantidadPidsController.text = '';
+    pesosController.text = '';
+    _unfocus();
+    // pidosIdController.text = '';
+    await tranferirBloc.resetValues();
+  }
+
+  ///
+  /// Dropdown elige un servicio IOS
+  Widget _eligeUnServicioDropDownIOS(){
+    final lsTipoTransferencia = tipoTranferenciaNombre.values.toList();
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.0),
+      child: StreamBuilder<TipoTransferencia>(
+        stream: tranferirBloc.tipoTransferencia$,
+        initialData: tranferirBloc.tipoTransferencia$.value,
+        builder: (context, snapshot) {
+          final tipoTranferencia = snapshot.data;
+          final initialItem = lsTipoTransferencia.indexOf(tipoTranferenciaNombre[tipoTranferencia]);
+          return InkWell(
+            onTap: () => showIosSelectPicker(
+              context: context,
+              title: 'Elige el servicio',
+              initialItem: initialItem,
+              items: List<Widget>.generate(lsTipoTransferencia.length,(int index) => Text(lsTipoTransferencia[index])),
+              onChangedItem: (int index) {
+                if( lsTipoTransferencia[index] == tipoTranferenciaNombre[TipoTransferencia.pidPuntos]) {
+                  _resetValues();
+                  tranferirBloc.onChangedtipoTransferecnia(TipoTransferencia.pidPuntos);
+                }else{
+                  _resetValues();
+                  tranferirBloc.onChangedtipoTransferecnia(TipoTransferencia.pidCash);
+                }
+              }
+            ),
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: secundaryColor,
+                borderRadius: BorderRadius.circular(20.0)
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 25.0),
+                      child: Text(
+                        tipoTranferenciaNombre[tipoTranferencia], 
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 15.0, color: Color(0xFF666666))
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_drop_down, 
+                    color: Color(0xFF676767),
+                    size: 25.0,
+                  ),
+                ],
+              ),
+            ),
+          );
+    // ;
+        }
+      ),
+    );
+  }
+  ///
+
+
+
+
+
   /// 
   /// build method
   /// 
@@ -655,6 +784,17 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _titulo(),
+                  if(isServicePasaloActive)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Elige el servicio'),
+                        ( Platform.isIOS )
+                          ? _eligeUnServicioDropDownIOS()
+                          : _eligeUnServicioDropDown(),
+                      ],
+                    ),
                   Text('Ingresa valor en: '),
                   _radioButtonRow(),
                   StreamBuilder<IngresaValorEn>(
@@ -691,7 +831,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
                         error: (e) => _titlelWithInputDisabled('Pidos ID:', 'No hay conexión, intentelo más tarde'),
                         data: (lsSettings) { 
                           currentValuePidPuntos = double.parse(lsSettings[1].value);
-                          // currentValuePidCash = double.parse(lsSettings[0].value);
+                          currentValuePidCash = double.parse(lsSettings[0].value);
                           return AnimatedBuilder(
                             animation: _pidosIdColorTween,
                             builder: (context, child) {
@@ -727,6 +867,8 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
     double currentValuePidInPesos = 0.0;
     if( tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos ){
       currentValuePidInPesos = currentValuePidPuntos;
+    }else{
+      currentValuePidInPesos = currentValuePidCash;
     }
     if(value.length>0){
       final cantidadPidNumber = num.parse(cantidadPidString);
@@ -752,8 +894,14 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
     pesosInString = pesosInString.replaceFirst('.', '');
     if(value.length>0){
       final pesos = double.parse(pesosInString);
-
-      final pesosRoundFloor = (pesos/currentValuePidPuntos).floor();
+      double currentValuePid = 0.0;
+      if( tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos ){
+        currentValuePid = currentValuePidPuntos;
+      }else{
+        currentValuePid = currentValuePidCash;
+      }
+      // final pesosRoundFloor = (pesos/currentValuePidPuntos).floor();
+      final pesosRoundFloor = (pesos/currentValuePid).floor();
       tranferirBloc.cantidadaEnPesosSink$.add(pesos);
       tranferirBloc.onChangedcantidadEnPids(pesosRoundFloor);
     }else{
@@ -787,10 +935,10 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
       currentPid = currtentPidPuntos;
       message = 'En este momento no cuentas con puntos pid disponibles para realizar esta acción';
     }
-    // else{
-    //   currentPid = currtentPidCash;
-    //   message = 'En este momento no cuentas con pidcash disponibles para realizar esta acción';
-    // }
+    else{
+      currentPid = currtentPidCash;
+      message = 'En este momento no cuentas con créditos pásalo disponibles para realizar esta acción';
+    }
     if( currentPid > 0.0 ){
       // print('TODO OK');
       tranferirBloc.onSubmitTransferencia();
@@ -803,4 +951,61 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
 
   }
 
+}
+
+
+
+
+
+
+
+
+
+
+class CustomDropDown extends StatelessWidget {
+  final TipoTransferencia value;
+  final String hint;
+  final String errorText;
+  final List<DropdownMenuItem> items;
+  final Function onChanged;
+
+  const CustomDropDown(
+      {Key key,
+      this.value,
+      this.hint,
+      this.items,
+      this.onChanged,
+      this.errorText})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10.0),
+      decoration: BoxDecoration(
+        color: secundaryColor,
+        borderRadius: BorderRadius.circular(20.0)
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 50.0),
+        child: Container(
+          // color: Colors.blue,
+          padding: EdgeInsets.only(right: 20.0),
+          child: DropdownButton<TipoTransferencia>(
+            value: value,
+            isDense: true,
+            iconSize: 25.0,
+            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w400),
+            items: items,
+            onChanged: (item) {
+              onChanged(item);
+            },
+            isExpanded: true,
+            underline: Container(),
+            icon: Icon(Icons.arrow_drop_down, color: Color(0xFF676767)),
+          ),
+        ),
+      ),
+    );
+  }
 }

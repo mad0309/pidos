@@ -90,7 +90,8 @@ class _RecuperarContrasenaMessagePageState extends State<RecuperarContrasenaMess
           elevation: 0.0,
           textColor: Colors.white,
           onPressed: (widget.success) 
-           ? () => Navigator.of(context).pushReplacementNamed('/login')
+          //  ? () => Navigator.of(context).pushReplacementNamed('/login')
+           ? () => Navigator.of(context).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false)
            : () => Navigator.of(context).pop()
         ),
       ),

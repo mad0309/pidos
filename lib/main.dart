@@ -16,6 +16,7 @@ import 'package:pidos/src/domain/repository/movimientos_repository.dart';
 import 'package:pidos/src/domain/repository/transferencia_repository.dart';
 import 'package:pidos/src/domain/repository/usuario_repository.dart';
 import 'package:pidos/src/presentation/blocs/login/login_bloc.dart';
+import 'package:pidos/src/presentation/blocs/servicios_bloc.dart';
 import 'package:pidos/src/presentation/states/auth_state.dart';
 import 'package:pidos/src/utils/colors.dart';
 import 'package:pidos/src/utils/portraid_mode_mixin.dart';
@@ -55,12 +56,12 @@ void main() async {
       ],
       child: BlocProvider(
         initBloc: () => LoginBloc(usuarioRepository: usuarioRepository),
-        child: MyApp(),
-        // child: BlocProvider(
-        //     initBloc: () => ServiciosBloc(
-        //         preferenciasUsuario: prefs,
-        //         initActive: prefs.getBool(StorageKeys.pidCash) ?? false),
-        //     child: MyApp()),
+        // child: MyApp(),
+        child: BlocProvider(
+            initBloc: () => ServiciosBloc(
+                preferenciasUsuario: prefs,
+                initActive: prefs.getBool(StorageKeys.pidCash) ?? false),
+            child: MyApp()),
       )));
 }
 

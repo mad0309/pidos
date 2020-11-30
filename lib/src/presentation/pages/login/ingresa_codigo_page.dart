@@ -69,7 +69,8 @@ class _IngresaCodigoPageState extends State<IngresaCodigoPage> {
       if( message is CodigoIngresadoSuccessMessage ) {
         mostrarSnackBar('Codigo Valido');
         await Future.delayed(Duration(milliseconds: 800));
-        Navigator.of(context).pushReplacementNamed('/login');
+        // Navigator.of(context).pushReplacementNamed('/login');
+        Navigator.of(context)..pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
       }
       if( message is CodigoIngresadoErrorMessage ){
         _cleanControllers();

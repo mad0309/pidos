@@ -132,21 +132,21 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                   ),
                   (_perfil != roleUsuarioName[RoleUsuario.cliente])
                       ? _cardPidsDisponibles()
-                      : _cardPidsDisponibles()
-                      // : StreamBuilder<bool>(
-                      //     stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
-                      //     initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
-                      //     builder: (context, snapshot) {
-                      //       final isActive = snapshot.data ?? false;
-                      //       if (isActive) {
-                      //         return Column(children: [
-                      //           _carrouselCards(),
-                      //           _dotsIndicator()
-                      //         ]);
-                      //       } else {
-                      //         return _cardPidsDisponibles();
-                      //       }
-                      //     })
+                      // : _cardPidsDisponibles()
+                      : StreamBuilder<bool>(
+                          stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
+                          initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+                          builder: (context, snapshot) {
+                            final isActive = snapshot.data ?? false;
+                            if (isActive) {
+                              return Column(children: [
+                                _carrouselCards(),
+                                _dotsIndicator()
+                              ]);
+                            } else {
+                              return _cardPidsDisponibles();
+                            }
+                          })
                 ],
               ),
               (_perfil != roleUsuarioName[RoleUsuario.cliente])
@@ -161,38 +161,39 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                         // ),
                       ],
                     )
-                    : Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 5.0,top: 0.05 * screenSizeHeight), // top: 30.0
-                            child: _transferirButton(),
-                          ),
-                        ],
-                      )
-                  // : StreamBuilder<bool>(
-                  //     stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
-                  //     initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
-                  //     builder: (context, snapshot) {
-                  //       final isActive = snapshot.data ?? false;
-                  //       if (isActive) {
-                  //         return Column(
-                  //           children: [
-                  //             _transferirButton(),
-                  //             _comprarButton(context),
-                  //           ],
-                  //         );
-                  //       } else {
-                  //         return Column(
-                  //           children: [
-                  //             Padding(
-                  //               padding: EdgeInsets.only(bottom: 5.0,top: 0.05 * screenSizeHeight), // top: 30.0
-                  //               child: _transferirButton(),
-                  //             ),
-                  //           ],
-                  //         );
-                  //       }
-                  //     }
-                  //   ),
+                    // : Column(
+                    //     children: [
+                    //       Padding(
+                    //         padding: EdgeInsets.only(bottom: 5.0,top: 0.05 * screenSizeHeight), // top: 30.0
+                    //         child: _transferirButton(),
+                    //       ),
+                    //     ],
+                    //   )
+                  : StreamBuilder<bool>(
+                      stream: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$,
+                      initialData: BlocProvider.of<ServiciosBloc>(context).isPidChasActive$.value,
+                      builder: (context, snapshot) {
+                        final isActive = snapshot.data ?? false;
+                        if (isActive) {
+                          return Column(
+                            children: [
+                              _transferirButton(),
+                              //TODO: COMENTADO POR AHORA 29/11/2020 PARA QUE SEA ACEPTADO EN APPLE
+                              // _comprarButton(context),
+                            ],
+                          );
+                        } else {
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 5.0,top: 0.05 * screenSizeHeight), // top: 30.0
+                                child: _transferirButton(),
+                              ),
+                            ],
+                          );
+                        }
+                      }
+                    ),
             ],
           ),
         ),
@@ -294,7 +295,8 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                                 );
                                 final contextApp = GlobalSingleton().contextApp;
                                 BlocProvider.of<LoginBloc>(context).logout();
-                                Navigator.of(contextApp).pushReplacementNamed('/login');
+                                // Navigator.of(contextApp).pushReplacementNamed('/login');
+                                Navigator.of(contextApp).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
                               },
                               noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
                               orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde')
@@ -404,7 +406,8 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                                   context: context,
                                 );
                                 BlocProvider.of<LoginBloc>(context).logout();
-                                Navigator.of(contextApp).pushReplacementNamed('/login');
+                                // Navigator.of(contextApp).pushReplacementNamed('/login');
+                                Navigator.of(contextApp).pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
                               },
                               noInternetConnection: () => mostrarSnackBar('No hay conexion a internet'),
                               orElse: () => mostrarSnackBar('Ocurrio un error intentelo más tarde')
@@ -414,7 +417,7 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                           data: (Usuario saldo) {
                             return Flexible(
                               child: FittedBox(
-                                child: Text(saldo.pidcash.toStringAsFixed(2),
+                                child: Text(saldo.pidcash?.toStringAsFixed(2) ?? '0.00',
                                   style: TextStyle(
                                       fontSize: screenSizeHeight *
                                           0.0591, //fontSize: 35.0,,
@@ -430,7 +433,8 @@ class _MiMonederoTabPageState extends State<MiMonederoTabPage> {
                       }),
                 ],
               ),
-              Text('Pid Cash',
+              // Text('Pid Cash',
+              Text('Créditos Pásalo',
                   style: TextStyle(
                       fontSize: 20.0, color: Colors.white)), //fontSize: 20.0
               Text('disponibles',
