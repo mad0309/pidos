@@ -45,7 +45,14 @@ class LoginApiService {
         "document": usuario.document,
         "password": usuario.contrasena
       });
-      resp.data['document'] = int.parse(resp.data['document']);
+      // ESTO SE HACE PORQUE EN IOS , EL CAMPO DOCUMENT RETORNA UN STRING
+      // YA QUE ES UN NUMERO GENERALO ALEATORIAMENT
+      // EN ANDROID NO PORQUE SE INGRESA OBLIGATORIO EL CAMPO NRO DE DOCUMENTO
+      // ESTO SE CORREGIRA MAS ADALANTE.
+      if( Platform.isIOS ){
+        resp.data['document'] = int.parse(resp.data['document']);
+      }
+      
       return Usuario.fromJson(resp.data);
     } catch (err) {
       // throw ApiResult.failure(error: NetworkExceptions.getDioException(err));
