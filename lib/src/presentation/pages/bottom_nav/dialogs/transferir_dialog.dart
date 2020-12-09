@@ -452,7 +452,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
   /// INGRESA CANTIDAD EN
   ///
 
-  Widget _radioButtonRow(){
+  Widget _radioButtonRow( TipoTransferencia tipoTransferencia ){
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
@@ -469,7 +469,12 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
               }else{
                 active = false;
               }
-              return _radioButtonWithLabel(ingresaValorEnNombre[IngresaValorEn.pids], active,IngresaValorEn.pids);
+              if( tipoTransferencia == TipoTransferencia.pidPuntos ){
+                return _radioButtonWithLabel(ingresaValorEnNombre[IngresaValorEn.pids], active,IngresaValorEn.pids);
+              }else{
+                return _radioButtonWithLabel('Pásalo', active,IngresaValorEn.pids);
+              }
+              
             }
           ),
           SizedBox(width: 40.0),
@@ -536,7 +541,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
   ///
   /// Cantidad en Pids INPUT
   ///
-  Widget _cantidadEnPids(){
+  Widget _cantidadEnPids( TipoTransferencia tipoTransferencia ){
     return StreamBuilder<ResultState<List<Settings>>>(
       stream: tranferirBloc.valorActualPidEnPesos$,
       initialData: tranferirBloc.valorActualPidEnPesos$.value,
@@ -554,9 +559,9 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
                 return _inputTextFieldPid(
                   textEditingController: cantidadPidsController,
                   focusNode: cantidadPidsFocus,
-                  hintText: 'Ingrese cantidad en pids',
+                  hintText: (tipoTransferencia == TipoTransferencia.pidPuntos) ? 'Ingrese cantidad en pids' : 'Ingrese cantidad en cred. pásalo',
                   textInputType: TextInputType.number,
-                  sufix: '  pids',
+                  sufix: (tipoTransferencia == TipoTransferencia.pidPuntos) ? '  pids' : '  pásalo',
                   onChanged: onChangePid,
                   borderColor: _ingreseCantidadPidsColorTween?.value
                 );
@@ -796,17 +801,30 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
                       ],
                     ),
                   Text('Ingresa valor en: '),
-                  _radioButtonRow(),
-                  StreamBuilder<IngresaValorEn>(
-                    stream: tranferirBloc.ingresaValorEn$,
-                    initialData: tranferirBloc.ingresaValorEn$.value,
-                    builder: (context, snapshot) {
-                      final ingresaValorEn = snapshot.data;
-                      if( ingresaValorEnNombre[ingresaValorEn] == 'Pids' ){
-                        return _cantidadEnPids();
-                      }else{
-                        return _cantidadEnPesos();
-                      }
+                  StreamBuilder<TipoTransferencia>(
+                    stream: tranferirBloc.tipoTransferencia$,
+                    initialData: tranferirBloc.tipoTransferencia$.value,
+                    builder: ( _ , snapshot) {
+                      final tipoTranferencias = snapshot.data;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _radioButtonRow(tipoTranferencias),
+                          StreamBuilder<IngresaValorEn>(
+                            stream: tranferirBloc.ingresaValorEn$,
+                            initialData: tranferirBloc.ingresaValorEn$.value,
+                            builder: (context, snapshot) {
+                              final ingresaValorEn = snapshot.data;
+                              if( ingresaValorEnNombre[ingresaValorEn] == 'Pids' ){
+                                return _cantidadEnPids(tipoTranferencias);
+                              }else{
+                                return _cantidadEnPesos();
+                              }
+                            }
+                          ),
+                        ],
+                      );
                     }
                   ),
                   StreamBuilder<IngresaValorEn>(
@@ -863,7 +881,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
   }
 
   void onChangePid(String value){
-    final cantidadPidString = value.replaceAll('  pids', '');
+    final cantidadPidString = (value.contains('  pids')) ? value.replaceAll('  pids', '') : value.replaceAll('  pásalo', '');
     double currentValuePidInPesos = 0.0;
     if( tranferirBloc.tipoTransferencia$.value == TipoTransferencia.pidPuntos ){
       currentValuePidInPesos = currentValuePidPuntos;
@@ -916,7 +934,7 @@ class __TransferenciaDialogState extends State<_TransferenciaDialog> with Ticker
     final destinationPidId = tranferirBloc.destinationPidId$.value;
     final usuario = PreferenciasUsuario().getUsuario();
     final currtentPidPuntos = usuario.pid;
-    final currtentPidCash = usuario.pidcash;
+    final currtentPidCash = usuario.pidcash ?? 0.0;
     double currentPid = 0.0;
     String message = '';
     bool isValid = true;
