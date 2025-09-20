@@ -1,10 +1,9 @@
 
-# Pidos App | El Sistema de Puntos que Premia tu Lealtad 🚀
+# Pidos App 🚀
+## El Sistema de Puntos que Premia tu Lealtad 
 
 <div align="center">
-<img src="./assets/readme-img/portada.png" alt="Banner de la aplicación Pidos" />
-<br/>
-**¡Gana. Canjea. Disfruta!**
+<img src="./assets/portada.png" alt="Banner de la aplicación Pidos" />
 </div>
 
 ---
@@ -86,7 +85,13 @@ lib/
 
 ## 📸 Capturas de Pantalla
 
-[Añade aquí las capturas de pantalla de tu aplicación para mostrar su UI/UX. Puedes usar el siguiente formato:]
+<div align="center">
+  <br/>
+  <div style="display: flex; flex-direction: row; justify-content: center;">
+    <img src="./assets/screen-1.png" alt="Descripción de la primera pantalla" style="width: 45%; margin: 10px;">
+    <img src="./assets/screen-2.png" alt="Descripción de la segunda pantalla" style="width: 45%; margin: 10px;">
+  </div>
+</div>
 
 -----
 
